@@ -9,6 +9,6 @@ Journal: TBD
 
 Notes
 ---------------------------
-Knit 'manuscript.Rmd' to obtain the figures in the manuscript. For full caption descriptions, see the main text.
+Knit 'manuscript-figures.Rmd' to obtain the figures in the manuscript. For full caption descriptions, see the main text. Figures are output to the 'doc' folder.
 
-The data from the analyses we conducted can be obtained by running the scripts in the 'code' folder get-mosquito-traits.R then get-analysis-dfs.R
+The data from the analyses conducted can be obtained by running the scripts in the 'code' folder get-mosquito-traits.R then get-analysis-dfs.R . Results are then output to the 'results' folder.

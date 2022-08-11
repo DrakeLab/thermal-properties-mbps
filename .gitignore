@@ -37,3 +37,17 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+# PDFs
+*.pdf
+
+# Images
+*.svg
+*.tiff
+
+# TeX files
+*.tex
+results/AllOutputs.csv
+results/MosquitoThermalResponse.csv
+results/ThermalCharacteristics.csv
+results/VectorTraits.csv
