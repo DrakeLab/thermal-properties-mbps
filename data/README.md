@@ -1,0 +1,3 @@
+# Raw and formatted data files
+
+'MosquitoThermalParameters.csv': function type and parameter values for thermal response curves defined in "Transmission of West Nile and five other temperate mosquito-borne viruses peaks at temperatures between 23°C and 26°C" (doi.org/10.7554/eLife.58511) and Mordecai EA, Cohen JM, Evans MV, Gudapati P, Johnson LR, Lippi CA, Miazgowicz K, Murdock CC, Rohr JR, Ryan SJ, Savage V, Shocket MS, Stewart Ibarra A, Thomas MB, Weikel DP. 2017. Detecting the impact of temperature on transmission of zika, dengue, and Chikungunya using mechanistic models. PLOS Neglected Tropical Diseases 11:e0005568. DOI: https://doi.org/10.1371/journal.pntd.0005568, PMID: 28448507
