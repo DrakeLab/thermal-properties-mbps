@@ -37,7 +37,7 @@ library(tidyverse)
 ## Get data---------------------------------------------------------------------
 
 # Read in mosquito-specific traits
-MosqThermParms <- read_csv("./data/clean/MosquitoThermalParameters.csv",
+MosqThermParms <- read_csv("./data/MosquitoThermalParameters.csv",
                            col_types = cols())
 
 
