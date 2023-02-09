@@ -117,7 +117,7 @@ plot.hists<-function(samps, my.par=c(2,2), n.hists=4, priors=NA){
   par(mfrow=my.par, bty="n")
   for(i in 1:n.hists){
     hist(samps[,i], main=names(samps)[i], xlab="", freq=FALSE)
-    if(!is.na(priors)){
+    if(all(!is.na(priors1))){
       x<-c(seq(0, 1, by=0.00001), seq(1, 4000, by=0.1))
       h<-priors$hyper[,i]
       if(priors$fun[i]=="beta") lines(x, dbeta(x, shape1=as.numeric(h[1]), shape2=as.numeric(h[2])), col=2)

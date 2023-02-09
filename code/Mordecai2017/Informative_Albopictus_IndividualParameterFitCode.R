@@ -1,16 +1,16 @@
 # Fit CHIKV models with informative priors
 
-load("aedes_prior_gamma_fits.Rsave")
+load("code/Mordecai2017/aedes_prior_gamma_fits.Rsave")
 
 ## Loading the required packages and supplementary code for sampling and analysis.
 library(IDPmisc)
 library('rjags')
 
 # This file contains tools for analysis and visualization.
-source("mcmc_utils_all.R") 
+source("code/Mordecai2017/mcmc_utils_all.R") 
 
 # This file contains the thermal response functions and their derivatives
-source("temp_functions_all.R") 
+source("code/Mordecai2017/temp_functions_all.R") 
 
 
 # Creating a small constant to keep denominators from being zero.
@@ -23,7 +23,7 @@ n.adapt <- 5000
 n.samps <- 5000
 
 ## Loading the data; my data will be called albopictusCHIKVmodelTempData.csv 
-data.all <- read.csv("albopictusCHIKVmodelTempData_2016-03-26.csv", header=TRUE)
+data.all <- read.csv("code/Mordecai2017/albopictusCHIKVmodelTempData_2016-03-26.csv", header=TRUE)
 
 ## Now the code will choose all the temperature sensitive traits and fit either a
 ## Briere or Quadratic model to it using MCMC sampling.
@@ -218,7 +218,7 @@ hypers = gamma.fits.TFD*0.1
 # Given the data the Briere fuction is chosen. Jag-briere.bug contains the specifics of 
 # the Briere model with the default priors.
 
-jags <- jags.model('jags-briere-informative.bug',
+jags <- jags.model('code/Mordecai2017/jags-briere-informative.bug',
                     data = list('Y' = data$trait, 'T' = data$T, 'N'=length(data$T), 'hypers'=hypers),
                     n.chains = n.chains, inits=list(Tm=31, T0=5, c=0.00007),
                     n.adapt = n.adapt)
@@ -287,7 +287,7 @@ hypers = gamma.fits.e2a*0.1
 # Given the data the Negative Quadratic function is chosen. Jags-quad-neg.bug contains
 # the specifics of the Negative Quadratic model with the default priors. 
 
-jags <- jags.model('jags-quad-neg-informative.bug',
+jags <- jags.model('code/Mordecai2017/jags-quad-neg-informative.bug',
                    data = list('Y' = data$trait, 'T' = data$T, 'N'=length(data$T), 'hypers' = hypers),
                    n.chains = n.chains,
                    inits=list(T0=5, Tm=33, n.qd=0.005), n.adapt = n.adapt)

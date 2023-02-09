@@ -500,7 +500,7 @@ hypers = gamma.fits.PDR*0.5
 # Given the data the Briere fuction is chosen. Jag-briere.bug contains the specifics of 
 # the Briere model with the default priors.
 
-jags <- jags.model('jags-briere-informative.bug',
+jags <- jags.model('code/Mordecai2017/jags-briere-informative.bug',
                    data = list('Y' = data$trait, 'T' = data$T, 'N' = length(data$T), 'hypers' = hypers),
                    n.chains = n.chains, inits = list(Tm = 38, T0 = 5, c = 0.00007),
                    n.adapt = n.adapt) 
@@ -549,6 +549,7 @@ plot(data$T, data$trait, xlim = c(5, 50),
      pch=(mycol+20),
      xlab="Temperature (C)",
      ylab=data$trait.name[1],
+     ylim=c(0.10,0.35),
      col=mycol, cex=1.5)
 
 add.sim.lines(Temps, sim.data=out1$fits, q=q1, mycol=8)

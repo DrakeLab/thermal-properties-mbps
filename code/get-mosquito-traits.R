@@ -1,5 +1,5 @@
 ## Kyle Dahlin, University of Georgia, kydahlin@gmail.com
-## Started September 2021
+## Initialized September 2021
 ##
 ## Title: Mosquito trait functions #############################################
 ##
@@ -31,10 +31,10 @@
 
 # 1) Set-up,load packages, get data, etc.#######################################
 
-  ## Load Libraries---------------------------------------------------------------
+### Load Libraries ----
 library(tidyverse)
 
-## Get data---------------------------------------------------------------------
+### Get data ----
 
 # Read in mosquito-specific traits
 MosqThermParms <- read_csv("./data/MosquitoThermalParameters.csv",
@@ -62,7 +62,7 @@ MosqPathPairs <- tibble(Mosquito_species=c('Aedes aegypti','Aedes albopictus',
 
 # 2) Define accessory functions ################################################
 
-## Define functions used to describe thermal response curves--------------------
+### Define functions used to describe thermal response curves ----
 # Briere function
 Briere <- function(q,Tmin,Tmax) {
   function(t) {pmax(q*t*(t-Tmin)*(Tmax-t)^(1/2),0,na.rm = TRUE)}
@@ -79,7 +79,7 @@ Linear <- function(q,z) {
 }
 
 
-## Assign appropriate thermal response curve to traits--------------------------
+### Assign appropriate thermal response curve to traits ----
 ### This is done through the following function:
 get.thermal.response <- function(SpeciesName, PathogenName, ParameterName) {
   
@@ -116,7 +116,7 @@ get.thermal.response <- function(SpeciesName, PathogenName, ParameterName) {
 
 # 3) Build parameter table-generating function for mosquito-pathogen pairs #####
 
-## Set up temperature vector----------------------------------------------------
+### Set up temperature vector ----
 # Lowest temperature
 Temperature_minimum = 10
 # Highest temperature
@@ -134,7 +134,7 @@ Temperature_vector = seq(Temperature_minimum,Temperature_maximum,
 ## *  deltaL is computed differently for Cx. quinquefasciatus: deltaL = eV*pLA
 ## *  betaV is computed differently for Culex quinquefasciatus+WNV and Aedes aegypti+ZIKV: betaV = bc
 
-## Create vector trait table----------------------------------------------------
+### Create vector trait table ----
 # Create a table with columns of:
 # Mosquito_species, Pathogen, Temperature and Model parameters:
 #    sigmaV, muV, fecundity,  deltaL, rhoL, etaV, betaV, deltaV
@@ -143,7 +143,7 @@ out <- tibble(Mosquito_species="", Pathogen = "", Temperature = numeric(),
               rhoL = numeric(), muV = numeric(),
               etaV = numeric(), betaV = numeric(), deltaV = numeric())
 
-# Obtain and assign trait values------------------------------------------------
+### Obtain and assign trait values ----
 for (ii in 1:dim(MosqPathPairs)[1]) 
 {
   Mosquito_species = MosqPathPairs$Mosquito_species[ii]
@@ -220,5 +220,5 @@ for (ii in 1:dim(MosqPathPairs)[1])
                  etaV = etaV, betaV = betaV)#, deltaV = deltaV)
 }
 
-# Save data frame---------------------------------------------------------------
+### Save data frame ----
 write_csv(out,"results/MosquitoThermalResponse.csv")
