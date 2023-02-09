@@ -4,7 +4,7 @@
 # Loading the required packages and supplementary code for sampling and analysis.
 library(IDPmisc)
 library('rjags')
-
+setwd("code/Mordecai2017/")
 # This file contains tools for analysis and visualization.
 source("mcmc_utils_all.R") 
 
@@ -96,15 +96,15 @@ albo = R0.M
 # save(albo, file="albo_R0_informative.Rsave")
 
 ## Reality check
-# plot(temp,a.M)
-# plot(temp,b.M)
-# plot(temp,c.M)
-# plot(temp,PDR.M)
-# plot(temp,MDR.M)
-# plot(temp,TFD.M)
-# plot(temp,e2a.M)
-# plot(temp,lf.M)
-# plot(temp,R0.M)
+plot(temp,a.M)
+plot(temp,b.M)
+plot(temp,c.M)
+plot(temp,PDR.M)
+plot(temp,MDR.M)
+plot(temp,TFD.M)
+plot(temp,e2a.M)
+plot(temp,lf.M)
+plot(temp,R0.M)
 
 # Build matrices to hold results
 

@@ -21,7 +21,7 @@ source("temp_functions_all.R")
 ec<-0.000001 
 
 ## Loading the data; my data will be called aegyptiDENVmodelTempData.csv 
-data.all <- read.csv("aegyptiDENVmodelTempData_2016-03-30.csv", header=TRUE)
+data.all <- read.csv("data/raw/aegyptiDENVmodelTempData_2016-03-30.csv", header=TRUE)
 
 # Exclude the Focks & Barrera 2006 data because they're from a model
 data.all = subset(data.all, ref!=as.character("Focks_Barrera_2006_Research&TrainingTropicalDis_Geneva_Paper"))

@@ -12,10 +12,16 @@
 ##           5) Functions to sample from thermal trait parameter distributions
 ##
 ##
-## Inputs:  data
+## Inputs:  data - data/raw/aegyptiDENVmodelTempData_2016-03-30.csv
+##                 data/raw/albopictusCHIKVmodelTempData_2016-03-26.csv
+##                 data/clean/trait_table.csv
+##                 data/clean/gamma_fits.csv
+##
+##          code - code/Mordecai2017/mcmc_utils_all.R
+##                 code/Mordecai2017/temp_functions_all.R
 ##
 ## Outputs: functions:
-##          data:
+##          data - data/clean/ThermalTraitSamples.csv
 ##
 ## Written and maintained by: Kyle Dahlin, kydahlin@gmail.com
 ## Initialized February 2023
@@ -27,7 +33,7 @@
 ## * Tesla, B., L. R. Demakovsky, E. A. Mordecai, S. J. Ryan, M. H. Bonds, C. N. Ngonghala, M. A. Brindley, and C. C. Murdock. 2018. Temperature drives Zika virus transmission: evidence from empirical and mathematical models. Proceedings. Biological sciences / The Royal Society 285:20180795.
 # _______________________________________________________________________________
 
-# 1) Set-up,load packages, get data, etc.#######################################
+# 1) Set-up,load packages, get data, etc. ----
 
 ### Load Libraries ----
 library(tidyverse)
@@ -243,3 +249,11 @@ for (trait_ID in unique(temp.Aegypti$trait.name)) {
 
   samples.Aegypti <- rbind(samples.Aegypti, samples)
 }
+
+# Combine samples
+samples.All <- tibble(Species = "Aedes albopictus", samples.Albopictus) %>% 
+  rbind(tibble(Species = "Aedes aegypti", samples.Aegypti)) %>% 
+  # reorder columns to match old parameter table
+  relocate(Species, trait, c, T0, Tm)
+  
+write.csv(samples.All, "data/clean/ThermalTraitSamples.csv")

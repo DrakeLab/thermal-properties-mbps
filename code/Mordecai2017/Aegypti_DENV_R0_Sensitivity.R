@@ -4,7 +4,7 @@
 # Loading the required packages and supplementary code for sampling and analysis.
 library(IDPmisc)
 library('rjags')
-
+setwd("code/Mordecai2017/")
 # This file contains tools for analysis and visualization.
 source("mcmc_utils_all.R") 
 
@@ -29,7 +29,7 @@ load("Aegypti_DENV_trait_means_informative.Rsave")
 
 ## Load previously calculated and saved derivatives to save time
 # load("aegy_derivative_outputs-uninformative.Rsave")
-load("aegy_derivative_outputs-informative.Rsave")
+# load("aegy_derivative_outputs-informative.Rsave")
 
 ## Next we set up the temperatures over which we will be evaluating
 ## R0, etc, as well as the thinning interval for the samples.
