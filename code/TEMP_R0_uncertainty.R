@@ -6,10 +6,11 @@
 ##          functions for sampling from these distributions
 ##
 ## Contents: 1) Set-up, load in necessary packages and data-sets
-##           2) Transform thermal trait parameters into model parameters
-##           3) Calculate R0 across all thermal trait parameter samples
-##           4) Create visualizations of R0 distributions
-##           5) Functions to sample from thermal trait parameter distributions
+##           2) Instantiate data frame incorporating all axes of variation
+##           3) Transform thermal trait parameters into model parameters
+##           4) Calculate R0 across all thermal trait parameter samples
+##           5) Create visualizations of R0 distributions
+##           6) Functions to sample from thermal trait parameter distributions
 ##
 ##
 ## Inputs:  data - data/clean/ThermalTraitSamples.csv
@@ -84,10 +85,24 @@ trait_names <- c(
   # 'PDR' # parasite development rate = 1/EIP
 )
 
-# 2) Transform thermal trait parameters into model parameters ----
+# 2) Instantiate data frame incorporating all axes of variation ----
+
+# System: mosquito species x pathogen
+
+# Sample number of thermal trait prior
+
+# Temperature
+
+# Model type (Ross-Macdonald or Chitnis)
+
+# Vertebrate host pace of life history
+
+# Vertebrate host population density
+
+# 3) Transform thermal trait parameters into model parameters ----
 # !!! This should be a separate script / set of functions later
 
-# Biting rate: GCR, GCD, a
+# Biting rate (sigmaV): GCR, GCD, a
 
 # Fecundity: 0.5*EFD/a, 0.5*ER*pO/a
 
@@ -102,11 +117,14 @@ trait_names <- c(
 # Vector competence: bc
 
 
-# 3) Calculate R0 across all thermal trait parameter samples ----
+# 4) Calculate R0 across all thermal trait parameter samples ----
 
-# 4) Create visualizations of R0 distributions ----
+# 5) Create visualizations of R0 distributions ----
 
-# 5) Functions to sample from thermal trait parameter distributions----
+# Biggest new development here will be to include 89% highest density interval
+# lines
+
+# 6) Functions to sample from thermal trait parameter distributions----
 
 
 
