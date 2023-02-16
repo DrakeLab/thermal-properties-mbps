@@ -7,6 +7,8 @@ Authors: Kyle J.-M. Dahlin, Suzanne M. O’Regan, Barbara A. Han, John Paul Schm
 
 Journal: TBD
 
+Initial Protocol: https://docs.google.com/document/d/1pp_RXbUcLCJs219e5fYKRhCdR5xp2-ZG74aToA4kEFQ/edit?usp=sharing
+
 Notes
 ---------------------------
 Knit 'manuscript-figures.Rmd' to obtain the figures in the manuscript. For full caption descriptions, see the main text. Figures are output to the 'doc' folder.

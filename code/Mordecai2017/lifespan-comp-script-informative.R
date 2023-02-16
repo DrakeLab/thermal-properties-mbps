@@ -1,13 +1,17 @@
 ## Load relevant packages and materials
 library(IDPmisc)
 library('rjags')
-source("temp_functions_all.R") 
-source("mcmc_utils_all.R")
+library(tidyverse)
 
+# This file contains tools for analysis and visualization.
+source("code/Mordecai2017/mcmc_utils_all.R")
+
+# This file contains the thermal response functions and their derivatives.
+source("code/Mordecai2017/temp_functions_all.R")
 ## Load data for first model fit
-data.all <- read.csv("aegyptiDENVmodelTempData_2016-03-30.csv", header=TRUE)
+data.all <- read.csv("data/raw/aegyptiDENVmodelTempData_2016-03-30.csv", header=TRUE)
 
-load("aedes_prior_gamma_fits.Rsave")
+load("code/Mordecai2017/aedes_prior_gamma_fits.Rsave")
 
 ## Specify the MCMC Input Parameters
 n.chains <- 5
@@ -23,8 +27,10 @@ data.1mu <- data.all[which(data.all$trait.name=="1/mu"),]
 # Convert Yang data to lifespan
 data.days$trait <- 1/data.days$trait
 
+
 ## Manipulating the survival data so we can examine it as mu 
 ec <- 0.000001
+
 
 ## Rohani et al. 2009 data were the proportion surviving for 31, 27, 23 days at 26, 28, and 30C, respectively
 ## Convert to mortality
@@ -41,7 +47,7 @@ hypers = gamma.fits.lf*0.01
 ## Set up the jags code, which contains the specifics of the quadratic model with the
 ## default priors. As well as a few different jags models that contain different things.
 
-jags <- jags.model('jags-quad-neg-informative.bug',
+jags <- jags.model('code/Mordecai2017/jags-quad-neg-informative.bug',
                    data = list('Y' = data$trait, 'T' = data$T, 'N'=length(data$T), 'hypers' = hypers),
                    n.chains = n.chains,
                    inits=list(T0=5, Tm=33, n.qd=0.005), n.adapt = n.adapt)
@@ -110,7 +116,7 @@ lines(Temps, -hypers[1,3]/hypers[1,3]*(Temps- hypers[1,1]/hypers[2,1])*(Temps-hy
 
 ########################################
 ## Second Set of Data which will be used
-data.all <- read.csv("albopictusCHIKVmodelTempData_2016-03-26.csv", header=TRUE)
+data.all <- read.csv("code/Mordecai2017/albopictusCHIKVmodelTempData_2016-03-26.csv", header=TRUE)
 data1 <- data.all[which(data.all$trait.name=="prop.dead"),]
 
 ## Manipulating the data so it can be used in the analysis
@@ -134,7 +140,7 @@ data = subset(data, trait2 %in% c("sugar-fed", NA))
 ## Set up the jags code, which contains the specifics of the quadratic model with the
 ## default priors. As well as a few different jags models that contain different things.
 
-jags <- jags.model('jags-quad-neg-informative.bug',
+jags <- jags.model('code/Mordecai2017/jags-quad-neg-informative.bug',
                    data = list('Y' = data$trait, 'T' = data$T, 'N'=length(data$T), 'hypers' = hypers),
                    n.chains = n.chains,
                    inits=list(T0=5, Tm=33, n.qd=0.005), n.adapt = n.adapt)

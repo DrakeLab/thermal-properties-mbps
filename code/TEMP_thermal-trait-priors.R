@@ -54,9 +54,13 @@ source("code/Mordecai2017/temp_functions_all.R")
 ## Load prior data for Aedes species
 data.Aegypti <- read.csv("data/raw/aegyptiDENVmodelTempData_2016-03-30.csv", header = TRUE) %>%
   # Exclude the Focks & Barrera 2006 data because they're from a model
-  filter(ref != "Focks_Barrera_2006_Research&TrainingTropicalDis_Geneva_Paper")
+  filter(ref != "Focks_Barrera_2006_Research&TrainingTropicalDis_Geneva_Paper") %>% 
+  # Exclude the Rohani et al 2009 data because it has "unrealistically long lifespans"
+  filter(ref != "Rohani_et_al_2009_SEJTropMedPH") 
 
-data.Albopictus <- read.csv("data/raw/albopictusCHIKVmodelTempData_2016-03-26.csv", header = TRUE)
+data.Albopictus <- read.csv("data/raw/albopictusCHIKVmodelTempData_2016-03-26.csv", header = TRUE) %>% 
+  # The starved mosquitoes had much shorter survival than all other data, so remove them
+  filter(trait2 %in% c("sugar-fed", NA))
 
 ### Define names of mosquitoes and pathogens under consideration ----
 
@@ -95,12 +99,51 @@ trait_names <- c(
   "p", # the survival probability of an adult mosquito
   "b", # probability of becoming infected
   "c", # probability of becoming infectious
-  "EIP" # extrinsic incubation period
+  "EIP", # extrinsic incubation period
+  "lf", # lifespan
+  "1/mu", # inverse of mortality rate
+  "p/days", # ??? proportion surviving each day ???
+  "prop.dead" # proportion dead after ??? days
   # 'PDR' # parasite development rate = 1/EIP
 )
 
+# !!! note lifespan is missing and needs t obe added in
 output_trait_names <- c("a", "TFD", "EFD", "MDR", "e2a", "b", "c", "PDR")
 input_trait_names <- c(output_trait_names, "GCD", "1/MDR", "GCR", "pEA", "EIP")
+
+
+# Function: transform thermal traits to parameters
+thermtrait.transform <- function(data_in) {
+  # list names of relevant traits
+  output_trait_names <- c("a", "TFD", "EFD", "MDR", "e2a", "b", "c", "PDR", "lf")
+
+  # load in table telling us how to transform traits
+  trait_lookup_table <- read.csv("data/clean/trait_table.csv", header = TRUE) %>%
+    # !!! modify to take into account mosquito species & pathogen
+    mutate(trait.to = trait.name) %>%
+    mutate(trait.name = computed.from) %>%
+    dplyr::select(trait.name, trait.to, from.transform)
+
+  data_out <- left_join(data_in, trait_lookup_table) %>%
+    # transform trait values according to the proper function (just identity or inverse for now)
+    mutate(trait = case_when(
+      from.transform == "Identity" ~ trait,
+      from.transform == "Inverse" ~ 1 / trait,
+      from.transform == "NegativeLogDifference" ~ -1 / log(1 - trait),
+      TRUE ~ trait
+    )) %>%
+    # make appropriate changes to the trait name
+    mutate(trait.name = case_when(
+      !is.na(trait.to) ~ trait.to,
+      TRUE ~ trait.name
+    )) %>%
+    # filter out unnecessary variables
+    filter(trait.name %in% output_trait_names) %>%
+    # select just the columns we need for analysis
+    dplyr::select(trait.name, T, trait)
+
+  return(data_out)
+}
 
 # Set up data frame of traits and mosquito pathogen pairs
 full_df <- expand_grid(Mosquito = MosqPathPairs, trait = as_tibble(trait_names))
@@ -111,9 +154,9 @@ trait_lookup_table <- read.csv("data/clean/trait_table.csv", header = TRUE)
 ### Set parameters for Monte Carlo sampling ----
 
 # Specify the parameters that control the MCMC (these will be used throughout the code).
-n.chains <- 2 # 5
-n.adapt <- 100 # 5000
-n.samps <- 100 # 5000
+n.chains <-5 # 2 # 5
+n.adapt <- 5000 # 100 # 5000
+n.samps <- 5000 # 100 # 5000
 
 # 2) Define accessory functions ----
 
@@ -126,27 +169,37 @@ thermtrait.prior.sample <- function(data_in, trait_name,
     # filter to just the trait of interest
     # might have to bind multiple traits together, use look-up table
     lookup_table <- read.csv("data/clean/trait_table.csv", header = TRUE) %>%
-      filter(trait.name == trait_name)
+      filter(trait.name == trait_name | computed.from == trait_name)
 
-    from_names <- lookup_table$computed.from
+    # trait_name <- unique(lookup_table$trait.name)
 
-    data <- filter(data_in, trait.name %in% from_names) %>%
-      # perform any necessary transformations to get the trait we're interested in
-      # !!! temporary. so far the only transformation is inversion
-      mutate(trait = ifelse(trait.name == trait_name, trait, 1 / trait))
+    from_names <- c(trait_name, unique(lookup_table$computed.from))
+
+    data <- filter(data_in, trait.name %in% from_names)
 
     # determine appropriate model using lookup table
     thermal_function <- unique(lookup_table$thermal.function)
+
     jags_choice <- case_when(
       thermal_function == "Briere" ~ "code/jags-models/jags-briere-informative.bug",
       thermal_function == "Quadratic" ~ "code/jags-models/jags-quad-neg-informative.bug"
     )
-
-    # create MCMC samples from a Briere model with default priors
+    # initial values
+    inits_list <- if (thermal_function == "Briere") {
+      list(Tm = 31, T0 = 5, c = 0.00007)
+    } else if (thermal_function == "Quadratic") {
+      list(T0 = 5, Tm = 33, n.qd = 0.005)
+    }
+    # names of variables being fit
+    variable.names <- case_when(
+      thermal_function == "Briere" ~ c("c", "Tm", "T0", "sigma"),
+      thermal_function == "Quadratic" ~ c("n.qd", "Tm", "T0", "sigma")
+    )
 
     # load in hyperparameters from prior fits
     hypers_table <- read.csv("data/clean/gamma_fits.csv", header = TRUE) %>%
-      filter(trait == trait_name) %>%
+      filter(trait %in% from_names) %>%
+      unique() %>% 
       # adjust by the appropriate multiplier
       mutate(value = multiplier * value) %>%
       dplyr::select(-multiplier) %>%
@@ -156,20 +209,19 @@ thermtrait.prior.sample <- function(data_in, trait_name,
       as.data.frame() %>%
       `rownames<-`(.[, 1]) %>%
       dplyr::select(-Var1)
+    
+    print(hypers_table)
 
-    # apply the appropriate multiplier to the hyperparameters
-    # !!! NB: double-check what's going on with lf in 'lifespan-comp-script-informative.R'
-
+    # create MCMC samples from the model with default priors
     jags <- jags.model(jags_choice,
       data = list("Y" = data$trait, "T" = data$T, "N" = length(data$T), "hypers" = hypers_table),
-      n.chains = n.chains, inits = list(Tm = 31, T0 = 5, c = 0.00007),
+      n.chains = n.chains, inits = inits_list,
       n.adapt = n.adapt
     )
     # The coda.samples() function takes n.samps new samples, and saves
     # them in the coda format, which we use for visualization and
     # analysis.
-
-    coda.samps <- coda.samples(jags, c("c", "Tm", "T0", "sigma"), n.samps)
+    coda.samps <- coda.samples(jags, variable.names, n.samps)
 
     # This command combines the samples from the n.chains into a format
     # that will be used for further analyses.
@@ -180,17 +232,13 @@ thermtrait.prior.sample <- function(data_in, trait_name,
     } else {
       samps <- make.linear.samps(coda.samps, nchains = n.chains, samp.lims = c(1, n.samps), sig = TRUE)
     }
-    # samps <- if_else(thermal_function == "Briere",
-    #                  make.briere.samps(coda.samps,nchains = n.chains,samp.lims = c(1, n.samps)),
-    #                  if_else(thermal_function == "Quadratic",
-    #                          make.quad.samps(coda.samps,nchains=n.chains, samp.lims=c(1, n.samps),sig=TRUE),
-    #                          make.linear.samps(coda.samps, nchains=n.chains, samp.lims=c(1, n.samps), sig=TRUE)
-    #                  )
-    # )
-    samps$tau <- 1 / samps$sigma
-    out.samps <- samps
 
-    # !!! NB: how to determine likelihood of sampled point?
+    samps$tau <- 1 / samps$sigma
+    if (is.null(samps$c)) {
+      samps$c <- samps$qd
+    }
+    samps$func <- thermal_function
+    out.samps <- dplyr::select(samps, T0, Tm, c, func)
 
     return(out.samps)
   })
@@ -203,47 +251,42 @@ thermtrait.prior.sample <- function(data_in, trait_name,
 
 # Aedes albopictus
 temp.Albopictus <- data.Albopictus %>%
-  # slim down to only the necessary columns
-  dplyr::select(-c(ref, trait2, trait2.name)) %>%
-  filter(trait.name %in% output_trait_names)
+  thermtrait.transform()
 
 samples.Albopictus <- tibble(
   trait = as.character(),
   T0 = as.double(),
   Tm = as.double(),
-  c = as.double()
+  c = as.double() # !!! note that we're using c as a generic parameter for Briere or Quadratic
 )
+
 for (trait_ID in unique(temp.Albopictus$trait.name)) {
   samples <- thermtrait.prior.sample(
     temp.Albopictus, trait_ID,
     n.chains, n.adapt, n.samps
   ) %>%
-    dplyr::select(c(T0, Tm, c)) %>%
     mutate(trait = trait_ID) %>%
     mutate(sample_num = row_number())
 
   samples.Albopictus <- rbind(samples.Albopictus, samples)
 }
 
-
 # Aedes aegypti
 temp.Aegypti <- data.Aegypti %>%
-  # slim down to only the necessary columns
-  dplyr::select(-c(ref, trait2, trait2.name)) %>%
-  filter(trait.name %in% output_trait_names)
+  thermtrait.transform()
 
 samples.Aegypti <- tibble(
   trait = as.character(),
   T0 = as.double(),
   Tm = as.double(),
-  c = as.double()
+  c = as.double() # !!! note that we're using c as a generic parameter for Briere or Quadratic
 )
+
 for (trait_ID in unique(temp.Aegypti$trait.name)) {
   samples <- thermtrait.prior.sample(
     temp.Aegypti, trait_ID,
     n.chains, n.adapt, n.samps
   ) %>%
-    dplyr::select(c(T0, Tm, c)) %>%
     mutate(trait = trait_ID) %>%
     mutate(sample_num = row_number())
 
@@ -251,9 +294,9 @@ for (trait_ID in unique(temp.Aegypti$trait.name)) {
 }
 
 # Combine samples
-samples.All <- tibble(Species = "Aedes albopictus", samples.Albopictus) %>% 
-  rbind(tibble(Species = "Aedes aegypti", samples.Aegypti)) %>% 
+samples.All <- tibble(Species = "Aedes albopictus", samples.Albopictus) %>%
+  rbind(tibble(Species = "Aedes aegypti", samples.Aegypti)) %>%
   # reorder columns to match old parameter table
   relocate(Species, trait, c, T0, Tm)
-  
-write.csv(samples.All, "data/clean/ThermalTraitSamples.csv")
+
+write_csv(samples.All, "data/clean/ThermalTraitSamples.csv")

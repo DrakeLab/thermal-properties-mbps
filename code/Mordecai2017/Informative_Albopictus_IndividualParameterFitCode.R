@@ -50,7 +50,7 @@ hypers = gamma.fits.a*0.1
 # specifics of the Briere model with the default priors, which is then used to create 
 # an MCMC sample using the data.
 
-jags <- jags.model('jags-briere-informative.bug',
+jags <- jags.model('code/Mordecai2017/jags-briere-informative.bug',
                    data = list('Y' = data$trait, 'T' = data$T, 'N'= length(data$T), 'hypers' = hypers),
                    n.chains = n.chains, inits = list(Tm = 31, T0 = 5, c = 0.00007),
                    n.adapt = n.adapt)
@@ -123,7 +123,7 @@ hypers = gamma.fits.MDR*0.1
 # Given the data the Briere fuction is chosen. Jag-briere.bug contains the specifics of 
 # the Briere model with the default priors.
 
-jags <- jags.model('jags-briere-informative.bug',
+jags <- jags.model('code/Mordecai2017/jags-briere-informative.bug',
                     data = list('Y' = data$trait, 'T' = data$T, 'N' = length(data$T), 'hypers' = hypers),
                     n.chains = n.chains, inits = list(Tm = 31, T0 = 5, c = 0.00007),
                     n.adapt = n.adapt) 
@@ -358,7 +358,7 @@ hypers = gamma.fits.b*0.5
 # specifics of the Briere model with the default priors, which is then used to create 
 # an MCMC sample using the data.
 
-jags <- jags.model('jags-briere-informative.bug',
+jags <- jags.model('code/Mordecai2017/jags-briere-informative.bug',
                    data = list('Y' = data$trait, 'T' = data$T, 'N'= length(data$T), 'hypers' = hypers),
                    n.chains = n.chains, inits = list(Tm = 31, T0 = 5, c = 0.00007),
                    n.adapt = n.adapt)
@@ -426,7 +426,7 @@ hypers = gamma.fits.c*0.5
 # specifics of the Briere model with the default priors, which is then used to create 
 # an MCMC sample using the data.
 
-jags <- jags.model('jags-briere-informative.bug',
+jags <- jags.model('code/Mordecai2017/jags-briere-informative.bug',
                    data = list('Y' = data$trait, 'T' = data$T, 'N'= length(data$T), 'hypers' = hypers),
                    n.chains = n.chains, inits = list(Tm = 31, T0 = 5, c = 0.00007),
                    n.adapt = n.adapt)
@@ -491,7 +491,7 @@ hypers = gamma.fits.PDR*0.5
 # Given the data the Briere fuction is chosen. Jag-briere.bug contains the specifics of 
 # the Briere model with the default priors.
 
-jags <- jags.model('jags-briere-informative.bug',
+jags <- jags.model('code/Mordecai2017/jags-briere-informative.bug',
                    data = list('Y' = data$trait, 'T' = data$T, 'N' = length(data$T), 'hypers' = hypers),
                    n.chains = n.chains, inits = list(Tm = 38, T0 = 5, c = 0.00007),
                    n.adapt = n.adapt) 
