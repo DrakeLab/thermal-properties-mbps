@@ -23,10 +23,10 @@ knitr::opts_chunk$set(
 library(tidyverse)
 library(latex2exp) #nec
 library(reshape2) #nec
-library(cowplot)
-library(viridis)
+library(cowplot) #nec
+library(viridis) #nec
 library(RColorBrewer) #nec
-library(MetBrewer)
+library(MetBrewer) #nec
 library(here)
 library(lemon)  #nec
 library(zplyr) # only needed for placing text using absolute coordinates in contact comparison figure
