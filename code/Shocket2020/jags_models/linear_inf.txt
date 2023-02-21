@@ -1,0 +1,22 @@
+
+    model{
+    
+    ## Priors
+    cf.m ~ dgamma(hypers[1,1], hypers[2,1])
+    cf.b ~ dgamma(hypers[1,2], hypers[2,2])
+    cf.sigma ~ dunif(0, 1000)
+    cf.tau <- 1 / (cf.sigma * cf.sigma)
+    
+    ## Likelihood
+    for(i in 1:N.obs){
+    trait.mu[i] <- -1 * cf.m * temp[i] + cf.b
+    trait[i] ~ dnorm(trait.mu[i], cf.tau)
+    }
+    
+    ## Derived Quantities and Predictions
+    for(i in 1:N.Temp.xs){
+    z.trait.mu.pred[i] <- (-1 * cf.m * Temp.xs[i] + cf.b) * (Temp.xs[i] < cf.b / cf.m)
+    }
+    
+    } # close model
+    
