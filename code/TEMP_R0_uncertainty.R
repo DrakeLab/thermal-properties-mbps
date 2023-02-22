@@ -45,7 +45,7 @@ res_reduce <- function(df, new_length) {
 # Load samples of thermal trait parameters
 samples.All <- read.csv("data/clean/ThermalTraitSamples.csv") %>% 
   # thin samples for analyses
-  filter(sample_num %in% res_reduce(sample_num, 200))
+  filter(sample_num %in% res_reduce(sample_num, 300))
 
 # Load functions from Mordecai et al., 2017
 # This file contains tools for analysis and visualization.
@@ -82,7 +82,7 @@ sample_vec <- unique(samples.All$sample_num)
 # Temperature
 min_Temp <- 10
 max_Temp <- 40
-res_Temp <- 0.1
+res_Temp <- 0.05
 Temp_vec <- seq(min_Temp, max_Temp, by = res_Temp)
 
 # Create data frame incorporating all variations for the host
@@ -103,7 +103,7 @@ sigmaH_vec <- sort(c(10^seq(-0.25, 3.25, by = .0625), 20, 50, Inf))
 # KH_vec <- KH_vec %>%
 #   c(10^(seq(5, 5 + log10(2), by = diff(log10(KH_vec), lag = 1)[1]))) %>%
 #   unique()
-KH_vec <- 10^seq(-2,5)
+KH_vec <- 10^seq(-2,5, length.out = 11)
 
 ## Get host-related pathogen parameters
 # *Probability of becoming infected after bite from infectious mosquito
@@ -169,7 +169,7 @@ get.thermal.response <- function(data_in, Temperature) {
 
 # For each mosquito species, trait, and sample, get a thermal response curve
 TPC_df <- samples.All %>%
-  full_join(list(Temperature = Temp_vec), by = character(), copy = TRUE) %>%
+  cross_join(list(Temperature = Temp_vec), copy = TRUE) %>%
   mutate(value = case_when(
     func == "Briere" ~ Briere(c, T0, Tm)(Temperature),
     func == "Quadratic" ~ Quadratic(c, T0, Tm)(Temperature),
