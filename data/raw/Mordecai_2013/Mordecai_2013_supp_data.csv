@@ -1,21 +1,21 @@
-ï»¿trait.name,T,trait,ref,trait2,trait2.name,mosquito_species,pathogen
+trait.name,T,trait,ref,trait2,trait2.name,mosquito_species,pathogen
 a,15,0.078125,"Lardeux et al., 2008",,,Anopheles pseudopunctipennis,none
-a,20,0.15625,"Lardeux et al., 2009",,,Anopheles pseudopunctipennis,none
-a,23,0.196078,"Lardeux et al., 2010",,,Anopheles pseudopunctipennis,none
-a,25,0.285714,"Lardeux et al., 2011",,,Anopheles pseudopunctipennis,none
-a,27,0.30303,"Lardeux et al., 2012",,,Anopheles pseudopunctipennis,none
-a,29,0.37037,"Lardeux et al., 2013",,,Anopheles pseudopunctipennis,none
-a,31,0.47619,"Lardeux et al., 2014",,,Anopheles pseudopunctipennis,none
-a,33,0.416667,"Lardeux et al., 2015",,,Anopheles pseudopunctipennis,none
-a,35,0.434783,"Lardeux et al., 2016",,,Anopheles pseudopunctipennis,none
-bc,32,0,"Stratman-Thomas, 1940",,,AnophelesÂ quadrimaculatus,Plasmodium vivax
-bc,30,78,"Stratman-Thomas, 1940",,,AnophelesÂ quadrimaculatus,Plasmodium vivax
-bc,28,73,"Stratman-Thomas, 1940",,,AnophelesÂ quadrimaculatus,Plasmodium vivax
-bc,26,100,"Stratman-Thomas, 1940",,,AnophelesÂ quadrimaculatus,Plasmodium vivax
-bc,23.5,79,"Stratman-Thomas, 1940",,,AnophelesÂ quadrimaculatus,Plasmodium vivax
-bc,22.5,89,"Stratman-Thomas, 1940",,,AnophelesÂ quadrimaculatus,Plasmodium vivax
-bc,16,100,"Stratman-Thomas, 1940",,,AnophelesÂ quadrimaculatus,Plasmodium vivax
-bc,13,0,"Stratman-Thomas, 1940",,,AnophelesÂ quadrimaculatus,Plasmodium vivax
+a,20,0.15625,"Lardeux et al., 2008",,,Anopheles pseudopunctipennis,none
+a,23,0.196078,"Lardeux et al., 2008",,,Anopheles pseudopunctipennis,none
+a,25,0.285714,"Lardeux et al., 2008",,,Anopheles pseudopunctipennis,none
+a,27,0.30303,"Lardeux et al., 2008",,,Anopheles pseudopunctipennis,none
+a,29,0.37037,"Lardeux et al., 2008",,,Anopheles pseudopunctipennis,none
+a,31,0.47619,"Lardeux et al., 2008",,,Anopheles pseudopunctipennis,none
+a,33,0.416667,"Lardeux et al., 2008",,,Anopheles pseudopunctipennis,none
+a,35,0.434783,"Lardeux et al., 2008",,,Anopheles pseudopunctipennis,none
+bc,32,0,"Stratman-Thomas, 1940",,,Anopheles quadrimaculatus,Plasmodium vivax
+bc,30,78,"Stratman-Thomas, 1940",,,Anopheles quadrimaculatus,Plasmodium vivax
+bc,28,73,"Stratman-Thomas, 1940",,,Anopheles quadrimaculatus,Plasmodium vivax
+bc,26,100,"Stratman-Thomas, 1940",,,Anopheles quadrimaculatus,Plasmodium vivax
+bc,23.5,79,"Stratman-Thomas, 1940",,,Anopheles quadrimaculatus,Plasmodium vivax
+bc,22.5,89,"Stratman-Thomas, 1940",,,Anopheles quadrimaculatus,Plasmodium vivax
+bc,16,100,"Stratman-Thomas, 1940",,,Anopheles quadrimaculatus,Plasmodium vivax
+bc,13,0,"Stratman-Thomas, 1940",,,Anopheles quadrimaculatus,Plasmodium vivax
 EIP,23,15,"Eling et al., 2001",,,Anopheles stephensi,Plasmodium falciparum
 EIP,26,11,"Eling et al., 2001",,,Anopheles stephensi,Plasmodium falciparum
 EIP,28,9,"Eling et al., 2001",,,Anopheles stephensi,Plasmodium falciparum
@@ -54,10 +54,18 @@ EFD,25,23.14,"Delatte et al., 2009",,,Aedes albopictus,none
 EFD,30,22.13,"Delatte et al., 2009",,,Aedes albopictus,none
 EFD,35,16.91,"Delatte et al., 2009",,,Aedes albopictus,none
 prop.live.50,5,5,Bayoh 2001,,day at which populations drops below 50% of original,Anopheles gambiae,none
-prop.live.51,10,10,Bayoh 2002,,day at which populations drops below 50% of original,Anopheles gambiae,none
-prop.live.52,15,25,Bayoh 2003,,day at which populations drops below 50% of original,Anopheles gambiae,none
-prop.live.53,20,31,Bayoh 2004,,day at which populations drops below 50% of original,Anopheles gambiae,none
-prop.live.54,25,30,Bayoh 2005,,day at which populations drops below 50% of original,Anopheles gambiae,none
-prop.live.55,30,15,Bayoh 2006,,day at which populations drops below 50% of original,Anopheles gambiae,none
-prop.live.56,35,10,Bayoh 2007,,day at which populations drops below 50% of original,Anopheles gambiae,none
-prop.live.57,40,5,Bayoh 2008,,day at which populations drops below 50% of original,Anopheles gambiae,none
+prop.live.50,10,10,Bayoh 2001,,day at which populations drops below 50% of original,Anopheles gambiae,none
+prop.live.50,15,25,Bayoh 2001,,day at which populations drops below 50% of original,Anopheles gambiae,none
+prop.live.50,20,31,Bayoh 2001,,day at which populations drops below 50% of original,Anopheles gambiae,none
+prop.live.50,25,30,Bayoh 2001,,day at which populations drops below 50% of original,Anopheles gambiae,none
+prop.live.50,30,15,Bayoh 2001,,day at which populations drops below 50% of original,Anopheles gambiae,none
+prop.live.50,35,10,Bayoh 2001,,day at which populations drops below 50% of original,Anopheles gambiae,none
+prop.live.50,40,5,Bayoh 2001,,day at which populations drops below 50% of original,Anopheles gambiae,none
+last.great.001,5,7,Bayoh 2001,,last day for which proportion is above 1%,Anopheles gambiae,none
+last.great.001,10,18,Bayoh 2001,,last day for which proportion is above 1%,Anopheles gambiae,none
+last.great.001,15,54,Bayoh 2001,,last day for which proportion is above 1%,Anopheles gambiae,none
+last.great.001,20,63,Bayoh 2001,,last day for which proportion is above 1%,Anopheles gambiae,none
+last.great.001,25,67,Bayoh 2001,,last day for which proportion is above 1%,Anopheles gambiae,none
+last.great.001,30,27,Bayoh 2001,,last day for which proportion is above 1%,Anopheles gambiae,none
+last.great.001,35,13,Bayoh 2001,,last day for which proportion is above 1%,Anopheles gambiae,none
+last.great.001,40,7,Bayoh 2001,,last day for which proportion is above 1%,Anopheles gambiae,none
