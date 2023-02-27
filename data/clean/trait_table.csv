@@ -1,37 +1,33 @@
-trait.to	trait.from	mosquito.species	pathogen	thermal.function	from.transform	
-a	GCR	Aedes aegypti	DENV	Briere	Identity	
-a	GCD	Aedes albopictus	CHIKV	Briere	Inverse	
-b	b	Aedes aegypti	DENV	Briere	Identity	
-b	b	Aedes albopictus	CHIKV	Briere	Identity	
-c	c	Aedes aegypti	DENV	Briere	Identity	
-c	c	Aedes albopictus	CHIKV	Briere	Identity	
-e2a	pEA	Aedes aegypti	DENV	Quadratic	Identity	
-e2a	pEA	Aedes albopictus	CHIKV	Quadratic	Identity	
-EFD	EFD	Aedes aegypti	DENV	Briere	Identity	
-MDR	MDR	Aedes aegypti	DENV	Briere	Identity	
-MDR	MDR	Aedes albopictus	CHIKV	Briere	Identity	
-MDR	1/MDR	Aedes albopictus	CHIKV	Briere	Inverse	
-PDR	PDR	Aedes aegypti	DENV	Briere	Identity	
-PDR	EIP	Aedes aegypti	DENV	Briere	Inverse	
-PDR	EIP	Aedes albopictus	CHIKV	Briere	Inverse	
-TFD	TFD	Aedes albopictus	CHIKV	Briere	Identity	
-lf	1/mu	Aedes aegypti	DENV	Quadratic	Identity	
-lf	p/days	Aedes aegypti	DENV	Quadratic	Inverse	
-lf	prop.dead	Aedes albopictus	CHIKV	Quadratic	NegativeLogDifference	
-lf	1/mu	Aedes albopictus	CHIKV	Quadratic	Identity	
-bc	bc				Identity	
-	prop.live.50					Mordecai 2013
-	prop.live.51					Mordecai 2013
-	prop.live.52					Mordecai 2013
-	prop.live.53					Mordecai 2013
-	prop.live.54					Mordecai 2013
-	prop.live.55					Mordecai 2013
-	prop.live.56					Mordecai 2013
-	prop.live.57					Mordecai 2013
-	EIR					Tesla 2018
-lf	lf				Identity	Tesla 2018
-	EFOC					Shocket 2020
-	EPR					Shocket 2020
-	pO					Shocket 2020
-	Egg viability					Shocket 2020
-	pLA					Shocket 2020
+trait.to,trait.from,mosquito.species,pathogen,thermal.function,from.transform,
+a,GCR,Aedes aegypti,DENV,Briere,Identity,
+a,GCD,Aedes albopictus,CHIKV,Briere,Inverse,
+b,b,Aedes aegypti,DENV,Briere,Identity,
+b,b,Aedes albopictus,CHIKV,Briere,Identity,
+c,c,Aedes aegypti,DENV,Briere,Identity,
+c,c,Aedes albopictus,CHIKV,Briere,Identity,
+e2a,pEA,Aedes aegypti,DENV,Quadratic,Identity,
+e2a,pEA,Aedes albopictus,CHIKV,Quadratic,Identity,
+EFD,EFD,Aedes aegypti,DENV,Briere,Identity,
+MDR,MDR,Aedes aegypti,DENV,Briere,Identity,
+MDR,MDR,Aedes albopictus,CHIKV,Briere,Identity,
+MDR,1/MDR,Aedes albopictus,CHIKV,Briere,Inverse,
+PDR,PDR,Aedes aegypti,DENV,Briere,Identity,
+PDR,EIP,Aedes aegypti,DENV,Briere,Inverse,
+PDR,EIP,Aedes albopictus,CHIKV,Briere,Inverse,
+TFD,TFD,Aedes albopictus,CHIKV,Briere,Identity,
+lf,1/mu,Aedes aegypti,DENV,Quadratic,Identity,
+lf,p/days,Aedes aegypti,DENV,Quadratic,Inverse,
+lf,prop.dead,Aedes albopictus,CHIKV,Quadratic,NegativeLogDifference,
+lf,1/mu,Aedes albopictus,CHIKV,Quadratic,Identity,
+bc,bc,Aedes aegypti,,,Identity,
+bc,bc,Aedes albopictus,,,,
+bc,bc,Culex quinquefasciatus,,,,
+bc,bc,Anopheles spp.,,,,
+,prop.live.50,,,,,Mordecai 2013
+,EIR,,,,,Tesla 2018
+lf,lf,,,,Identity,Tesla 2018
+,EFOC,,,,,Shocket 2020
+,EPR,,,,,Shocket 2020
+,pO,,,,,Shocket 2020
+,Egg viability,,,,,Shocket 2020
+,pLA,,,,,Shocket 2020
