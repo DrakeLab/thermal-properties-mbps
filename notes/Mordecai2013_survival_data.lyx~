@@ -146,34 +146,6 @@ c & =\frac{-\log\left(\frac{-\log\left(\frac{f}{a}\right)}{b}\right)}{t}
 
 \end_inset
 
-Using a Gompertz model with 
-\begin_inset Formula $y_{0}=0$
-\end_inset
-
- and 
-\begin_inset Formula $y_{\max}=1$
-\end_inset
-
-, gives:
-\begin_inset Formula 
-\begin{align*}
-g\left(d;k,L\right) & =e^{-e^{k\left(L-d\right)+1}}
-\end{align*}
-
-\end_inset
-
-Comparing with above, we get
-\begin_inset Formula 
-\begin{align*}
-g & =1-p\\
-1-p & =e^{-e^{k\left(L-d\right)+1}}\\
--\log\left(1-p\right) & =e^{k\left(L-d\right)+1}\\
-1-\log\left(-\log\left(1-p\right)\right) & =k\left(d-L\right)\\
-\frac{1-\log\left(-\log\left(1-p\right)\right)}{d-L} & =k
-\end{align*}
-
-\end_inset
-
 
 \end_layout
 

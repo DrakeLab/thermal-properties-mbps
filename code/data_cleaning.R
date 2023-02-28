@@ -31,65 +31,11 @@ library(tidyverse)
 ###* Data sets ----
 # Mordecai 2013
 # -- Mordecai_2013_supp_data.csv
-# -- survival_data.csv
+# -- survival_data.csv (survival data for Anopheles gambiae from Bayoh 2001, taken from Supplementary Data .doc)
 data.Mordecai2013 <- read.csv("data/raw/Mordecai_2013/Mordecai_2013_supp_data.csv", header = TRUE) %>%
   mutate(lead_author = "Mordecai") %>%
   mutate(year = "2013") %>%
   select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
-
-# Treat survival data separately.
-# - Use data from the first day of the experiment, one day before reaching 0.01
-#   threshold to three days after the threshold, giving 6 data points
-# - Use the exponent(?) of the constant mortality function as an independent 
-#   observation of mortality at each temperature
-survival.Mordecai2013 <- read.csv("data/raw/Mordecai_2013/survival_data.csv", header = TRUE) %>%
-  pivot_longer(cols = X5.C:X40.C, names_to = "T", values_to = "prop.alive") %>% 
-  rename(day = D) %>% 
-  mutate(T = readr::parse_number(T)) %>% 
-  mutate(prop.alive = ifelse(day > 5 & is.na(prop.alive), 0, prop.alive))
-
-survival_fit.df <- tibble(T = numeric(), y0 = numeric(), ymax = numeric(), 
-                          k = numeric(), lag = numeric())
-for (TT in c(15, 20, 25, 30)) {# unique(survival.Mordecai2013$T)) {
-  df <- filter(survival.Mordecai2013, T == TT)
-  
-  Gomp_fit <- nls(1-prop.alive ~ Gompertz(day, y0, ymax, k, lag),
-                  data = df,
-                  start = list(y0 = 0.9, ymax = -0.03, k = -0.1, lag = 10))
-  Gomp_coefs <- coef(Gomp_fit)
-  
-  survival_fit.df <- add_row(survival_fit.df, T = TT, y0 = Gomp_coefs["y0"], 
-                             ymax = Gomp_coefs["ymax"], k = Gomp_coefs["k"], 
-                             lag = Gomp_coefs["lag"])
-}
-
-# Gompertz function
-Gompertz <- function(x, y0, ymax, k, lag){
-  result <- y0 + (ymax -y0)*exp(-exp(k*(lag-x)/(ymax-y0) + 1) )
-  return(result)
-}
-
-Gomp_df <- tibble(day = unique(survival.Mordecai2013$day)) %>% 
-  full_join(survival_fit.df, by = character()) %>% 
-  mutate(pred.p = Gompertz(x = day, y0 = y0, ymax = ymax, k = k, lag = lag))
-
-survival_plot <- survival.Mordecai2013 %>% 
-  arrange(T, prop.alive) %>% 
-  # filter(prop.alive != 0) %>%
-  ggplot(aes(x = day, y = 1-prop.alive, color = as.factor(T), group = T)) +
-  # ggplot(aes(x = day, y = ((log((-log(1-prop.alive) )/ day))/day)/day, color = as.factor(T), group = T)) +
-  # geom_path() +
-  geom_point() +
-  geom_path(data = Gomp_df, aes(x = day, y = pred.p))
-
-survival_test <- survival.Mordecai2013 %>% 
-  # This is roughly linear
-  mutate(c = (-(log((-log(1-prop.alive) )/ day)/day))) %>% 
-  filter(is.finite(c)) %>% 
-  ggplot(aes(x = day, y = c, group = T, color = as.factor(T))) +
-  geom_point() +
-  # ylim(-0.5, 0.5)
-
 
 # Mordecai 2017
 # -- aegyptiDENVmodelTempData_2016-03-30.csv
@@ -100,15 +46,23 @@ data.Mordecai2017.Aegypti <- read.csv("data/raw/Mordecai_2017/aegyptiDENVmodelTe
   # Exclude the Rohani et al 2009 data because it has "unrealistically long lifespans"
   filter(ref != "Rohani_et_al_2009_SEJTropMedPH") %>%
   mutate(mosquito_species = "Aedes aegypti") %>%
-  mutate(pathogen = "DENV")
+  mutate(pathogen = ifelse(trait.name %in% c("b", "c", "PDR"), "DENV", NA)) %>%
+  select(-c("trait2", "trait2.name"))
 
 data.Mordecai2017.Albopictus <- read.csv("data/raw/Mordecai_2017/albopictusCHIKVmodelTempData_2016-03-26.csv", header = TRUE) %>%
   # The starved mosquitoes had much shorter survival than all other data, so remove them
   filter(trait2 %in% c("sugar-fed", NA)) %>%
   mutate(mosquito_species = "Aedes albopictus") %>%
-  mutate(pathogen = "CHIKV")
+  mutate(pathogen = ifelse(trait.name %in% c("b", "c", "PDR"), "DENV", NA)) %>%
+  select(-c("trait2", "trait2.name"))
 
-data.Mordecai2017 <- rbind(data.Mordecai2017.Aegypti, data.Mordecai2017.Albopictus) %>%
+data.Mordecai2017.PDRaddl <- read.csv("data/raw/Mordecai_2017/EIP_priors_2015-12-04.csv", header = TRUE) %>%
+  rename(pathogen = virus, mosquito_species = mosquito)
+  
+
+data.Mordecai2017 <- rbind(data.Mordecai2017.Aegypti, 
+                           data.Mordecai2017.Albopictus,
+                           data.Mordecai2017.PDRaddl) %>%
   mutate(lead_author = "Mordecai") %>%
   mutate(year = "2017") %>%
   select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
@@ -123,6 +77,8 @@ data.Shocket2018 <- read.csv("data/raw/Shocket_2018/RRVTraitData.csv", header = 
     host.code == "Anot" ~ "Aedes notoscriptus",
     host.code == "Ocam" ~ "Ochlerotatus camptorhynchus"
   )) %>%
+  # Rename pEA traits with the actual trait measured
+  mutate(trait.name = ifelse(trait.name == "pEA", notes, trait.name)) %>% 
   mutate(lead_author = "Shocket") %>%
   mutate(year = "2018") %>%
   rename(pathogen = paras.code) %>%
@@ -134,8 +90,14 @@ data.Shocket2018 <- read.csv("data/raw/Shocket_2018/RRVTraitData.csv", header = 
 # -- ZIKV_trait_data_fits.csv
 # -- zikv_traits.csv
 data.Tesla2018 <- read.csv("data/raw/Tesla_2018/zikv_traits.csv", header = TRUE) %>%
+  # NB: MDR, pEA, EFD, and a are same as Mordecai 2017
+  filter(!trait.name %in% c("MDR", "pEA", "EFD", "a")) %>% 
   mutate(mosquito_species = "Aedes aegypti") %>%
-  mutate(pathogen = "ZIKV") %>%
+  mutate(infection_status = stringr::word(rep, 2, 2, sep = "-")) %>%
+  mutate(pathogen = case_when(
+    trait.name %in% c("bc", "EIR") ~ "ZIKV",
+    infection_status == "inf" ~ "ZIKV")
+    ) %>%
   mutate(lead_author = "Tesla") %>%
   mutate(year = "2018") %>%
   select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
@@ -238,6 +200,69 @@ data.All <- data.All %>%
   arrange(lead_author, desc(year)) %>%
   distinct(across(trait.name:pathogen), .keep_all = TRUE)
 
+###* Visualize traits as functions of temperature
+
+# Set up data frame for visualization
+# Focal systems: 
+# - Aedes aegypti / DENV
+# - Aedes aegypti / ZIKV
+# - Aedes albopictus / DENV
+# - Culex quinquefasciatus / WNV
+# - Anopheles spp. / Plasmodium falciparum
+data.Viz <- data.All %>%
+  dplyr::mutate(Species = stringr::word(mosquito_species, 2, 2, sep = " ")) %>%
+  dplyr::mutate(Genus = stringr::word(mosquito_species, 1, 1, sep = " ")) %>%
+  mutate(species_label = case_when(
+    (Genus == "Aedes" & !(Species %in% c("aegypti", "albopictus"))) ~ "spp.",
+    (Genus == "Culex" & Species != "quinquefasciatus") ~ "spp.",
+    (Genus == "Anopheles" & Species != "gambiae") ~ "spp.",
+    TRUE ~ Species
+  )) %>%
+  mutate(mosquito_species = paste(Genus, species_label, sep = " ")) %>% 
+  mutate(pathogen_1 = stringr::word(pathogen, 1, 1, sep = " ")) %>% 
+  mutate(pathogen_2 = stringr::word(pathogen, 2, 2, sep = " ")) %>% 
+  mutate(pathogen_new = case_when(
+    # pathogen %in% c("WNV-SA", "WNV-NY99", "WNV") ~ "WNV",
+    pathogen == "DENV" ~ "DENV",
+    pathogen == "ZIKV" ~ "ZIKV",
+    pathogen %in% c("WNV-NY99", "WNV-SA", "WNV") ~ "WNV",
+    (pathogen_1 == "Plasmodium"  & pathogen_2 != "falciparum") ~ "Plasmodium spp.",
+    (pathogen_1 == "Plasmodium"  & pathogen_2 == "falciparum") ~ "Plasmodium falciparum",
+    pathogen %in% c("SLEV", "MVE") ~ "flavivirus",
+    pathogen %in% c("WEEV", "SINV", "EEEV", "RRV") ~ "togavirus",
+    pathogen == "RVFV" ~ "togavirus",
+    is.na(pathogen) ~ "none",
+    TRUE ~ pathogen
+    # TRUE ~ NA
+  )) %>% 
+  unite(
+    col = "system_ID",
+    c("mosquito_species", "pathogen_new"),
+    sep = " / ",
+    remove = TRUE
+  ) 
+
+# show thermal response of all traits across all systems
+trait_plots <- data.Viz %>%
+  # filter to only traits we care about
+  filter(!trait.name %in% c("prop.live.50", "last.great.001", "EFOC", "EPR")) %>% 
+  ggplot(aes(x = T, y = trait, color = as.factor(system_ID), group = system_ID)) +
+  geom_point() +
+  facet_wrap(~ trait.name, scales = "free")
+
+# show thermal response of selected traits across selected systems
+select_trait_plots <- data.Viz %>% 
+  filter(system_ID %in% c("Aedes aegypti / DENV", "Aedes aegypti / none", 
+                          "Aedes aegypti / ZIKV", "Aedes aegypti / none",
+                          "Aedes albopictus / DENV", "Aedes albopictus / none", 
+                          "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
+                          "Anopheles spp. / Plasmodium falciparum",
+                          "Anopheles spp. / none"
+                          )) %>% 
+  ggplot(aes(x = T, y = trait, color = as.factor(system_ID), group = system_ID)) +
+  geom_point() +
+  facet_wrap(~ trait.name, scales = "free")
+
 ###* Filter to chosen mosquito species and pathogens ----
 
 # Chosen species:
@@ -245,13 +270,15 @@ data.All <- data.All %>%
 data.Temp <- data.All %>%
   dplyr::mutate(Species = stringr::word(mosquito_species, 2, 2, sep = " ")) %>%
   dplyr::mutate(Genus = stringr::word(mosquito_species, 1, 1, sep = " ")) %>%
-  filter(Genus %in% c("Aedes", "Anopheles", "Culex")) %>%
-  # Temporary: if data isn't from the exact species, combine it at the genus level
+  # filter(Genus %in% c("Aedes", "Anopheles", "Culex")) %>%
+  # !!! Temporary: if data isn't from the exact species, combine it at the genus level
+  # Can use data from these other species to create informative priors for the focal species
   # Anopheles data is always kept at the genus level (?)
   mutate(species_label = case_when(
     (Genus == "Aedes" & !(Species %in% c("aegypti", "albopictus"))) ~ "spp.",
     (Genus == "Culex" & Species != "quinquefasciatus") ~ "spp.",
-    Genus == "Anopheles" ~ "spp.",
+    (Genus == "Anopheles" & Species != "gambiae") ~ "spp.",
+    # Genus == "Anopheles" ~ "spp.",
     TRUE ~ Species
   )) %>%
   mutate(mosquito_species_new = paste(Genus, species_label, sep = " "))
