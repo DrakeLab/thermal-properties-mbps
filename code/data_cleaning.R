@@ -35,7 +35,7 @@ library(tidyverse)
 data.Mordecai2013 <- read.csv("data/raw/Mordecai_2013/Mordecai_2013_supp_data.csv", header = TRUE) %>%
   mutate(lead_author = "Mordecai") %>%
   mutate(year = "2013") %>%
-  select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
+  select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)%>% unique()
 
 # Mordecai 2017
 # -- aegyptiDENVmodelTempData_2016-03-30.csv
@@ -194,19 +194,6 @@ out_params_list <- c(
 
 
 # 3) Exploratory analysis of the data ----
-
-# Check if data is repeated across studies
-
-# Get all unique entries (ignoring the study it comes from)
-data.Anon <- select(data.All, -c("lead_author", "year")) %>% unique()
-
-dim(data.All)[1] - dim(data.Anon)[1] # 344 entries are repeated
-
-###* Modify data.All to only keep unique entries ----
-# assigning to them the oldest associated reference
-data.All <- data.All %>%
-  arrange(lead_author, desc(year)) %>%
-  distinct(across(trait.name:pathogen), .keep_all = TRUE)
 
 ###* Visualize traits as functions of temperature
 

@@ -4,14 +4,14 @@ library('rjags')
 library(tidyverse)
 
 # This file contains tools for analysis and visualization.
-source("code/Mordecai2017/mcmc_utils_all.R")
+source("code/Mordecai_2017/mcmc_utils_all.R")
 
 # This file contains the thermal response functions and their derivatives.
-source("code/Mordecai2017/temp_functions_all.R")
+source("code/Mordecai_2017/temp_functions_all.R")
 ## Load data for first model fit
-data.all <- read.csv("data/raw/aegyptiDENVmodelTempData_2016-03-30.csv", header=TRUE)
+data.all <- read.csv("data/raw/Mordecai_2017/aegyptiDENVmodelTempData_2016-03-30.csv", header=TRUE)
 
-load("code/Mordecai2017/aedes_prior_gamma_fits.Rsave")
+load("code/Mordecai_2017/aedes_prior_gamma_fits.Rsave")
 
 ## Specify the MCMC Input Parameters
 n.chains <- 5
