@@ -45,15 +45,8 @@ data.Mordecai2017.Aegypti <- read.csv("data/raw/Mordecai_2017/aegyptiDENVmodelTe
   filter(ref != "Focks_Barrera_2006_Research&TrainingTropicalDis_Geneva_Paper") %>%
   # Exclude the Rohani et al 2009 data because it has "unrealistically long lifespans"
   filter(ref != "Rohani_et_al_2009_SEJTropMedPH") %>%
-  # Data from this reference wasn't copied correctly
-  filter(ref != "Yang_et_al_2008_EpidInfect") %>% 
   mutate(mosquito_species = "Aedes aegypti") %>%
   mutate(pathogen = ifelse(trait.name %in% c("b", "c", "PDR"), "DENV", NA)) %>%
-  select(-c("trait2", "trait2.name"))
-
-data.Yang2008 <-read.csv("data/raw/Yangetal2008_data.csv", header = TRUE)  %>% 
-  mutate(mosquito_species = "Aedes aegypti") %>% 
-  mutate(pathogen = "none") %>%
   select(-c("trait2", "trait2.name"))
 
 data.Mordecai2017.Albopictus <- read.csv("data/raw/Mordecai_2017/albopictusCHIKVmodelTempData_2016-03-26.csv", header = TRUE) %>%
