@@ -31,11 +31,15 @@ library(tidyverse)
 ###* Data sets ----
 # Mordecai 2013
 # -- Mordecai_2013_supp_data.csv
-# -- survival_data.csv (survival data for Anopheles gambiae from Bayoh 2001, taken from Supplementary Data .doc)
+# -- Bayoh2001_mortality.csv (survival data for Anopheles gambiae from Bayoh 2001,
+#    taken from Supplementary Data of Mordecai 2013. See Mordecai_2013_lifespan.R for details)
 data.Mordecai2013 <- read.csv("data/raw/Mordecai_2013/Mordecai_2013_supp_data.csv", header = TRUE) %>%
+  # Add in lifespan data
+  rbind(read_csv("data/clean/Bayoh2001_mortality.csv")) %>% 
   mutate(lead_author = "Mordecai") %>%
   mutate(year = "2013") %>%
-  select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)%>% unique()
+  select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)%>%
+  unique()
 
 # Mordecai 2017
 # -- aegyptiDENVmodelTempData_2016-03-30.csv
@@ -232,8 +236,6 @@ data.Viz <- data.All %>%
 
 # show thermal response of all traits across all systems
 trait_plots <- data.Viz %>%
-  # filter to only traits we care about
-  filter(!trait.name %in% c("prop.live.50", "last.great.001", "EFOC", "EPR")) %>% 
   ggplot(aes(x = T, y = trait, color = as.factor(system_ID), group = system_ID)) +
   geom_point() +
   facet_wrap(~ trait.name, scales = "free")
