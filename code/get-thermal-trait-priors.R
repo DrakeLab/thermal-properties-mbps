@@ -52,10 +52,6 @@ source("code/Mordecai_2017/temp_functions_all.R")
 ### * Load in data ----
 data.in <- read.csv("data/clean/data_for_TPC_fitting.csv") %>% dplyr::select(-X)
 
-
-traits <- tibble(trait.name = unique(data.in$trait.name))
-systems 
-
 trait_table <- distinct(data.in, trait.name, mosquito_species, pathogen) %>% 
   arrange(trait.name, mosquito_species)
 write_csv(trait_table, "data/clean/temp_trait_table.csv")
