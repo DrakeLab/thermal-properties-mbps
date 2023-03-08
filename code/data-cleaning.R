@@ -5,13 +5,12 @@
 ## Purpose: Translate data from multiple sources into the format used in our
 ##          analyses
 ##
-## Contents: 1) Set-up, load in necessary packages and data-sets
-##           2) Define accessory functions
-##           ) Exploratory analysis of the data
-##           3) Translate traits and trait names to standard form
-##           ) Apply any transformations needed to get the correct trait
-##           ) Assign the proper thermal response function to the trait
-##           ) Assign mosquito species and pathogen names to data
+## Contents: 0) Set-up, load in necessary packages
+##           1) Load in all data sets
+##           2) Combine data sets
+##           3) Rename non-focal focal systems and synonymous traits
+##           4) Data visualizations / diagnostics
+##           5) Export data set
 ##
 ##
 ## Inputs:  data is found in data/raw/ in folders labeled by the first author
@@ -25,23 +24,30 @@
 ## Written and maintained by: Kyle Dahlin, kydahlin@gmail.com
 ## Initialized February 2023
 
-# 1) Set-up, load in necessary packages and data-sets ----
+
+# 0) Set-up, load in necessary packages and data-sets ---------------------
 library(tidyverse)
 
-###* Data sets ----
-# Mordecai 2013
+
+# 1) Load in all data sets ------------------------------------------------
+
+### * Mordecai 2013 ----
 # -- Mordecai_2013_supp_data.csv
 # -- Bayoh2001_mortality.csv (survival data for Anopheles gambiae from Bayoh 2001,
-#    taken from Supplementary Data of Mordecai 2013. See Mordecai_2013_lifespan.R for details)
+#    taken from Supplementary Data of Mordecai 2013. See Bayoh2001-lifespan-analysis.R for details)
 data.Mordecai2013 <- read.csv("data/raw/Mordecai_2013/Mordecai_2013_supp_data.csv", header = TRUE) %>%
   # Add in lifespan data
   rbind(read_csv("data/clean/Bayoh2001_mortality.csv")) %>% 
   mutate(lead_author = "Mordecai") %>%
+  # Make bc a probability
+  mutate(trait = ifelse(trait.name == "bc", trait / 100, trait)) %>% 
+  # Fix EIP entry errors (EIP = 0 really means parasite never developed)
+  mutate(trait = ifelse(trait.name == "EIP" & trait == 0, Inf, trait)) %>% 
   mutate(year = "2013") %>%
-  select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)%>%
+  select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year) %>%
   unique()
 
-# Mordecai 2017
+### * Mordecai 2017 ----
 # -- aegyptiDENVmodelTempData_2016-03-30.csv
 # -- albopictusCHIKVmodelTempData_2016-03-26.csv
 data.Mordecai2017.Aegypti <- read.csv("data/raw/Mordecai_2017/aegyptiDENVmodelTempData_2016-03-30.csv", header = TRUE) %>%
@@ -66,13 +72,12 @@ data.Mordecai2017.PDRaddl <- read.csv("data/raw/Mordecai_2017/EIP_priors_2015-12
 
 data.Mordecai2017 <- rbind(data.Mordecai2017.Aegypti, 
                            data.Mordecai2017.Albopictus,
-                           data.Mordecai2017.PDRaddl,
-                           data.Yang2008) %>%
+                           data.Mordecai2017.PDRaddl) %>%
   mutate(lead_author = "Mordecai") %>%
   mutate(year = "2017") %>%
   select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
 
-# Shocket 2018
+### *  Shocket 2018 ----
 # -- RRVPriorData.csv
 # -- RRVTraitData.csv
 data.Shocket2018 <- read.csv("data/raw/Shocket_2018/RRVTraitData.csv", header = TRUE) %>%
@@ -89,7 +94,7 @@ data.Shocket2018 <- read.csv("data/raw/Shocket_2018/RRVTraitData.csv", header = 
   rename(pathogen = paras.code) %>%
   select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
 
-# Tesla 2018
+### * Tesla 2018 ----
 # -- InfectionData.csv
 # -- SurvivalData.csv
 # -- ZIKV_trait_data_fits.csv
@@ -107,10 +112,10 @@ data.Tesla2018 <- read.csv("data/raw/Tesla_2018/zikv_traits.csv", header = TRUE)
   mutate(year = "2018") %>%
   select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
 
-# Mordecai 2019
+### * Mordecai 2019 ----
 # -- raw data not provided
 
-# Shocket 2020
+### * Shocket 2020 ----
 # - This article has separate tables for each trait
 # -- TraitData_a.csv
 # -- TraitData_bc.csv
@@ -165,61 +170,48 @@ data.Shocket2020 <- read.csv("data/raw/Shocket_2020/TraitData_a.csv", header = T
   filter(mosquito_species != "missing code") %>%
   select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
 
+# 2) Combine data sets ----------------------------------------------------
 # Combine all data frames
 data.All <- rbind(data.Mordecai2013, data.Mordecai2017, data.Shocket2018, data.Tesla2018, data.Shocket2020)
 
-# write.csv(data.All, "data/clean/data.All.csv")
-
-# 2) Define accessory functions ----
-
-# List of traits from data
-in_trait_list <- unique(data.All$trait.name)
-
-# List of intermediate traits (ones that TPCs are fit to)
-inter_trait_list <- c("a", "TFD", "EFD", "MDR", "e2a", "b", "c", "PDR", "lf")
-
-# Table explaining how to convert from initial to intermediate traits
 
 
-# List of parameters we need for the model
-out_params_list <- c(
-  "sigmaV", "fecundity", "deltaL", "lf",
-  "KL", "rhoL", "muV", "betaV", "etaV"
-)
+# 3) Rename non-focal focal systems and synonymous traits -----------------
 
-# Functions for converting from intermediate traits to model parameters
-
-
-# 3) Exploratory analysis of the data ----
-
-###* Visualize traits as functions of temperature
-
-# Set up data frame for visualization
-# Focal systems: 
+# List of focal disease systems: 
 # - Aedes aegypti / DENV
 # - Aedes aegypti / ZIKV
 # - Aedes albopictus / DENV
 # - Culex quinquefasciatus / WNV
 # - Anopheles spp. / Plasmodium falciparum
-data.Viz <- data.All %>%
-  dplyr::mutate(Species = stringr::word(mosquito_species, 2, 2, sep = " ")) %>%
-  dplyr::mutate(Genus = stringr::word(mosquito_species, 1, 1, sep = " ")) %>%
+
+# Reduce all non-focal mosquito and parasite species to the genus level
+data.Reduced <- data.All %>%
+  # Separate mosquito binomial
+  mutate(Species = stringr::word(mosquito_species, 2, 2, sep = " ")) %>%
+  mutate(Genus = stringr::word(mosquito_species, 1, 1, sep = " ")) %>%
+  mutate(Genus = ifelse(Genus %in% c("Aedes", "Culex", "Anopheles"), Genus, "Other")) %>% 
+  # Reduce non-focal MOSQUITO species to genus level
   mutate(species_label = case_when(
     (Genus == "Aedes" & !(Species %in% c("aegypti", "albopictus"))) ~ "spp.",
     (Genus == "Culex" & Species != "quinquefasciatus") ~ "spp.",
-    (Genus == "Anopheles" & Species != "gambiae") ~ "spp.",
+    Genus == "Anopheles" ~ "spp.",
+    # (Genus == "Anopheles" & Species != "gambiae") ~ "spp.", # Not enough data for Anopheles gambiae alone to fit model.
+    Genus == "Other" ~ "spp.",
     TRUE ~ Species
   )) %>%
   mutate(mosquito_species = paste(Genus, species_label, sep = " ")) %>% 
+  # Separate parasite binomial
   mutate(pathogen_1 = stringr::word(pathogen, 1, 1, sep = " ")) %>% 
   mutate(pathogen_2 = stringr::word(pathogen, 2, 2, sep = " ")) %>% 
-  mutate(pathogen_new = case_when(
-    # pathogen %in% c("WNV-SA", "WNV-NY99", "WNV") ~ "WNV",
+  # Reduce non-focal PARASITES to genus level
+  mutate(pathogen = case_when(
     pathogen == "DENV" ~ "DENV",
     pathogen == "ZIKV" ~ "ZIKV",
     pathogen %in% c("WNV-NY99", "WNV-SA", "WNV") ~ "WNV",
-    (pathogen_1 == "Plasmodium"  & pathogen_2 != "falciparum") ~ "Plasmodium spp.",
-    (pathogen_1 == "Plasmodium"  & pathogen_2 == "falciparum") ~ "Plasmodium falciparum",
+    pathogen_1 == "Plasmodium" ~ "Plasmodium spp.",
+    # (pathogen_1 == "Plasmodium"  & pathogen_2 != "falciparum") ~ "Plasmodium spp.", # Not enough data for Plasmodium falciparum alone to fit model.
+    # (pathogen_1 == "Plasmodium"  & pathogen_2 == "falciparum") ~ "Plasmodium falciparum",
     pathogen %in% c("SLEV", "MVE") ~ "flavivirus",
     pathogen %in% c("WEEV", "SINV", "EEEV", "RRV") ~ "togavirus",
     pathogen == "RVFV" ~ "togavirus",
@@ -229,60 +221,71 @@ data.Viz <- data.All %>%
   )) %>% 
   unite(
     col = "system_ID",
-    c("mosquito_species", "pathogen_new"),
+    c("mosquito_species", "pathogen"),
     sep = " / ",
-    remove = TRUE
-  ) 
+    remove = FALSE
+  ) %>% 
+  select(-c(Species, Genus, species_label, pathogen_1, pathogen_2))
+
+
+# List of traits for fitting thermal performance curves
+# TPC_trait_list <- c("a", "TFD", "EFD", "MDR", "e2a", "b", "c", "PDR", "lf")
+
+# Load the table explaining how to convert from initial to intermediate traits
+transform_table <- read_csv("data/clean/trait_transforms.csv") %>% 
+  select(-notes) %>% 
+  rename(trait.name = trait.from) %>% 
+  arrange(final.trait, trait.to, trait.name)
+
+# Define small value for inverting traits
+eps <- 0#.Machine$double.eps
+
+# Rename synonymous traits
+data.Reduced <- data.Reduced %>% 
+  right_join(transform_table) %>% 
+  mutate(trait = case_when(
+    transform == "Identity" ~ trait,
+    transform == "Inverse" ~ 1/(trait + eps),
+    transform == "Remove" ~ NaN,
+    TRUE ~ trait
+    # Others will be transformed after fitting thermal performance curves
+  )) %>% 
+  mutate(trait.from = trait.name) %>% 
+  mutate(trait.name = trait.to, .keep = "unused") %>% 
+  filter(!is.na(trait))
+
+
+# 4) Data visualizations / diagnostics ------------------------------------
+
+###* Visualize traits as functions of temperature
+
+# Set up data frame for visualization
+data.Viz <- data.Reduced
 
 # show thermal response of all traits across all systems
 trait_plots <- data.Viz %>%
-  ggplot(aes(x = T, y = trait, color = as.factor(system_ID), group = system_ID)) +
+  ggplot(aes(x = T, y = trait, color = as.factor(mosquito_species),
+             shape = as.factor(pathogen), group = system_ID)) +
   geom_point() +
+  scale_shape_manual(values = 1:length(unique(data.Viz$pathogen))) +
   facet_wrap(~ trait.name, scales = "free")
 
-# show thermal response of selected traits across selected systems
+# show thermal response data for focal systems only
 select_trait_plots <- data.Viz %>% 
   filter(system_ID %in% c("Aedes aegypti / DENV", "Aedes aegypti / none", 
                           "Aedes aegypti / ZIKV", "Aedes aegypti / none",
                           "Aedes albopictus / DENV", "Aedes albopictus / none", 
                           "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
-                          "Anopheles spp. / Plasmodium falciparum",
+                          "Anopheles spp. / Plasmodium spp.",
                           "Anopheles spp. / none"
-                          )) %>% 
-  ggplot(aes(x = T, y = trait, color = as.factor(system_ID), group = system_ID)) +
+  )) %>% 
+  ggplot(aes(x = T, y = trait, color = as.factor(mosquito_species),
+             shape = as.factor(pathogen), group = system_ID)) +
   geom_point() +
+  scale_shape_manual(values = 1:8) +
   facet_wrap(~ trait.name, scales = "free")
 
-###* Filter to chosen mosquito species and pathogens ----
+# 5) Save and export data set ---------------------------------------------
 
-# Chosen species:
-# -- Aedes aegypti, Aedes albopictus, Culex quinquefasciatus, Anopheles spp.
-data.Temp <- data.All %>%
-  dplyr::mutate(Species = stringr::word(mosquito_species, 2, 2, sep = " ")) %>%
-  dplyr::mutate(Genus = stringr::word(mosquito_species, 1, 1, sep = " ")) %>%
-  # filter(Genus %in% c("Aedes", "Anopheles", "Culex")) %>%
-  # !!! Temporary: if data isn't from the exact species, combine it at the genus level
-  # Can use data from these other species to create informative priors for the focal species
-  # Anopheles data is always kept at the genus level (?)
-  mutate(species_label = case_when(
-    (Genus == "Aedes" & !(Species %in% c("aegypti", "albopictus"))) ~ "spp.",
-    (Genus == "Culex" & Species != "quinquefasciatus") ~ "spp.",
-    (Genus == "Anopheles" & Species != "gambiae") ~ "spp.",
-    # Genus == "Anopheles" ~ "spp.",
-    TRUE ~ Species
-  )) %>%
-  mutate(mosquito_species_new = paste(Genus, species_label, sep = " "))
-
-# To get data that exactly matches our chosen species
-# data.Only <- filter(data.Temp, mosquito_species == mosquito_species_new)
-
-# 3) Translate traits and trait names to standard form ----
-
-
-# ) Apply any transformations needed to get the correct trait ----
-
-
-# ) Assign the proper thermal response function to the trait ----
-
-
-# ) Assign mosquito species and pathogen names to data ----
+# Save data.frame to file
+write.csv(data.Reduced, "data/clean/data_for_TPC_fitting.csv")

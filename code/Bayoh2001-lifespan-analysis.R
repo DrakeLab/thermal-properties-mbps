@@ -2,7 +2,8 @@
 ##
 ## Project: Global zoonoses - spillover of mosquito-borne pathogens
 ##
-## Purpose: Estimate mortality rate from data provided in Bayoh 2001
+## Purpose: Estimate mortality rate from data provided in Bayoh 2001, following 
+##          process outlined in Mordecai et al., 2013
 ##
 ## Contents: 1) Set-up, load in necessary packages and data-sets
 ##           2) Load in and clean data as necessary
@@ -12,13 +13,14 @@
 ##           6) Output data in correct format for further processing (to data_cleaning.R)
 ##
 ##
-## Inputs:  data/raw/Mordecai_2013/Mordecai_2013_supp_data.csv
+## Inputs:  data/raw/Mordecai_2013/survival_data.csv
 ##
 ##
-## Outputs: data - Mordecai_2013_lifespan.Rdata
+## Outputs: data - data/clean/Bayoh2001_mortality.csv
 ##
 ## Written and maintained by: Kyle Dahlin, kydahlin@gmail.com
 ## Initialized March 2023
+
 
 
 # 1) Set-up load in necessary packages ----

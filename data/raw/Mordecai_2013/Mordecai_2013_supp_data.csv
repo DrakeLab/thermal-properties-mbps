@@ -53,19 +53,3 @@ EFD,20,13.08,"Delatte et al., 2009",,,Aedes albopictus,none
 EFD,25,23.14,"Delatte et al., 2009",,,Aedes albopictus,none
 EFD,30,22.13,"Delatte et al., 2009",,,Aedes albopictus,none
 EFD,35,16.91,"Delatte et al., 2009",,,Aedes albopictus,none
-prop.live.50,5,5,Bayoh 2001,,day at which populations drops below 50% of original,Anopheles gambiae,none
-prop.live.50,10,10,Bayoh 2001,,day at which populations drops below 50% of original,Anopheles gambiae,none
-prop.live.50,15,25,Bayoh 2001,,day at which populations drops below 50% of original,Anopheles gambiae,none
-prop.live.50,20,31,Bayoh 2001,,day at which populations drops below 50% of original,Anopheles gambiae,none
-prop.live.50,25,30,Bayoh 2001,,day at which populations drops below 50% of original,Anopheles gambiae,none
-prop.live.50,30,15,Bayoh 2001,,day at which populations drops below 50% of original,Anopheles gambiae,none
-prop.live.50,35,10,Bayoh 2001,,day at which populations drops below 50% of original,Anopheles gambiae,none
-prop.live.50,40,5,Bayoh 2001,,day at which populations drops below 50% of original,Anopheles gambiae,none
-last.great.001,5,7,Bayoh 2001,,last day for which proportion is above 1%,Anopheles gambiae,none
-last.great.001,10,18,Bayoh 2001,,last day for which proportion is above 1%,Anopheles gambiae,none
-last.great.001,15,54,Bayoh 2001,,last day for which proportion is above 1%,Anopheles gambiae,none
-last.great.001,20,63,Bayoh 2001,,last day for which proportion is above 1%,Anopheles gambiae,none
-last.great.001,25,67,Bayoh 2001,,last day for which proportion is above 1%,Anopheles gambiae,none
-last.great.001,30,27,Bayoh 2001,,last day for which proportion is above 1%,Anopheles gambiae,none
-last.great.001,35,13,Bayoh 2001,,last day for which proportion is above 1%,Anopheles gambiae,none
-last.great.001,40,7,Bayoh 2001,,last day for which proportion is above 1%,Anopheles gambiae,none
