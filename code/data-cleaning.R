@@ -44,7 +44,7 @@ data.Mordecai2013 <- read.csv("data/raw/Mordecai_2013/Mordecai_2013_supp_data.cs
   # Fix EIP entry errors (EIP = 0 really means parasite never developed)
   mutate(trait = ifelse(trait.name == "EIP" & trait == 0, Inf, trait)) %>% 
   mutate(year = "2013") %>%
-  select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year) %>%
+  dplyr::select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year) %>%
   unique()
 
 ### * Mordecai 2017 ----
@@ -57,14 +57,14 @@ data.Mordecai2017.Aegypti <- read.csv("data/raw/Mordecai_2017/aegyptiDENVmodelTe
   filter(ref != "Rohani_et_al_2009_SEJTropMedPH") %>%
   mutate(mosquito_species = "Aedes aegypti") %>%
   mutate(pathogen = ifelse(trait.name %in% c("b", "c", "PDR"), "DENV", NA)) %>%
-  select(-c("trait2", "trait2.name"))
+  dplyr::select(-c("trait2", "trait2.name"))
 
 data.Mordecai2017.Albopictus <- read.csv("data/raw/Mordecai_2017/albopictusCHIKVmodelTempData_2016-03-26.csv", header = TRUE) %>%
   # The starved mosquitoes had much shorter survival than all other data, so remove them
   filter(trait2 %in% c("sugar-fed", NA)) %>%
   mutate(mosquito_species = "Aedes albopictus") %>%
   mutate(pathogen = ifelse(trait.name %in% c("b", "c", "PDR"), "DENV", NA)) %>%
-  select(-c("trait2", "trait2.name"))
+  dplyr::select(-c("trait2", "trait2.name"))
 
 data.Mordecai2017.PDRaddl <- read.csv("data/raw/Mordecai_2017/EIP_priors_2015-12-04.csv", header = TRUE) %>%
   rename(pathogen = virus, mosquito_species = mosquito)
@@ -75,7 +75,7 @@ data.Mordecai2017 <- rbind(data.Mordecai2017.Aegypti,
                            data.Mordecai2017.PDRaddl) %>%
   mutate(lead_author = "Mordecai") %>%
   mutate(year = "2017") %>%
-  select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
+  dplyr::select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
 
 ### *  Shocket 2018 ----
 # -- RRVPriorData.csv
@@ -92,7 +92,7 @@ data.Shocket2018 <- read.csv("data/raw/Shocket_2018/RRVTraitData.csv", header = 
   mutate(lead_author = "Shocket") %>%
   mutate(year = "2018") %>%
   rename(pathogen = paras.code) %>%
-  select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
+  dplyr::select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
 
 ### * Tesla 2018 ----
 # -- InfectionData.csv
@@ -110,7 +110,7 @@ data.Tesla2018 <- read.csv("data/raw/Tesla_2018/zikv_traits.csv", header = TRUE)
     ) %>%
   mutate(lead_author = "Tesla") %>%
   mutate(year = "2018") %>%
-  select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
+  dplyr::select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
 
 ### * Mordecai 2019 ----
 # -- raw data not provided
@@ -128,23 +128,23 @@ data.Tesla2018 <- read.csv("data/raw/Tesla_2018/zikv_traits.csv", header = TRUE)
 
 data.Shocket2020 <- read.csv("data/raw/Shocket_2020/TraitData_a.csv", header = TRUE) %>%
   rename(trait.name = Trait.Name) %>%
-  select(trait.name, T, trait, host.code, paras.code) %>%
+  dplyr::select(trait.name, T, trait, host.code, paras.code) %>%
   rbind(read.csv("data/raw/Shocket_2020/TraitData_bc.csv", header = TRUE) %>%
-          select(trait.name, T, trait, host.code, paras.code)) %>%
+          dplyr::select(trait.name, T, trait, host.code, paras.code)) %>%
   rbind(read.csv("data/raw/Shocket_2020/TraitData_EFD.csv", header = TRUE) %>%
           rename(trait.name = Trait.Name) %>%
-          select(trait.name, T, trait, host.code, paras.code)) %>%
+          dplyr::select(trait.name, T, trait, host.code, paras.code)) %>%
   rbind(read.csv("data/raw/Shocket_2020/TraitData_EV.csv", header = TRUE) %>%
-          select(trait.name, T, trait, host.code, paras.code)) %>%
+          dplyr::select(trait.name, T, trait, host.code, paras.code)) %>%
   rbind(read.csv("data/raw/Shocket_2020/TraitData_lf.csv", header = TRUE) %>%
-          select(trait.name, T, trait, host.code, paras.code)) %>%
+          dplyr::select(trait.name, T, trait, host.code, paras.code)) %>%
   rbind(read.csv("data/raw/Shocket_2020/TraitData_MDR.csv", header = TRUE) %>%
-          select(trait.name, T, trait, host.code, paras.code)) %>%
+          dplyr::select(trait.name, T, trait, host.code, paras.code)) %>%
   rbind(read.csv("data/raw/Shocket_2020/TraitData_PDR.csv", header = TRUE) %>%
           rename(trait.name = Trait.Name) %>%
-          select(trait.name, T, trait, host.code, paras.code)) %>%
+          dplyr::select(trait.name, T, trait, host.code, paras.code)) %>%
   rbind(read.csv("data/raw/Shocket_2020/TraitData_pLA.csv", header = TRUE) %>%
-          select(trait.name, T, trait, host.code, paras.code)) %>%
+          dplyr::select(trait.name, T, trait, host.code, paras.code)) %>%
   rename(pathogen = paras.code) %>%
   mutate(lead_author = "Shocket") %>%
   mutate(year = "2020") %>%
@@ -168,7 +168,7 @@ data.Shocket2020 <- read.csv("data/raw/Shocket_2020/TraitData_a.csv", header = T
     TRUE ~ "missing code"
   )) %>%
   filter(mosquito_species != "missing code") %>%
-  select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
+  dplyr::select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
 
 # 2) Combine data sets ----------------------------------------------------
 # Combine all data frames
@@ -225,7 +225,7 @@ data.Reduced <- data.All %>%
     sep = " / ",
     remove = FALSE
   ) %>% 
-  select(-c(Species, Genus, species_label, pathogen_1, pathogen_2))
+  dplyr::select(-c(Species, Genus, species_label, pathogen_1, pathogen_2))
 
 
 # List of traits for fitting thermal performance curves
@@ -233,7 +233,7 @@ data.Reduced <- data.All %>%
 
 # Load the table explaining how to convert from initial to intermediate traits
 transform_table <- read_csv("data/clean/trait_transforms.csv") %>% 
-  select(-notes) %>% 
+  dplyr::select(-notes) %>% 
   rename(trait.name = trait.from) %>% 
   arrange(final.trait, trait.to, trait.name)
 
@@ -246,7 +246,7 @@ data.Reduced <- data.Reduced %>%
   mutate(trait = case_when(
     transform == "Identity" ~ trait,
     transform == "Inverse" ~ 1/(trait + eps),
-    transform == "Remove" ~ NaN,
+    transform == "NegativeLogDifference" ~ -log(1-trait), # following Mordecai et al., 2017 for prop.dead data from Alto et al., 2001b
     TRUE ~ trait
     # Others will be transformed after fitting thermal performance curves
   )) %>% 

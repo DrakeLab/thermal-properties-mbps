@@ -14,7 +14,7 @@ TFD,TFD,EFD,Multiply_a,"total fecundity. eggs laid per female per
 gonotrophic cycle (number/female)"
 GCD,a,a,Inverse,gonotrophic cycle duration
 1/MDR,MDR,MDR,Inverse,average development time (approx. = inverse of mosquito development rate)
-prop.dead,NA,NA,Remove,unused data. Only available for Aedes albopictus
+prop.dead,lf,lf,NegativeLogDifference,proportion dead after time T
 a,a,a,Identity,biting rate
 bc,bc,bc,Identity,probability of becoming infectious from feeding on infectious host
 EFOC,EFOC,EFD,Multiply_a,eggs per female per oviposition cycle

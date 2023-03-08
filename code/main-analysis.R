@@ -42,7 +42,7 @@ data.in.TPC <- read_csv("data/clean/data_for_TPC_fitting.csv")
 
 # 2) Fit trait thermal performance curves to trait data -------------------
 
-# thermal-trait-priors.R = calculate distributions of thermal trait parameters
+# get-thermal-trait-priors.R = calculate distributions of thermal trait parameters
 
 # 3) Translate traits into model parameters -------------------------------
 

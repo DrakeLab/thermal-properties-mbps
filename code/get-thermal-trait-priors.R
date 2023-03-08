@@ -5,15 +5,14 @@
 ## Purpose: Compute prior distributions for thermal trait parameters and provide
 ##          functions for sampling from these distributions
 ##
-## Contents: 1) Set-up, load in necessary packages and data-sets
-##           2) Define accessory functions
-##           3) Calculate prior distributions of thermal trait parameters from data
-##           4) Save thermal trait parameter distributions
-##           5) Functions to sample from thermal trait parameter distributions
+## Contents: 0) Set-up, load in necessary packages and data-sets
+##           1) Define accessory functions
+##           2) Calculate prior distributions of thermal trait parameters from data
+##           3) Save thermal trait parameter distributions
+##           4) Functions to sample from thermal trait parameter distributions
 ##
 ##
-## Inputs:  data - data/raw/aegyptiDENVmodelTempData_2016-03-30.csv
-##                 data/raw/albopictusCHIKVmodelTempData_2016-03-26.csv
+## Inputs:  data - data/clean/data_for_TPC_fitting.csv
 ##                 data/clean/trait_table.csv
 ##                 data/clean/gamma_fits.csv
 ##
@@ -34,83 +33,24 @@
 # * Tesla, B., L. R. Demakovsky, E. A. Mordecai, S. J. Ryan, M. H. Bonds, C. N. Ngonghala, M. A. Brindley, and C. C. Murdock. 2018. Temperature drives Zika virus transmission: evidence from empirical and mathematical models. Proceedings. Biological sciences / The Royal Society 285:20180795.
 # _______________________________________________________________________________
 
-# 1) Set-up,load packages, get data, etc. ----
+# 0) Set-up, load in necessary packages and data-sets ---------------------
 
-### Load Libraries ----
+# Load Libraries
 library(tidyverse)
 library(IDPmisc)
 library("rjags") # Make sure you have installed JAGS-4.x.y.exe (for any x >=0, y>=0) from http://www.sourceforge.net/projects/mcmc-jags/files
 library("MASS")
 library("here")
 
-### Load functions (from Mordecai et al., 2017)
+# Load utility functions (from Mordecai et al., 2017)
 # This file contains tools for analysis and visualization.
 source("code/Mordecai2017/mcmc_utils_all.R")
 
 # This file contains the thermal response functions and their derivatives.
 source("code/Mordecai2017/temp_functions_all.R")
 
-### Load in data ----
-
-## Load prior data for Aedes species
-data.Aegypti <- read.csv("data/raw/aegyptiDENVmodelTempData_2016-03-30.csv", header = TRUE) %>%
-  # Exclude the Focks & Barrera 2006 data because they're from a model
-  filter(ref != "Focks_Barrera_2006_Research&TrainingTropicalDis_Geneva_Paper") %>% 
-  # Exclude the Rohani et al 2009 data because it has "unrealistically long lifespans"
-  filter(ref != "Rohani_et_al_2009_SEJTropMedPH") 
-
-data.Albopictus <- read.csv("data/raw/albopictusCHIKVmodelTempData_2016-03-26.csv", header = TRUE) %>% 
-  # The starved mosquitoes had much shorter survival than all other data, so remove them
-  filter(trait2 %in% c("sugar-fed", NA))
-
-### Define names of mosquitoes and pathogens under consideration ----
-
-# Define mosquito species names and codes:
-sp_names <- c(
-  "Aedes aegypti", "Aedes albopictus", "Culex quinquefasciatus",
-  "Anopheles spp."
-)
-sp_code <- c("AE", "AL", "CQ", "AN")
-names(sp_names) <- sp_code
-
-# Define pathogen names
-path_names <- c("DENV", "ZIKV", "WNV", "P.fal.")
-
-# Define mosquito-pathogen pairs
-## The generated parameter table should include a set of parameters for
-## each pair defined here
-MosqPathPairs <- tibble(
-  Mosquito_species = c(
-    "Aedes aegypti", "Aedes albopictus",
-    "Aedes aegypti",
-    "Culex quinquefasciatus",
-    "Anopheles spp."
-  ),
-  Pathogen = c("DENV", "DENV", "ZIKV", "WNV", "P.fal.")
-)
-
-trait_names <- c(
-  "GCD", # gonotrophic cycle duration
-  "GCR", #
-  "a", # biting rate
-  "1/MDR", # mosquito development time
-  "TFD", # total female fecundity
-  "pEA", # the probability a mosquito will survive from hatching to maturation
-  "e2a", #
-  "p", # the survival probability of an adult mosquito
-  "b", # probability of becoming infected
-  "c", # probability of becoming infectious
-  "EIP", # extrinsic incubation period
-  "lf", # lifespan
-  "1/mu", # inverse of mortality rate
-  "p/days", # ??? proportion surviving each day ???
-  "prop.dead" # proportion dead after ??? days
-  # 'PDR' # parasite development rate = 1/EIP
-)
-
-output_trait_names <- c("a", "TFD", "EFD", "MDR", "e2a", "b", "c", "PDR", "lf")
-input_trait_names <- c(output_trait_names, "GCD", "1/MDR", "GCR", "pEA", "EIP")
-
+### * Load in data ----
+data.in.TPC <- read_csv("data/clean/data_for_TPC_fitting.csv")
 
 # Function: transform thermal traits to parameters
 thermtrait.transform <- function(data_in) {
