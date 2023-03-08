@@ -44,46 +44,21 @@ library("here")
 
 # Load utility functions (from Mordecai et al., 2017)
 # This file contains tools for analysis and visualization.
-source("code/Mordecai2017/mcmc_utils_all.R")
+source("code/Mordecai_2017/mcmc_utils_all.R")
 
 # This file contains the thermal response functions and their derivatives.
-source("code/Mordecai2017/temp_functions_all.R")
+source("code/Mordecai_2017/temp_functions_all.R")
 
 ### * Load in data ----
-data.in.TPC <- read_csv("data/clean/data_for_TPC_fitting.csv")
+data.in <- read.csv("data/clean/data_for_TPC_fitting.csv") %>% dplyr::select(-X)
 
-# Function: transform thermal traits to parameters
-thermtrait.transform <- function(data_in) {
-  # list names of relevant traits
-  output_trait_names <- c("a", "TFD", "EFD", "MDR", "e2a", "b", "c", "PDR", "lf")
 
-  # load in table telling us how to transform traits
-  trait_lookup_table <- read.csv("data/clean/trait_table.csv", header = TRUE) %>%
-    # !!! modify to take into account mosquito species & pathogen
-    mutate(trait.to = trait.name) %>%
-    mutate(trait.name = computed.from) %>%
-    dplyr::select(trait.name, trait.to, from.transform)
+traits <- tibble(trait.name = unique(data.in$trait.name))
+systems 
 
-  data_out <- left_join(data_in, trait_lookup_table) %>%
-    # transform trait values according to the proper function (just identity or inverse for now)
-    mutate(trait = case_when(
-      from.transform == "Identity" ~ trait,
-      from.transform == "Inverse" ~ 1 / trait,
-      from.transform == "NegativeLogDifference" ~ -1 / log(1 - trait),
-      TRUE ~ trait
-    )) %>%
-    # make appropriate changes to the trait name
-    mutate(trait.name = case_when(
-      !is.na(trait.to) ~ trait.to,
-      TRUE ~ trait.name
-    )) %>%
-    # filter out unnecessary variables
-    filter(trait.name %in% output_trait_names) %>%
-    # select just the columns we need for analysis
-    dplyr::select(trait.name, T, trait)
-
-  return(data_out)
-}
+trait_table <- distinct(data.in, trait.name, mosquito_species, pathogen) %>% 
+  arrange(trait.name, mosquito_species)
+write_csv(trait_table, "data/clean/temp_trait_table.csv")
 
 # Set up data frame of traits and mosquito pathogen pairs
 full_df <- expand_grid(Mosquito = MosqPathPairs, trait = as_tibble(trait_names))

@@ -56,14 +56,32 @@ data.Mordecai2017.Aegypti <- read.csv("data/raw/Mordecai_2017/aegyptiDENVmodelTe
   # Exclude the Rohani et al 2009 data because it has "unrealistically long lifespans"
   filter(ref != "Rohani_et_al_2009_SEJTropMedPH") %>%
   mutate(mosquito_species = "Aedes aegypti") %>%
-  mutate(pathogen = ifelse(trait.name %in% c("b", "c", "PDR"), "DENV", NA)) %>%
+  mutate(pathogen = ifelse(trait.name %in% c("b", "c", "PDR"), case_when(
+    ref == "Alto&Bettinardi_2013_AJTMH" ~ "DENV",
+    ref == "Carrington_et_al_2013_PNTD" ~ "DENV",
+    ref == "Davis_1932_AmJEpidemiology" ~ "YFV",
+    ref == "Focks_et_al_1995_AJTMH" ~ "DENV",
+    ref == "Lambrects_et_al_2011_PNAS" ~ "DENV",
+    ref == "McLeah_et_al_1975_MosquitoNews" ~ "DENV",
+    ref == "McLean_et_al_1974_CanJMicobiol" ~ "DENV",
+    ref == "Watts_et_al_1987_AJTMH" ~ "DENV"
+    ), NA)) %>% 
+  # mutate(pathogen = ifelse(trait.name %in% c("b", "c", "PDR"), "DENV", NA)) %>%
   dplyr::select(-c("trait2", "trait2.name"))
 
 data.Mordecai2017.Albopictus <- read.csv("data/raw/Mordecai_2017/albopictusCHIKVmodelTempData_2016-03-26.csv", header = TRUE) %>%
   # The starved mosquitoes had much shorter survival than all other data, so remove them
   filter(trait2 %in% c("sugar-fed", NA)) %>%
+  # This study only considered Aedes aegypti
+  filter(ref != "Lambrects_et_al_2011_PNAS") %>% 
   mutate(mosquito_species = "Aedes albopictus") %>%
-  mutate(pathogen = ifelse(trait.name %in% c("b", "c", "PDR"), "DENV", NA)) %>%
+  mutate(pathogen = ifelse(trait.name %in% c("b", "c", "PDR"), case_when(
+    ref == "Alto&Bettinardi_2013_AJTMH" ~ "DENV",
+    ref == "Westbrook_et_al_2010_VecBorn&ZooDis" ~ "CHIKV",
+    ref == "Westbrook_Thesis_2010" ~ "CHIKV",
+    ref == "Xiao_et_al_2014_Arch Virol" ~ "DENV"
+  ), NA)) %>% 
+  # mutate(pathogen = ifelse(trait.name %in% c("b", "c", "PDR"), "CHIKV", NA)) %>%
   dplyr::select(-c("trait2", "trait2.name"))
 
 data.Mordecai2017.PDRaddl <- read.csv("data/raw/Mordecai_2017/EIP_priors_2015-12-04.csv", header = TRUE) %>%
@@ -212,9 +230,9 @@ data.Reduced <- data.All %>%
     pathogen_1 == "Plasmodium" ~ "Plasmodium spp.",
     # (pathogen_1 == "Plasmodium"  & pathogen_2 != "falciparum") ~ "Plasmodium spp.", # Not enough data for Plasmodium falciparum alone to fit model.
     # (pathogen_1 == "Plasmodium"  & pathogen_2 == "falciparum") ~ "Plasmodium falciparum",
-    pathogen %in% c("SLEV", "MVE") ~ "flavivirus",
-    pathogen %in% c("WEEV", "SINV", "EEEV", "RRV") ~ "togavirus",
-    pathogen == "RVFV" ~ "togavirus",
+    pathogen %in% c("SLEV", "MVE", "YFV") ~ "other flavivirus",
+    pathogen %in% c("WEEV", "SINV", "EEEV", "RRV", "CHIKV") ~ "other togavirus", # might want to separate out CHIKV later
+    pathogen == "RVFV" ~ "other togavirus",
     is.na(pathogen) ~ "none",
     TRUE ~ pathogen
     # TRUE ~ NA
