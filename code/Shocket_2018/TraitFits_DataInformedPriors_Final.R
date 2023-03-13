@@ -23,7 +23,7 @@ library('R2jags')
 library('mcmcplots')
 
 # Load Data
-data.RRV <- read.csv("RRVTraitData.csv") # Data from database for most traits (except below)
+data.RRV <- read.csv("data/raw/Shocket_2018/RRVTraitData.csv") # Data from database for most traits (except below)
 data.surv.proc <- read.csv("McDonaldSurvivalDataExpanded_ForJAGS.csv") # Processed survival data from McDonald 1980
 data.EFD.proc <- read.csv("McDonaldEFDDataExpanded_ForJAGS.csv") # Processed fecundity data from McDonald 1980
 

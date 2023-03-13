@@ -87,7 +87,6 @@ data.Mordecai2017.Albopictus <- read.csv("data/raw/Mordecai_2017/albopictusCHIKV
 data.Mordecai2017.PDRaddl <- read.csv("data/raw/Mordecai_2017/EIP_priors_2015-12-04.csv", header = TRUE) %>%
   rename(pathogen = virus, mosquito_species = mosquito)
   
-
 data.Mordecai2017 <- rbind(data.Mordecai2017.Aegypti, 
                            data.Mordecai2017.Albopictus,
                            data.Mordecai2017.PDRaddl) %>%
@@ -98,7 +97,25 @@ data.Mordecai2017 <- rbind(data.Mordecai2017.Aegypti,
 ### *  Shocket 2018 ----
 # -- RRVPriorData.csv
 # -- RRVTraitData.csv
+
+# Process EFD data separately
+data.EFD.proc <- read.csv("data/raw/Shocket_2018/RRVTraitData.csv", header = TRUE) %>%
+  # remove McDonald_1980_AusJofEco EFD data which will be dealt with separately
+  filter(ref == "McDonald_1980_AusJofEco" & trait.name == "EFD") %>% 
+  mutate(trait2 = as.double(trait2)) %>% 
+  group_by(T) %>%
+  mutate(trait = sum(trait)/max(trait2)) %>%
+  dplyr::select(trait.name, T, trait, ref, trait2, trait2.name, host.code, paras.code, notes) %>% 
+  unique() %>% 
+  ungroup()
+
 data.Shocket2018 <- read.csv("data/raw/Shocket_2018/RRVTraitData.csv", header = TRUE) %>%
+  # remove EFD data from Williams_2011_AusJEntrom which did not count actual eggs laid 
+  filter(!(ref == "Williams_2011_AusJEntrom" & trait.name == "EFD")) %>% 
+  # remove McDonald_1980_AusJofEco EFD data which will be dealt with separately
+  filter(!(ref == "McDonald_1980_AusJofEco" & trait.name == "EFD")) %>% 
+  # add in processed McDonald_1980_AusJofEco EFD data
+  rbind(data.EFD.proc) %>% 
   mutate(mosquito_species = case_when(
     host.code == "Ovig" ~ "Ochlerotatus vigilax",
     host.code == "Cann" ~ "Culex annulirostris",
@@ -111,6 +128,14 @@ data.Shocket2018 <- read.csv("data/raw/Shocket_2018/RRVTraitData.csv", header = 
   mutate(year = "2018") %>%
   rename(pathogen = paras.code) %>%
   dplyr::select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
+
+
+data.EFD.20 <- subset(data.EFD.proc, T == 20)
+data.EFD.25 <- subset(data.EFD.proc, T == 25)
+data.EFD.30 <- subset(data.EFD.proc, T == 30)
+EFD.means <- data.frame(T = c(20, 25, 30), mean = c(mean(data.EFD.20$trait), mean(data.EFD.25$trait), mean(data.EFD.30$trait)), 
+                        SE = c(sd(data.EFD.20$trait)/sqrt(nrow(data.EFD.20)), sd(data.EFD.25$trait)/sqrt(nrow(data.EFD.25)), sd(data.EFD.30$trait)/sqrt(nrow(data.EFD.30))))
+
 
 ### * Tesla 2018 ----
 # -- InfectionData.csv
@@ -192,9 +217,7 @@ data.Shocket2020 <- read.csv("data/raw/Shocket_2020/TraitData_a.csv", header = T
 # Combine all data frames
 data.All <- rbind(data.Mordecai2013, data.Mordecai2017, data.Shocket2018, data.Tesla2018, data.Shocket2020)
 
-
-
-# 3) Rename non-focal focal systems and synonymous traits -----------------
+# 3) Rename non-focal systems and combine synonymous traits -----------------
 
 # List of focal disease systems: 
 # - Aedes aegypti / DENV
@@ -305,4 +328,4 @@ select_trait_plots <- data.Viz %>%
 # 5) Save and export data set ---------------------------------------------
 
 # Save data.frame to file
-write.csv(data.Reduced, "data/clean/data_for_TPC_fitting.csv")
+write_csv(data.Reduced, "data/clean/data_for_TPC_fitting.csv")

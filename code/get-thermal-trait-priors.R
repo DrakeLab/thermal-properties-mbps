@@ -50,113 +50,227 @@ source("code/Mordecai_2017/mcmc_utils_all.R")
 source("code/Mordecai_2017/temp_functions_all.R")
 
 ### * Load in data ----
-data.in <- read.csv("data/clean/data_for_TPC_fitting.csv") %>% dplyr::select(-X)
+# Trait data
+data.in <- read_csv("data/clean/data_for_TPC_fitting.csv") # !!! remove this later so this can interact with the main-analysis.R script
 
-trait_table <- distinct(data.in, trait.name, mosquito_species, pathogen) %>% 
-  arrange(trait.name, mosquito_species)
-write_csv(trait_table, "data/clean/temp_trait_table.csv")
+# Load table of TPC forms to use for traits
+TPC_forms <- read_csv("data/clean/trait_TPC_forms.csv") %>%
+  # when TPC function can't be found from literature (a total of 10)
+  # use Briere (less restrictive than quadratic)
+  mutate(TPC.function = ifelse(is.na(TPC.function), "Briere", TPC.function))
 
 # Set up data frame of traits and mosquito pathogen pairs
-full_df <- expand_grid(Mosquito = MosqPathPairs, trait = as_tibble(trait_names))
+# full_df <- expand_grid(Mosquito = MosqPathPairs, trait = as_tibble(trait_names))
 
 # This table shows which functional form to use for each trait
-trait_lookup_table <- read.csv("data/clean/trait_table.csv", header = TRUE)
+trait_lookup_table <- read_csv("data/clean/trait_transforms.csv")
 
-### Set parameters for Monte Carlo sampling ----
 
-# Specify the parameters that control the MCMC (these will be used throughout the code).
-n.chains <-5 # 2 # 5
-n.adapt <- 5000 # 100 # 5000
-n.samps <- 5000 # 100 # 5000
-
-# 2) Define accessory functions ----
+# 1) Define accessory functions -------------------------------------------
 
 # Function: get samples of thermal trait parameters
-thermtrait.prior.sample <- function(data_in, trait_name,
-                                    n.chains = 5, n.adapt = 5000, n.samps = 5000) {
+thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
+                                    n.chains = 5, n.adapt = 5000, n.samps = 5000,
+                                    old_informative = FALSE) {
   with(as.list(data_in), {
-    # data_in should be specified to the species and pathogen level
-
+    # restrict to the trait we care about
+    data <- filter(data_in, trait.name == trait_in)
+    
     # filter to just the trait of interest
     # might have to bind multiple traits together, use look-up table
-    lookup_table <- read.csv("data/clean/trait_table.csv", header = TRUE) %>%
-      filter(trait.name == trait_name | computed.from == trait_name)
-
-    # trait_name <- unique(lookup_table$trait.name)
-
-    from_names <- c(trait_name, unique(lookup_table$computed.from))
-
-    data <- filter(data_in, trait.name %in% from_names)
-
-    # determine appropriate model using lookup table
-    thermal_function <- unique(lookup_table$thermal.function)
-
-    jags_choice <- case_when(
-      thermal_function == "Briere" ~ "code/jags-models/jags-briere-informative.bug",
-      thermal_function == "Quadratic" ~ "code/jags-models/jags-quad-neg-informative.bug"
-    )
+    # !!! still necessary?
+    # transform_table <- read_csv("data/clean/trait_transforms.csv") %>%
+    #   filter(trait.to == trait_in)
+    
+    # Get the proper TPC function
+    TPC_function <- read_csv("data/clean/trait_TPC_forms.csv") %>%
+      filter(trait.name == trait_in) %>%
+      filter(mosquito_species == mosquito_in) %>%
+      filter(pathogen == pathogen_in) %>%
+      dplyr::select(TPC.function)
+    
+    # trait_name <- unique(transform_table$trait.name)
+    
+    # from_names <- c(trait_in, unique(transform_table$trait.from)) %>% unique()
+    
     # initial values
-    inits_list <- if (thermal_function == "Briere") {
+    inits_list <- if (TPC_function == "Briere") {
       list(Tm = 31, T0 = 5, c = 0.00007)
-    } else if (thermal_function == "Quadratic") {
+    } else if (TPC_function == "Quadratic") {
       list(T0 = 5, Tm = 33, n.qd = 0.005)
     }
-    # names of variables being fit
-    variable.names <- case_when(
-      thermal_function == "Briere" ~ c("c", "Tm", "T0", "sigma"),
-      thermal_function == "Quadratic" ~ c("n.qd", "Tm", "T0", "sigma")
-    )
-
-    # load in hyperparameters from prior fits
-    hypers_table <- read.csv("data/clean/gamma_fits.csv", header = TRUE) %>%
-      filter(trait %in% from_names) %>%
-      unique() %>% 
-      # adjust by the appropriate multiplier
-      mutate(value = multiplier * value) %>%
-      dplyr::select(-multiplier) %>%
-      # all the rest of this is to get the data back in the form that "jags" wants
-      dplyr::select(-trait) %>%
-      pivot_wider(names_from = Var2, values_from = value) %>%
-      as.data.frame() %>%
-      `rownames<-`(.[, 1]) %>%
-      dplyr::select(-Var1)
     
-    print(hypers_table)
-
-    # create MCMC samples from the model with default priors
-    jags <- jags.model(jags_choice,
-      data = list("Y" = data$trait, "T" = data$T, "N" = length(data$T), "hypers" = hypers_table),
-      n.chains = n.chains, inits = inits_list,
-      n.adapt = n.adapt
-    )
-    # The coda.samples() function takes n.samps new samples, and saves
-    # them in the coda format, which we use for visualization and
-    # analysis.
-    coda.samps <- coda.samples(jags, variable.names, n.samps)
-
-    # This command combines the samples from the n.chains into a format
-    # that will be used for further analyses.
-    if (thermal_function == "Briere") {
-      samps <- make.briere.samps(coda.samps, nchains = n.chains, samp.lims = c(1, n.samps))
-    } else if (thermal_function == "Quadratic") {
-      samps <- make.quad.samps(coda.samps, nchains = n.chains, samp.lims = c(1, n.samps), sig = TRUE)
+    # names of TPC parameters being fit
+    variable_names <- if (TPC_function == "Briere") {
+      c("c", "Tm", "T0", "sigma")
+    } else if (TPC_function == "Quadratic") {
+      c("n.qd", "Tm", "T0", "sigma")
+    }
+    
+    # If you want to use the hyperparameters from Mordecai et al., 2017, load them in
+    if (old_informative == TRUE) {
+      
+     prev_hypers <- read_csv("data/clean/gamma_fits.csv") %>%
+        filter(trait %in% trait_in) %>%
+        unique() %>%
+        # adjust by the appropriate multiplier
+        mutate(value = multiplier * value) %>%
+        dplyr::select(-multiplier) %>%
+        # all the rest of this is to get the data back in the form that "jags" wants
+        dplyr::select(-trait) %>%
+        pivot_wider(names_from = Var2, values_from = value) %>%
+        as.data.frame() %>%
+        `rownames<-`(.[, 1]) %>%
+        dplyr::select(-Var1)
+     
+     if (dim(prev_hypers)[1] == 0) {stop("No saved TPC hyperparameter data. Switch old_informative to false")}
+     
+     jags_choice <- case_when(
+       TPC_function == "Briere" ~ "code/jags-models/jags-briere-informative.bug",
+       TPC_function == "Quadratic"  ~ "code/jags-models/jags-quad-neg-informative.bug"
+       # TPC_function == "Linear" ~ # !!! figure out what to put here (check Mordecai 2019 for how they handled lifespan for Cx. quinquefasciatus)
+     )
+     
+     jags_data <-  list("Y" = data$trait, "T" = data$T, 
+            "N" = length(data$T), "hypers" = prev_hypers)
+     
+     samps <- run.jags(jags_data, TPC_function, variable_names,
+                       jags_choice, inits_list,
+                       n.chains, n.adapt, n.samps)
+     
+      # Otherwise:
+      # 1) use default priors
+      # 2) update these using any related species
+      # 3) sequentially update with more recent datasets
     } else {
-      samps <- make.linear.samps(coda.samps, nchains = n.chains, samp.lims = c(1, n.samps), sig = TRUE)
-    }
 
-    samps$tau <- 1 / samps$sigma
-    if (is.null(samps$c)) {
-      samps$c <- samps$qd
-    }
-    samps$func <- thermal_function
-    out.samps <- dplyr::select(samps, T0, Tm, c, func)
+      # Gather data from other species of the same genus
+      other_species <- data %>%
+        filter(stringr::word(mosquito_species, 1, 1) == stringr::word(mosquito_in, 1, 1)) %>%
+        filter(mosquito_species != mosquito_in)
+      
+      # if such data is unavailable, use data from species outside of the genus
+      if (dim(other_species)[1] == 0) {
+        other_species <- data %>%
+          filter(mosquito_species == "other spp.")
+      }
+      
+      # First, inform prior distribution of TPC hyperparameters using data from other species
+      if (dim(other_species)[1] > 0) { 
+      other_data <-  list("Y" = other_species$trait, "T" = other_species$T, 
+                         "N" = length(other_species$T))
+      
+      # Select the appropriate bugs model
+      jags_other <- case_when(
+        TPC_function == "Briere" ~ "code/jags-models/jags-briere.bug",
+        TPC_function == "Quadratic" ~ "code/jags-models/jags-quad-neg.bug"
+        # TPC_function == "Linear" ~ # !!! figure out what to put here (check Mordecai 2019 for how they handled lifespan for Cx. quinquefasciatus)
+      )
+      
+      other_samps <- run.jags(other_data, TPC_function, variable_names,
+                        jags_other, inits_list,
+                        n.chains, n.adapt, n.samps)
+      prev_hypers = apply(other_samps, 2, function(df) fitdistr(df, "gamma")$estimate)
+      
+      } else {prev_hypers = c()} # if no trait data is available for any other speices, start with uninformed priors
+      
+      # List of studies with data reported for the particular trait and mosquito species
+      other_studies <- data %>%
+        filter(mosquito_species == mosquito_in) %>%
+        arrange(year, lead_author) %>% 
+        distinct(lead_author, year)
+      
+      # Select the appropriate bug model
+      jags_choice <- case_when(
+        TPC_function == "Briere" & is.null(prev_hypers) ~ "code/jags-models/jags-briere.bug",
+        TPC_function == "Briere" & !is.null(prev_hypers) ~ "code/jags-models/jags-briere-informative.bug",
+        TPC_function == "Quadratic" & is.null(prev_hypers) ~ "code/jags-models/jags-quad-neg.bug",
+        TPC_function == "Quadratic" & !is.null(prev_hypers) ~ "code/jags-models/jags-quad-neg-informative.bug"
+        # TPC_function == "Linear" ~ # !!! figure out what to put here (check Mordecai 2019 for how they handled lifespan for Cx. quinquefasciatus)
+      )
+      
+      # Initialize the previous hyperparameters
+      
+      for (ii in dim(other_studies)[1]) {
+        # Identify study
+        index_author <- other_studies$lead_author[ii]
+        index_year <- other_studies$year[ii]
+        
+        data_temp <- filter(data, lead_author == index_author, year == index_year)
+        
+        jags_data <-  if (is.null(prev_hypers)) {
+          list("Y" = data_temp$trait, "T" = data_temp$T, 
+               "N" = length(data_temp$T))
+        } else {
+          list("Y" = data_temp$trait, "T" = data_temp$T, 
+               "N" = length(data_temp$T), "hypers" = prev_hypers)
+        }
+        
+        samps <- run.jags(jags_data, TPC_function, variable_names,
+                         jags_choice, inits_list,
+                         n.chains, n.adapt, n.samps)
+        
+        if (ii < dim(other_studies)[1]) {
+          # for older entries, generate posterior distributions to estimate 
+          # hyperparameters for future fitting
+        
+        prev_hypers = apply(samps, 2,
+                           function(df) fitdistr(df, "gamma")$estimate)
+        
+        rm(out.samps) # !!! remove after debugging
+        # for the final entry, just generate samples from the jags.model
+        } else {
+        samps <- mutate(samps, func = as.character(TPC_function))
 
+        }
+        
+      }
+    }
+    out.samps <- dplyr::select(samps, T0, Tm, c)
     return(out.samps)
   })
 }
 
+# Function: get samples of trait TPC hyperparameters from running jags
+run.jags <- function(jags_data, TPC_function, variable_names,
+                     jags_choice, inits_list,
+                     n.chains, n.adapt, n.samps) {
+  # create MCMC samples from the model with default priors
+  jags <- jags.model(jags_choice,
+                     data = jags_data,
+                     n.chains = n.chains, inits = inits_list,
+                     n.adapt = n.adapt
+  )
+  # The coda.samples() function takes n.samps new samples, and saves
+  # them in the coda format, which we use for visualization and
+  # analysis.
+  coda.samps <- coda.samples(jags, variable_names, n.samps)
+  
+  # This command combines the samples from the n.chains into a format
+  # that will be used for further analyses.
+  if (TPC_function == "Briere") {
+    samps <- make.briere.samps(coda.samps, nchains = n.chains, samp.lims = c(1, n.samps))
+  } else if (TPC_function == "Quadratic") {
+    samps <- make.quad.samps(coda.samps, nchains = n.chains, samp.lims = c(1, n.samps), sig = TRUE)
+  } else {
+    samps <- make.linear.samps(coda.samps, nchains = n.chains, samp.lims = c(1, n.samps), sig = TRUE)
+  }
+  
+  samps$tau <- 1 / samps$sigma
+  if (is.null(samps$c)) {
+    samps$c <- samps$qd
+  }
+  return(samps)
+}
 
-# 3) Calculate prior distributions of thermal trait parameters from data ----
+# 2) Calculate prior distributions of thermal trait parameters from data ----
+
+### Set parameters for Monte Carlo sampling ----
+
+# Specify the parameters that control the MCMC (these will be used throughout the code).
+n.chains <- 2 # 5
+n.adapt <- 100 # 5000
+n.samps <- 100 # 5000
 
 # !!! I will come back and generalize this to take any choice of mosquito species
 
@@ -178,7 +292,7 @@ for (trait_ID in unique(temp.Albopictus$trait.name)) {
   ) %>%
     mutate(trait = trait_ID) %>%
     mutate(sample_num = row_number())
-
+  
   samples.Albopictus <- rbind(samples.Albopictus, samples)
 }
 
@@ -200,9 +314,11 @@ for (trait_ID in unique(temp.Aegypti$trait.name)) {
   ) %>%
     mutate(trait = trait_ID) %>%
     mutate(sample_num = row_number())
-
+  
   samples.Aegypti <- rbind(samples.Aegypti, samples)
 }
+
+# 3) Save thermal trait parameter distributions ---------------------------
 
 # Combine samples
 samples.All <- tibble(Species = "Aedes albopictus", samples.Albopictus) %>%
@@ -211,3 +327,5 @@ samples.All <- tibble(Species = "Aedes albopictus", samples.Albopictus) %>%
   relocate(Species, trait, c, T0, Tm)
 
 write_csv(samples.All, "data/clean/ThermalTraitSamples.csv")
+
+# 4) Functions to sample from thermal trait parameter distributions -------

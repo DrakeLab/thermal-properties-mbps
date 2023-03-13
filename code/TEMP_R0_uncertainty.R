@@ -322,7 +322,7 @@ meanR0TPC_df <- plot_df %>%
 
 quantsR0TPC_df <- plot_df %>%
   group_by(Species, Temperature, Model, sigmaH, KH) %>%
-  mutate(lowHCI_val = quantile(norm_R0, 0.055)) %>%
+  mutate(lowHCI_val = quantile(norm_R0, 0.055)) %>% # !!! make sure this is the right way to calculate this 
   mutate(highHCI_val = quantile(norm_R0, 0.945)) %>%
   arrange(Species, sigmaH, KH, Temperature, lowHCI_val, highHCI_val) %>%
   dplyr::select(-c("sample_num"))

@@ -44,6 +44,8 @@ data.in.TPC <- read_csv("data/clean/data_for_TPC_fitting.csv")
 
 # get-thermal-trait-priors.R = calculate distributions of thermal trait parameters
 
+
+
 # 3) Translate traits into model parameters -------------------------------
 
 # trait-transform.R = perform necessary transformations to traits to get model parameters
