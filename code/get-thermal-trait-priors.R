@@ -83,7 +83,9 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
     #   filter(trait.to == trait_in)
     
     # Get the proper TPC function
-    TPC_function <- read_csv("data/clean/trait_TPC_forms.csv") %>%
+    TPC_function <- TPC_forms %>%
+      # For cases with multiple possible TPC functions, choose the one used in later studies
+      mutate(TPC.function = str_extract(TPC.function, "[^/]+$")) %>% 
       filter(trait.name == trait_in) %>%
       filter(mosquito_species == mosquito_in) %>%
       filter(pathogen == pathogen_in) %>%
@@ -110,7 +112,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
     # If you want to use the hyperparameters from Mordecai et al., 2017, load them in
     if (old_informative == TRUE) {
       
-     prev_hypers <- read_csv("data/clean/gamma_fits.csv") %>%
+      prev_hypers <- read_csv("data/clean/gamma_fits.csv") %>%
         filter(trait %in% trait_in) %>%
         unique() %>%
         # adjust by the appropriate multiplier
@@ -122,28 +124,28 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         as.data.frame() %>%
         `rownames<-`(.[, 1]) %>%
         dplyr::select(-Var1)
-     
-     if (dim(prev_hypers)[1] == 0) {stop("No saved TPC hyperparameter data. Switch old_informative to false")}
-     
-     jags_choice <- case_when(
-       TPC_function == "Briere" ~ "code/jags-models/jags-briere-informative.bug",
-       TPC_function == "Quadratic"  ~ "code/jags-models/jags-quad-neg-informative.bug"
-       # TPC_function == "Linear" ~ # !!! figure out what to put here (check Mordecai 2019 for how they handled lifespan for Cx. quinquefasciatus)
-     )
-     
-     jags_data <-  list("Y" = data$trait, "T" = data$T, 
-            "N" = length(data$T), "hypers" = prev_hypers)
-     
-     samps <- run.jags(jags_data, TPC_function, variable_names,
-                       jags_choice, inits_list,
-                       n.chains, n.adapt, n.samps)
-     
+      
+      if (dim(prev_hypers)[1] == 0) {stop("No saved TPC hyperparameter data. Switch old_informative to false")}
+      
+      jags_choice <- case_when(
+        TPC_function == "Briere" ~ "code/jags-models/jags-briere-informative.bug",
+        TPC_function == "Quadratic"  ~ "code/jags-models/jags-quad-neg-informative.bug"
+        # TPC_function == "Linear" ~ # !!! figure out what to put here (check Mordecai 2019 for how they handled lifespan for Cx. quinquefasciatus)
+      )
+      
+      jags_data <-  list("Y" = data$trait, "T" = data$T, 
+                         "N" = length(data$T), "hypers" = prev_hypers)
+      
+      samps <- run.jags(jags_data, TPC_function, variable_names,
+                        jags_choice, inits_list,
+                        n.chains, n.adapt, n.samps)
+      
       # Otherwise:
       # 1) use default priors
       # 2) update these using any related species
       # 3) sequentially update with more recent datasets
     } else {
-
+      
       # Gather data from other species of the same genus
       other_species <- data %>%
         filter(stringr::word(mosquito_species, 1, 1) == stringr::word(mosquito_in, 1, 1)) %>%
@@ -157,22 +159,37 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
       
       # First, inform prior distribution of TPC hyperparameters using data from other species
       if (dim(other_species)[1] > 0) { 
-      other_data <-  list("Y" = other_species$trait, "T" = other_species$T, 
-                         "N" = length(other_species$T))
-      
-      # Select the appropriate bugs model
-      jags_other <- case_when(
-        TPC_function == "Briere" ~ "code/jags-models/jags-briere.bug",
-        TPC_function == "Quadratic" ~ "code/jags-models/jags-quad-neg.bug"
-        # TPC_function == "Linear" ~ # !!! figure out what to put here (check Mordecai 2019 for how they handled lifespan for Cx. quinquefasciatus)
-      )
-      
-      other_samps <- run.jags(other_data, TPC_function, variable_names,
-                        jags_other, inits_list,
-                        n.chains, n.adapt, n.samps)
-      prev_hypers = apply(other_samps, 2, function(df) fitdistr(df, "gamma")$estimate)
-      
-      } else {prev_hypers = c()} # if no trait data is available for any other speices, start with uninformed priors
+        
+        # !!! placeholder, to deal with inability to create informed priors
+        if (mosquito_in == "Culex quinquefasciatus" & pathogen_in == "none" & trait_in == "EPR") {
+          assumed_data <- tibble(T = c(10,50), trait = c(0,0))
+          other_species <- other_species %>% 
+            dplyr::select(trait, T) %>% 
+            rbind(assumed_data)
+        }
+        
+        # Add zeroes at extreme temperatures to help with convergence of fitdistr below
+        assumed_data <- tibble(T = c(0,60), trait = c(0,0))
+        other_species <- other_species %>% 
+          dplyr::select(trait, T) %>% 
+          rbind(assumed_data)
+        
+        other_data <-  list("Y" = other_species$trait, "T" = other_species$T, 
+                            "N" = length(other_species$T))
+        
+        # Select the appropriate bugs model
+        jags_other <- case_when(
+          TPC_function == "Briere" ~ "code/jags-models/jags-briere.bug",
+          TPC_function == "Quadratic" ~ "code/jags-models/jags-quad-neg.bug"
+          # TPC_function == "Linear" ~ # !!! figure out what to put here (check Mordecai 2019 for how they handled lifespan for Cx. quinquefasciatus)
+        )
+        
+        other_samps <- run.jags(other_data, TPC_function, variable_names,
+                                jags_other, inits_list,
+                                n.chains, n.adapt, 1000)
+        prev_hypers = apply(other_samps, 2, function(df) fitdistr(df, "gamma")$estimate)
+        
+      } else {prev_hypers = c()} # if no trait data is available for any other species, start with uninformed priors
       
       # List of studies with data reported for the particular trait and mosquito species
       other_studies <- data %>%
@@ -207,21 +224,21 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         }
         
         samps <- run.jags(jags_data, TPC_function, variable_names,
-                         jags_choice, inits_list,
-                         n.chains, n.adapt, n.samps)
+                          jags_choice, inits_list,
+                          n.chains, n.adapt, n.samps)
         
         if (ii < dim(other_studies)[1]) {
           # for older entries, generate posterior distributions to estimate 
           # hyperparameters for future fitting
-        
-        prev_hypers = apply(samps, 2,
-                           function(df) fitdistr(df, "gamma")$estimate)
-        
-        rm(out.samps) # !!! remove after debugging
-        # for the final entry, just generate samples from the jags.model
+          
+          prev_hypers = apply(samps, 2,
+                              function(df) fitdistr(df, "gamma")$estimate)
+          
+          rm(out.samps) # !!! remove after debugging
+          # for the final entry, just generate samples from the jags.model
         } else {
-        samps <- mutate(samps, func = as.character(TPC_function))
-
+          samps <- mutate(samps, func = as.character(TPC_function))
+          
         }
         
       }
@@ -239,7 +256,8 @@ run.jags <- function(jags_data, TPC_function, variable_names,
   jags <- jags.model(jags_choice,
                      data = jags_data,
                      n.chains = n.chains, inits = inits_list,
-                     n.adapt = n.adapt
+                     n.adapt = n.adapt,
+                     quiet = TRUE # switch to FALSE to show messages and progress bars
   )
   # The coda.samples() function takes n.samps new samples, and saves
   # them in the coda format, which we use for visualization and
