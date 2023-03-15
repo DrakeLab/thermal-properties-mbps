@@ -16,8 +16,8 @@
 ##                 data/clean/trait_table.csv
 ##                 data/clean/gamma_fits.csv
 ##
-##          code - code/Mordecai2017/mcmc_utils_all.R
-##                 code/Mordecai2017/temp_functions_all.R
+##          code - code/Mordecai_2017/mcmc_utils_all.R
+##                 code/Mordecai_2017/temp_functions_all.R
 ##
 ## Outputs: functions:
 ##          data - data/clean/ThermalTraitSamples.csv
@@ -100,6 +100,8 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
       list(Tm = 31, T0 = 5, c = 0.00007)
     } else if (TPC_function == "Quadratic") {
       list(T0 = 5, Tm = 33, n.qd = 0.005)
+    } else if (TPC_function == "Linear") {
+      list(T0 = 5, Tm = 40, c = 0.005)
     }
     
     # names of TPC parameters being fit
@@ -107,6 +109,8 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
       c("c", "Tm", "T0", "sigma")
     } else if (TPC_function == "Quadratic") {
       c("n.qd", "Tm", "T0", "sigma")
+    } else if (TPC_function == "Linear") {
+      c("c", "Tm", "T0", "sigma")
     }
     
     # If you want to use the hyperparameters from Mordecai et al., 2017, load them in
@@ -129,8 +133,8 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
       
       jags_choice <- case_when(
         TPC_function == "Briere" ~ "code/jags-models/jags-briere-informative.bug",
-        TPC_function == "Quadratic"  ~ "code/jags-models/jags-quad-neg-informative.bug"
-        # TPC_function == "Linear" ~ # !!! figure out what to put here (check Mordecai 2019 for how they handled lifespan for Cx. quinquefasciatus)
+        TPC_function == "Quadratic"  ~ "code/jags-models/jags-quad-neg-informative.bug",
+        TPC_function == "Linear" ~ "code/jags-models/jags-linear-informative.bug"
       )
       
       jags_data <-  list("Y" = data$trait, "T" = data$T, 
@@ -160,19 +164,19 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
       # First, inform prior distribution of TPC hyperparameters using data from other species
       if (dim(other_species)[1] > 0) { 
         
-        # !!! placeholder, to deal with inability to create informed priors
-        if (mosquito_in == "Culex quinquefasciatus" & pathogen_in == "none" & trait_in == "EPR") {
-          assumed_data <- tibble(T = c(10,50), trait = c(0,0))
-          other_species <- other_species %>% 
-            dplyr::select(trait, T) %>% 
-            rbind(assumed_data)
-        }
-        
-        # Add zeroes at extreme temperatures to help with convergence of fitdistr below
-        assumed_data <- tibble(T = c(0,60), trait = c(0,0))
-        other_species <- other_species %>% 
-          dplyr::select(trait, T) %>% 
-          rbind(assumed_data)
+        # # !!! placeholder, to deal with inability to create informed priors
+        # if (mosquito_in == "Culex quinquefasciatus" & pathogen_in == "none" & trait_in == "EPR") {
+        #   assumed_data <- tibble(T = c(10,50), trait = c(0,0))
+        #   other_species <- other_species %>% 
+        #     dplyr::select(trait, T) %>% 
+        #     rbind(assumed_data)
+        # }
+        # 
+        # # Add zeroes at extreme temperatures to help with convergence of fitdistr below
+        # assumed_data <- tibble(T = c(0,60), trait = c(0,0))
+        # other_species <- other_species %>% 
+        #   dplyr::select(trait, T) %>% 
+        #   rbind(assumed_data)
         
         other_data <-  list("Y" = other_species$trait, "T" = other_species$T, 
                             "N" = length(other_species$T))
@@ -180,8 +184,8 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         # Select the appropriate bugs model
         jags_other <- case_when(
           TPC_function == "Briere" ~ "code/jags-models/jags-briere.bug",
-          TPC_function == "Quadratic" ~ "code/jags-models/jags-quad-neg.bug"
-          # TPC_function == "Linear" ~ # !!! figure out what to put here (check Mordecai 2019 for how they handled lifespan for Cx. quinquefasciatus)
+          TPC_function == "Quadratic" ~ "code/jags-models/jags-quad-neg.bug",
+          TPC_function == "Linear" ~  "code/jags-models/jags-linear.bug"
         )
         
         other_samps <- run.jags(other_data, TPC_function, variable_names,
@@ -202,8 +206,9 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         TPC_function == "Briere" & is.null(prev_hypers) ~ "code/jags-models/jags-briere.bug",
         TPC_function == "Briere" & !is.null(prev_hypers) ~ "code/jags-models/jags-briere-informative.bug",
         TPC_function == "Quadratic" & is.null(prev_hypers) ~ "code/jags-models/jags-quad-neg.bug",
-        TPC_function == "Quadratic" & !is.null(prev_hypers) ~ "code/jags-models/jags-quad-neg-informative.bug"
-        # TPC_function == "Linear" ~ # !!! figure out what to put here (check Mordecai 2019 for how they handled lifespan for Cx. quinquefasciatus)
+        TPC_function == "Quadratic" & !is.null(prev_hypers) ~ "code/jags-models/jags-quad-neg-informative.bug",
+        TPC_function == "Linear" & is.null(prev_hypers) ~ "code/jags-models/jags-linear.bug",
+        TPC_function == "Linear" & !is.null(prev_hypers) ~ "code/jags-models/jags-linear-informative.bug"
       )
       
       # Initialize the previous hyperparameters
@@ -239,11 +244,15 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         } else {
           samps <- mutate(samps, func = as.character(TPC_function))
           
+          if (is.null(samps$T0)) {samps$T0 <- NA}
+          
         }
         
       }
     }
-    out.samps <- dplyr::select(samps, T0, Tm, c)
+    
+    out.samps <- dplyr::select(samps, -c(sigma, tau, func))
+    
     return(out.samps)
   })
 }
@@ -271,12 +280,15 @@ run.jags <- function(jags_data, TPC_function, variable_names,
   } else if (TPC_function == "Quadratic") {
     samps <- make.quad.samps(coda.samps, nchains = n.chains, samp.lims = c(1, n.samps), sig = TRUE)
   } else {
-    samps <- make.linear.samps(coda.samps, nchains = n.chains, samp.lims = c(1, n.samps), sig = TRUE)
+    samps <- make.linear.samps(coda.samps, nchains = n.chains, samp.lims = c(1, n.samps), sig = TRUE) %>% 
+      mutate(Tm = n.inter/slope) %>% 
+      mutate(c = slope) %>% 
+      dplyr::select(c, Tm, sigma)
   }
   
   samps$tau <- 1 / samps$sigma
   if (is.null(samps$c)) {
-    samps$c <- samps$qd
+    samps <- mutate(samps, c = qd, .keep = "unused")
   }
   return(samps)
 }
