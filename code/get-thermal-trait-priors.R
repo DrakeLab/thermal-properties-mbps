@@ -97,7 +97,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
     
     # initial values
     inits_list <- if (TPC_function == "Briere") {
-      list(Tm = 31, T0 = 5, c = 0.00007)
+      list(T0 = 5, Tm = 31, c = 0.00007)
     } else if (TPC_function == "Quadratic") {
       list(T0 = 5, Tm = 33, n.qd = 0.005)
     } else if (TPC_function == "Linear") {
@@ -261,7 +261,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
 run.jags <- function(jags_data, TPC_function, variable_names,
                      jags_choice, inits_list,
                      n.chains, n.adapt, n.samps) {
-  # create MCMC samples from the model with default priors
+  # create MCMC samples from the model
   jags <- jags.model(jags_choice,
                      data = jags_data,
                      n.chains = n.chains, inits = inits_list,
