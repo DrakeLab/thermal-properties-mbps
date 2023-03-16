@@ -10,8 +10,7 @@ model {
   # Prior
   c ~ dgamma(1,10)
   Tm ~ dunif(25,45)
-  T0  ~ dunif(0, 24)
   sigma<-1/tau
-  tau ~ dgamma(0.0001, 0.0001)
+  tau ~ dgamma(10, 1)
 
 }

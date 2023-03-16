@@ -3,14 +3,13 @@ model {
   # Likelihood
   for (i in 1:N) {
       Y[i] ~ dnorm(mu[i], tau)T(0,)
-      mu.temp[i] <- (-c*T[i] + c*Tm)*(Tm>T[i])
+      mu.temp[i] <- c*(Tm-T[i])*(T[i]<Tm)
       mu[i] <- 0*(mu.temp[i]<0) + mu.temp[i]*(mu.temp[i]>0)
       
   }
   # Prior
   c ~ dgamma(hypers[1,1], hypers[2,1])
   Tm ~ dgamma(hypers[1,2], hypers[2,2])
-  T0  ~ dunif(0, 24)
   sigma<-1/tau
   tau ~ dgamma(hypers[1,4], hypers[2,4])
 
