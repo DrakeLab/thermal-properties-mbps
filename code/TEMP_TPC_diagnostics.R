@@ -168,7 +168,15 @@ TPC_df <- samples %>%
     func == "Quadratic" ~ Quadratic(c, T0, Tm)(Temperature),
     func == "Linear" ~ Linear(c, Tm)(Temperature)
   )) %>% 
-  dplyr::select(-c("c", "T0", "Tm"))
+  dplyr::select(-c("c", "T0", "Tm")) #%>% 
+  # filter(system_ID %in% c("Aedes aegypti / DENV", "Aedes aegypti / none",
+  #                         "Aedes aegypti / ZIKV", "Aedes aegypti / none",
+  #                         "Aedes albopictus / DENV", "Aedes albopictus / none",
+  #                         "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
+  #                         "Anopheles spp. / Plasmodium spp.",
+  #                         "Anopheles spp. / none"
+  # ))
+  # 
 
 # get mean TPC from samples
 meanTPC_df <- TPC_df %>% 
@@ -186,38 +194,18 @@ quantsTPC_df <- TPC_df %>%
 
 ###* Figure: TPC curves with 89% high confidence intervals ---- 
 TPC_plot <- TPC_df %>%
-  # group_by(sample_num) %>% 
-  arrange(Temperature) %>% 
-  filter(system_ID %in% c("Aedes aegypti / DENV", "Aedes aegypti / none",
-                          "Aedes aegypti / ZIKV", "Aedes aegypti / none",
-                          "Aedes albopictus / DENV", "Aedes albopictus / none",
-                          "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
-                          "Anopheles spp. / Plasmodium spp.",
-                          "Anopheles spp. / none"
-  )) %>%
+  group_by(sample_num) %>%
+  arrange(Temperature)  %>%
   # group_by()
   ggplot() +
-  geom_line(data = meanTPC_df%>% 
-              filter(system_ID %in% c("Aedes aegypti / DENV", "Aedes aegypti / none",
-                                      "Aedes aegypti / ZIKV", "Aedes aegypti / none",
-                                      "Aedes albopictus / DENV", "Aedes albopictus / none",
-                                      "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
-                                      "Anopheles spp. / Plasmodium spp.",
-                                      "Anopheles spp. / none"
-              )), aes(x = Temperature, y = mean_val, color = system_ID)) +
+  geom_line(data = meanTPC_df,
+            aes(x = Temperature, y = mean_val, color = system_ID)) +
   # 89% HCI of R0 TPC curves
   geom_ribbon(
-    data = quantsTPC_df%>% 
-      filter(system_ID %in% c("Aedes aegypti / DENV", "Aedes aegypti / none",
-                              "Aedes aegypti / ZIKV", "Aedes aegypti / none",
-                              "Aedes albopictus / DENV", "Aedes albopictus / none",
-                              "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
-                              "Anopheles spp. / Plasmodium spp.",
-                              "Anopheles spp. / none"
-      )),
+    data = quantsTPC_df,
     aes(x = Temperature, ymin = lowHCI_val, ymax = highHCI_val, fill = system_ID),
     alpha = 0.1
   ) +
-  # facet_wrap(~ trait, scales = "free", ncol = 2) +
-  theme_minimal_grid(12) +
-  geom_point(test_df, mapping = aes(x = T, y = trait))
+  facet_wrap(~ trait, scales = "free", ncol = 2) +
+  theme_minimal_grid(12) #+
+  # geom_point(test_df, mapping = aes(x = T, y = trait))
