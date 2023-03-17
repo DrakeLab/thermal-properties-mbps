@@ -13,9 +13,9 @@ make.linear.samps<-function(coda.samps, nchains=2, samp.lims=c(151, 5000), sig=T
   l1<-samp.lims[1]
   l2<-samp.lims[2]
   for(i in 1:nchains){
-    n.inter<-c(n.inter, coda.samps[[i]][l1:l2,1])
-    slope<-c(slope, coda.samps[[i]][l1:l2,2])
-    if(sig) sigma<-c(sigma, coda.samps[[i]][l1:l2,3])
+    n.inter<-c(n.inter, coda.samps[[i]][l1:l2,3])
+    slope<-c(slope, coda.samps[[i]][l1:l2,1])
+    if(sig) sigma<-c(sigma, coda.samps[[i]][l1:l2,2])
   }
   if(sig){
     samps<-data.frame(matrix(c(n.inter, slope, sigma), ncol=3, byrow=FALSE))

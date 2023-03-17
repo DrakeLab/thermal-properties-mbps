@@ -60,12 +60,8 @@ TPC_forms <- read_csv("data/clean/trait_TPC_forms.csv") %>%
   # use Briere (less restrictive than quadratic)
   mutate(TPC.function = ifelse(is.na(TPC.function), "Briere", TPC.function))
 
-# Set up data frame of traits and mosquito pathogen pairs
-# full_df <- expand_grid(Mosquito = MosqPathPairs, trait = as_tibble(trait_names))
-
 # This table shows which functional form to use for each trait
 trait_lookup_table <- read_csv("data/clean/trait_transforms.csv")
-
 
 # 1) Define accessory functions -------------------------------------------
 
@@ -75,41 +71,35 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
                                     old_informative = FALSE) {
   with(as.list(data_in), {
     # restrict to the trait we care about
-    data <- filter(data_in, trait.name == trait_in)
+    data <- dplyr::filter(data_in, trait.name == trait_in)
+    
+    # check if the trait is a probability
+    prob_bool <- trait_in %in% c("b", "c", "bc", "e2a", "pLA", "pRH", "pO", "EV")
     
     # Get the proper TPC function
     TPC_function <- TPC_forms %>%
       # For cases with multiple possible TPC functions, choose the one used in later studies
       mutate(TPC.function = str_extract(TPC.function, "[^/]+$")) %>%
-      filter(trait.name == trait_in) %>%
-      filter(mosquito_species == mosquito_in) %>%
-      filter(pathogen == pathogen_in) %>%
+      dplyr::filter(trait.name == trait_in) %>%
+      dplyr::filter(mosquito_species == mosquito_in) %>%
+      dplyr::filter(pathogen == pathogen_in) %>%
       dplyr::select(TPC.function) %>%
       as.character()
     
     # initial values
-    inits_list <- if (TPC_function == "Briere") {
-      list(T0 = 5, Tm = 31, c = 0.00007)
-    } else if (TPC_function == "Quadratic") {
-      list(T0 = 5, Tm = 33, n.qd = 0.005)
-    } else if (TPC_function == "Linear") {
-      list(Tm = 40, c = 0.005)
-    }
+    inits_list <- if (TPC_function == "Briere") {list(T0 = 5, Tm = 31, c = 0.00007)
+      } else if (TPC_function == "Quadratic") {list(T0 = 5, Tm = 33, n.qd = 0.005)
+    } else if (TPC_function == "Linear") {list(z = 0.2, c = 0.005)} # corresponds to Tm = 40
     
     # names of TPC parameters being fit
-    variable_names <- if (TPC_function == "Briere") {
-      c("c", "Tm", "T0", "sigma")
-    } else if (TPC_function == "Quadratic") {
-      c("n.qd", "Tm", "T0", "sigma")
-    } else if (TPC_function == "Linear") {
-      c("c", "Tm", "sigma")
-    }
+    variable_names <- if (TPC_function == "Briere") {c("c", "Tm", "T0", "sigma")
+    } else if (TPC_function == "Quadratic") {c("n.qd", "Tm", "T0", "sigma")
+    } else if (TPC_function == "Linear") {c("c", "z", "sigma")}
     
     # If you want to use the hyperparameters from Mordecai et al., 2017, load them in
     if (old_informative == TRUE) { # !!! switch order of if/else for easier reading
-      
       prev_hypers <- read_csv("data/clean/gamma_fits.csv") %>%
-        filter(trait %in% trait_in) %>%
+        dplyr::filter(trait %in% trait_in) %>%
         unique() %>%
         # adjust by the appropriate multiplier
         mutate(value = multiplier * value) %>%
@@ -125,11 +115,18 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         stop("No saved TPC hyperparameter data. Switch old_informative to false")
       }
       
-      jags_choice <- case_when(
-        TPC_function == "Briere" ~ "code/jags-models/jags-briere-informative.bug",
-        TPC_function == "Quadratic" ~ "code/jags-models/jags-quad-neg-informative.bug",
-        TPC_function == "Linear" ~ "code/jags-models/jags-linear-informative.bug"
+      jags_choice <- if (prob_bool) {case_when(
+        TPC_function == "Briere" ~ "code/jags-models/jags-briere-trunc-informative.bug",
+        TPC_function == "Quadratic" ~ "code/jags-models/jags-quad-neg-trunc-informative.bug",
+        TPC_function == "Linear" ~ "code/jags-models/jags-linear-trunc-informative.bug"
       )
+      } else {
+        case_when(
+          TPC_function == "Briere" ~ "code/jags-models/jags-briere-informative.bug",
+          TPC_function == "Quadratic" ~ "code/jags-models/jags-quad-neg-informative.bug",
+          TPC_function == "Linear" ~ "code/jags-models/jags-linear-informative.bug"
+        )
+      }
       
       jags_data <- list(
         "Y" = data$trait, "T" = data$T,
@@ -149,13 +146,13 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
     } else {
       # Gather data from other species of the same genus
       other_species <- data %>%
-        filter(stringr::word(mosquito_species, 1, 1) == stringr::word(mosquito_in, 1, 1)) %>%
-        filter(mosquito_species != mosquito_in)
+        dplyr::filter(stringr::word(mosquito_species, 1, 1) == stringr::word(mosquito_in, 1, 1)) %>%
+        dplyr::filter(mosquito_species != mosquito_in)
       
       # if such data is unavailable, use data from species outside of the genus
       if (dim(other_species)[1] == 0) {
         other_species <- data %>%
-          filter(mosquito_species == "Other spp.")
+          dplyr::filter(mosquito_species == "Other spp.")
       }
       
       # First, inform prior distribution of TPC hyperparameters using data from other species
@@ -167,11 +164,19 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         )
         
         # Select the appropriate bugs model
-        jags_other <- case_when(
-          TPC_function == "Briere" ~ "code/jags-models/jags-briere.bug",
-          TPC_function == "Quadratic" ~ "code/jags-models/jags-quad-neg.bug",
-          TPC_function == "Linear" ~ "code/jags-models/jags-linear.bug"
+        jags_other <- if (prob_bool) {case_when(
+          TPC_function == "Briere" ~ "code/jags-models/jags-briere-trunc.bug",
+          TPC_function == "Quadratic" ~ "code/jags-models/jags-quad-neg-trunc.bug",
+          TPC_function == "Linear" ~ "code/jags-models/jags-linear-trunc.bug"
         )
+        } else {
+          case_when(
+            TPC_function == "Briere" ~ "code/jags-models/jags-briere.bug",
+            TPC_function == "Quadratic" ~ "code/jags-models/jags-quad-neg.bug",
+            TPC_function == "Linear" ~ "code/jags-models/jags-linear.bug"
+          )
+        }
+        
         print("Getting hyperparameters for informed prior distribution from other species...")
         # Get hyperparameters of informed prior distribution
         prev_hypers <- retry( # keep trying until distribution fitting converges
@@ -191,20 +196,30 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
       
       # List of studies with data reported for the particular trait and mosquito species
       other_studies <- data %>%
-        filter(mosquito_species == mosquito_in) %>%
+        dplyr::filter(mosquito_species == mosquito_in) %>%
         arrange(year, lead_author) %>%
         distinct(lead_author, year)
       
       # Select the appropriate bug model
-      jags_choice <- case_when(
-        TPC_function == "Briere" & is.null(prev_hypers) ~ "code/jags-models/jags-briere.bug",
-        TPC_function == "Briere" & !is.null(prev_hypers) ~ "code/jags-models/jags-briere-informative.bug",
-        TPC_function == "Quadratic" & is.null(prev_hypers) ~ "code/jags-models/jags-quad-neg.bug",
-        TPC_function == "Quadratic" & !is.null(prev_hypers) ~ "code/jags-models/jags-quad-neg-informative.bug",
-        TPC_function == "Linear" & is.null(prev_hypers) ~ "code/jags-models/jags-linear.bug",
-        TPC_function == "Linear" & !is.null(prev_hypers) ~ "code/jags-models/jags-linear-informative.bug"
+      jags_choice <- if (prob_bool) {case_when(
+        TPC_function == "Briere" & is.null(prev_hypers) ~ "code/jags-models/jags-briere-trunc.bug",
+        TPC_function == "Briere" & !is.null(prev_hypers) ~ "code/jags-models/jags-briere-trunc-informative.bug",
+        TPC_function == "Quadratic" & is.null(prev_hypers) ~ "code/jags-models/jags-quad-neg-trunc.bug",
+        TPC_function == "Quadratic" & !is.null(prev_hypers) ~ "code/jags-models/jags-quad-neg-trunc-informative.bug",
+        TPC_function == "Linear" & is.null(prev_hypers) ~ "code/jags-models/jags-linear-trunc.bug",
+        TPC_function == "Linear" & !is.null(prev_hypers) ~ "code/jags-models/jags-linear-trunc-informative.bug"
       )
-      
+      } else {
+        case_when(
+          TPC_function == "Briere" & is.null(prev_hypers) ~ "code/jags-models/jags-briere.bug",
+          TPC_function == "Briere" & !is.null(prev_hypers) ~ "code/jags-models/jags-briere-informative.bug",
+          TPC_function == "Quadratic" & is.null(prev_hypers) ~ "code/jags-models/jags-quad-neg.bug",
+          TPC_function == "Quadratic" & !is.null(prev_hypers) ~ "code/jags-models/jags-quad-neg-informative.bug",
+          TPC_function == "Linear" & is.null(prev_hypers) ~ "code/jags-models/jags-linear.bug",
+          TPC_function == "Linear" & !is.null(prev_hypers) ~ "code/jags-models/jags-linear-informative.bug"
+        )
+      }
+
       # Initialize the previous hyperparameters
       print(paste0("Found ", dim(other_studies)[1]-1, " other studies for ",
                    mosquito_in, " / ", pathogen_in, " / ", trait_in))
@@ -214,7 +229,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         index_author <- other_studies$lead_author[ii]
         index_year <- other_studies$year[ii]
         
-        data_temp <- filter(data, lead_author == index_author, year == index_year)
+        data_temp <- dplyr::filter(data, lead_author == index_author, year == index_year)
         
         jags_data <- if (is.null(prev_hypers)) {
           list(
@@ -274,6 +289,7 @@ get.prior_hyperparams <- function(data, TPC_function, variable_names,
                                   n.chains, n.adapt, 
                                   scale_factor = 100) {
   # Initialize hyperparameter list
+  print("Trying...")
   hypers <- NULL
   
   # Collect samples
@@ -282,6 +298,9 @@ get.prior_hyperparams <- function(data, TPC_function, variable_names,
     jags_model, inits_list,
     n.chains, n.adapt, 1000
   )
+  if (TPC_function == "Linear") {
+    temp_samples <- mutate(temp_samples, z = c*Tm) %>% 
+      dplyr::select(-Tm)}
   # rescale
   temp_samples <- temp_samples / scale_factor
   temp_samples <- dplyr::select(temp_samples,-sample_num)

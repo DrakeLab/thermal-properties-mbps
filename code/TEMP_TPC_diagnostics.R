@@ -21,8 +21,8 @@ pathogen_in <-  filter(data.in, system_ID == system_sample) %>%
 # pathogen_in = "none"
 
 
-n.chains <- 5# 2 # 5
-n.adapt <- 5000#100 # 5000
+n.chains <- 2 # 5
+n.adapt <- 100 # 5000
 n.samps <- 100 # 5000
 
 data_in <- data.in
@@ -39,11 +39,11 @@ samples <- tibble(
 
 distinct_combos <- distinct(data_in, trait.name, system_ID)
 
-problem_set <- c(27,28, 29, 62, 63)
 
 for (sample_num in 1:dim(distinct_combos)[1]) {
 # for (sample_num in problem_set) {
   # if (sample_num %in% c(27,28, 29, 62, 63)) {next} # skip the problem samples
+  print(paste0("System # ", sample_num, " --------------------------------------------------------------------------"))
   system_sample <- distinct_combos$system_ID[sample_num]
   trait_in <- distinct_combos$trait.name[sample_num]
 
@@ -60,7 +60,6 @@ for (sample_num in 1:dim(distinct_combos)[1]) {
   temp_sample <- temp_sample %>%
     mutate(trait = trait_in,
            system_ID = system_sample)
-  print(paste0("System # ", sample_num, " --------------------------------------------------------------------------"))
   samples <- rbind(samples, temp_sample)
 
 }
@@ -71,7 +70,7 @@ write_csv(samples, "data/clean/temp_samples.csv")
 # -------------------------------------------------------------------------
 
 
-samples <- read_csv("data/clean/temp_samples.csv")
+# samples <- read_csv("data/clean/temp_samples.csv")
 
 library(reshape2)
 library(cowplot)
@@ -187,7 +186,7 @@ quantsTPC_df <- TPC_df %>%
 
 ###* Figure: TPC curves with 89% high confidence intervals ---- 
 TPC_plot <- TPC_df %>%
-  group_by(sample_num) %>% 
+  # group_by(sample_num) %>% 
   arrange(Temperature) %>% 
   filter(system_ID %in% c("Aedes aegypti / DENV", "Aedes aegypti / none",
                           "Aedes aegypti / ZIKV", "Aedes aegypti / none",
@@ -197,7 +196,7 @@ TPC_plot <- TPC_df %>%
                           "Anopheles spp. / none"
   )) %>%
   # group_by()
-  ggplot(aes(x = Temperature)) +
+  ggplot() +
   geom_line(data = meanTPC_df%>% 
               filter(system_ID %in% c("Aedes aegypti / DENV", "Aedes aegypti / none",
                                       "Aedes aegypti / ZIKV", "Aedes aegypti / none",
@@ -205,7 +204,7 @@ TPC_plot <- TPC_df %>%
                                       "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
                                       "Anopheles spp. / Plasmodium spp.",
                                       "Anopheles spp. / none"
-              )), aes(y = mean_val, color = system_ID)) +
+              )), aes(x = Temperature, y = mean_val, color = system_ID)) +
   # 89% HCI of R0 TPC curves
   geom_ribbon(
     data = quantsTPC_df%>% 
@@ -214,10 +213,11 @@ TPC_plot <- TPC_df %>%
                               "Aedes albopictus / DENV", "Aedes albopictus / none",
                               "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
                               "Anopheles spp. / Plasmodium spp.",
-                              "Anopheles spp. / none"TPC_plot
+                              "Anopheles spp. / none"
       )),
-    aes(ymin = lowHCI_val, ymax = highHCI_val, fill = system_ID),
+    aes(x = Temperature, ymin = lowHCI_val, ymax = highHCI_val, fill = system_ID),
     alpha = 0.1
   ) +
-  facet_wrap(~ trait, scales = "free", ncol = 2) +
-  theme_minimal_grid(12)
+  # facet_wrap(~ trait, scales = "free", ncol = 2) +
+  theme_minimal_grid(12) +
+  geom_point(test_df, mapping = aes(x = T, y = trait))
