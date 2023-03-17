@@ -1,31 +1,61 @@
+source("code/get-thermal-trait-priors.R")
 data_in <- data.in
 
 distinct_combos <- distinct(data_in, trait.name, system_ID)
-sample_num <- sample(1:dim(distinct_combos)[1], 1)
 
 
-system_sample <- distinct_combos$system_ID[sample_num]
-trait_in <- distinct_combos$trait.name[sample_num]
-
-mosquito_in <-  filter(data.in, system_ID == system_sample) %>% 
-  dplyr::select(mosquito_species) %>% unique() %>% as.character()
-pathogen_in <-  filter(data.in, system_ID == system_sample) %>% 
-  dplyr::select(pathogen) %>% unique() %>% as.character()
+n.chains <- 5 # 2 # 5
+n.adapt <- 5000 # 100 # 5000
+n.samps <- 1000 # 100 # 5000
 
 
-# trait_in = "EFD"
+samples <- tibble(
+  trait = as.character(),
+  system_ID = as.character(),
+  T0 = as.double(),
+  Tm = as.double(),
+  c = as.double(), # !!! note that we're using c as a generic parameter for Briere or Quadratic
+  sample_num = as.double(),
+  func = as.character()
+)
+for (sample_num in 1:dim(distinct_combos)[1]) {
+  print(paste0("System # ", sample_num, "--------------------------------------------------------"))
+  system_sample <- distinct_combos$system_ID[sample_num]
+  trait_in <- distinct_combos$trait.name[sample_num]
+
+  mosquito_in <- filter(data.in, system_ID == system_sample) %>%
+    dplyr::select(mosquito_species) %>%
+    unique() %>%
+    as.character()
+  pathogen_in <- filter(data.in, system_ID == system_sample) %>%
+    dplyr::select(pathogen) %>%
+    unique() %>%
+    as.character()
 
 
-# mosquito_in = "Culex quinquefasciatus"
+  temp_sample <- thermtrait.prior.sample(data.in, trait_in, mosquito_in, pathogen_in,
+    n.chains, n.adapt, n.samps,
+    old_informative = FALSE
+  )
 
-# pathogen_in = "none"
+  temp_sample <- temp_sample %>%
+    mutate(
+      trait = trait_in,
+      system_ID = system_sample
+    )
+  samples <- rbind(samples, temp_sample)
+}
 
+distinct_combos <- distinct(data_in, trait.name, system_ID)
 
-n.chains <- 2 # 5
-n.adapt <- 100 # 5000
-n.samps <- 100 # 5000
+library(foreach)
+library(doParallel)
+cores <- detectCores()
+cl <- makeCluster(cores[1] - 1, outfile = "") # not to overload your computer
+registerDoParallel(cl)
 
-data_in <- data.in
+library(progressr)
+handlers(global = TRUE)
 
 samples <- tibble(
   trait = as.character(),
@@ -37,61 +67,35 @@ samples <- tibble(
   func = as.character()
 )
 
-distinct_combos <- distinct(data_in, trait.name, system_ID)
-
-
-for (sample_num in 1:dim(distinct_combos)[1]) {
-# for (sample_num in problem_set) {
-  # if (sample_num %in% c(27,28, 29, 62, 63)) {next} # skip the problem samples
-  print(paste0("System # ", sample_num, " --------------------------------------------------------------------------"))
-  system_sample <- distinct_combos$system_ID[sample_num]
-  trait_in <- distinct_combos$trait.name[sample_num]
-
-  mosquito_in <-  filter(data.in, system_ID == system_sample) %>%
-    dplyr::select(mosquito_species) %>% unique() %>% as.character()
-  pathogen_in <-  filter(data.in, system_ID == system_sample) %>%
-    dplyr::select(pathogen) %>% unique() %>% as.character()
-
-
-  temp_sample <- thermtrait.prior.sample(data_in, trait_in, mosquito_in, pathogen_in,
-                                     n.chains, n.adapt, n.samps,
-                                     old_informative = FALSE)
-  
-  temp_sample <- temp_sample %>%
-    mutate(trait = trait_in,
-           system_ID = system_sample)
-  samples <- rbind(samples, temp_sample)
-
-}
-
 # Save samples for now
 write_csv(samples, "data/clean/temp_samples.csv")
 
 # -------------------------------------------------------------------------
 
 
-# samples <- read_csv("data/clean/temp_samples.csv")
+samples <- read_csv("data/clean/temp_samples.csv")
 
 library(reshape2)
 library(cowplot)
 
 # 2) Histograms of parameter distributions of thermal traits ----
 plot_df <- samples %>%
-  dplyr::select(-func) %>% 
-  mutate(temp_diff = Tm - T0) %>% 
-  mutate(logc = log(c)) %>% 
-  melt(id = c("system_ID", "trait", "sample_num")) %>% 
-  filter(system_ID %in% c("Aedes aegypti / DENV", "Aedes aegypti / none",
-                          "Aedes aegypti / ZIKV", "Aedes aegypti / none",
-                          "Aedes albopictus / DENV", "Aedes albopictus / none",
-                          "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
-                          "Anopheles spp. / Plasmodium spp.",
-                          "Anopheles spp. / none"
-  )) 
+  dplyr::select(-func) %>%
+  mutate(temp_diff = Tm - T0) %>%
+  mutate(logc = log(c)) %>%
+  melt(id = c("system_ID", "trait", "sample_num")) %>%
+  filter(system_ID %in% c(
+    "Aedes aegypti / DENV", "Aedes aegypti / none",
+    "Aedes aegypti / ZIKV", "Aedes aegypti / none",
+    "Aedes albopictus / DENV", "Aedes albopictus / none",
+    "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
+    "Anopheles spp. / Plasmodium spp.",
+    "Anopheles spp. / none"
+  ))
 
 ###* Figure: thermal trait parameter posterior distributions ----
 parm_hists <- plot_df %>%
-  filter(variable != "c") %>% 
+  filter(variable != "c") %>%
   ggplot(aes(value, color = system_ID, fill = system_ID)) +
   geom_histogram(aes(), bins = 100) +
   # geom_density() +
@@ -121,7 +125,7 @@ Quadratic <- function(q, Tmin, Tmax) {
 # Linear
 Linear <- function(q, Tmax) {
   function(t) {
-    pmax(q*(Tmax - t), 0, na.RM = FALSE)
+    pmax(q * (Tmax - t), 0, na.RM = FALSE)
   }
 }
 
@@ -130,13 +134,13 @@ Linear <- function(q, Tmax) {
 get.thermal.response <- function(data_in, Temperature) {
   parms <- dplyr::select(data_in, c, T0, Tm)
   function_type <- dplyr::select(data_in, func)
-  
+
   temp_function <- case_when(
     function_type == "Briere" ~ Briere(parms$c, parms$T0, parms$Tm),
     function_type == "Quadratic" ~ Quadratic(parms$c, parms$T0, parms$Tm),
     function_type == "Linear" ~ Linear(parms$c, parms$Tm)
   )
-  
+
   out <- temp_function(Temperature)
 }
 
@@ -158,7 +162,7 @@ thin_size <- 100
 
 # For each mosquito species, trait, and sample, get a thermal response curve
 TPC_df <- samples %>%
-  # filter(sample_num %in% seq(1, thin_size)) %>%
+  filter(sample_num %in% seq(1, thin_size)) %>%
   full_join(list(Temperature = Temps), by = character(), copy = TRUE) %>%
   # group_by(sample_num) %>%
   # try sapply or lapply
@@ -167,45 +171,50 @@ TPC_df <- samples %>%
     func == "Briere" ~ Briere(c, T0, Tm)(Temperature),
     func == "Quadratic" ~ Quadratic(c, T0, Tm)(Temperature),
     func == "Linear" ~ Linear(c, Tm)(Temperature)
-  )) %>% 
-  dplyr::select(-c("c", "T0", "Tm")) #%>% 
-  # filter(system_ID %in% c("Aedes aegypti / DENV", "Aedes aegypti / none",
-  #                         "Aedes aegypti / ZIKV", "Aedes aegypti / none",
-  #                         "Aedes albopictus / DENV", "Aedes albopictus / none",
-  #                         "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
-  #                         "Anopheles spp. / Plasmodium spp.",
-  #                         "Anopheles spp. / none"
-  # ))
-  # 
+  )) %>%
+  dplyr::select(-c("c", "T0", "Tm")) # %>%
+# filter(system_ID %in% c("Aedes aegypti / DENV", "Aedes aegypti / none",
+#                         "Aedes aegypti / ZIKV", "Aedes aegypti / none",
+#                         "Aedes albopictus / DENV", "Aedes albopictus / none",
+#                         "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
+#                         "Anopheles spp. / Plasmodium spp.",
+#                         "Anopheles spp. / none"
+# ))
+
 
 # get mean TPC from samples
-meanTPC_df <- TPC_df %>% 
-  group_by(system_ID, trait, Temperature) %>% 
-  summarise(mean_val = mean(Trait_val), .groups = "keep")
+meanTPC_df <- TPC_df %>%
+  group_by(system_ID, trait, Temperature) %>%
+  summarise(mean_val = mean(Trait_val), .groups = "keep") %>%
+  unique()
 
 
-# get edges of 89% HCI of samples
-quantsTPC_df <- TPC_df %>% 
-  group_by(system_ID, trait, Temperature) %>% 
-  mutate(lowHCI_val = quantile(Trait_val, 0.055)) %>% 
-  mutate(highHCI_val = quantile(Trait_val, 0.945)) %>% 
-  dplyr::select(-c("sample_num", "Trait_val", "func"))
+# get edges of 89% HCI of samples # !!! not calculated correctly
+quantsTPC_df <- TPC_df %>%
+  group_by(system_ID, trait, Temperature) %>%
+  mutate(lowHCI_val = quantile(Trait_val, 0.055)) %>%
+  mutate(highHCI_val = quantile(Trait_val, 0.945)) %>%
+  dplyr::select(-c("sample_num", "Trait_val", "func")) %>%
+  unique()
 
 
-###* Figure: TPC curves with 89% high confidence intervals ---- 
+###* Figure: TPC curves with 89% high confidence intervals ----
 TPC_plot <- TPC_df %>%
   group_by(sample_num) %>%
-  arrange(Temperature)  %>%
+  arrange(Temperature) %>%
   # group_by()
   ggplot() +
-  geom_line(data = meanTPC_df,
-            aes(x = Temperature, y = mean_val, color = system_ID)) +
-  # 89% HCI of R0 TPC curves
+  # means of TPC curves
+  geom_line(
+    data = meanTPC_df,
+    aes(x = Temperature, y = mean_val, color = system_ID)
+  ) +
+  # 89% HCI of TPC curves
   geom_ribbon(
     data = quantsTPC_df,
     aes(x = Temperature, ymin = lowHCI_val, ymax = highHCI_val, fill = system_ID),
     alpha = 0.1
   ) +
-  facet_wrap(~ trait, scales = "free", ncol = 2) +
-  theme_minimal_grid(12) #+
-  # geom_point(test_df, mapping = aes(x = T, y = trait))
+  # geom_point(filter(data_in, trait.name == trait), mapping = aes(x = T, y = trait, color = system_ID)) +
+  facet_wrap(~trait, scales = "free", ncol = 2) +
+  theme_minimal_grid(12)

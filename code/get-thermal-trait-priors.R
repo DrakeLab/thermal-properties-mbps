@@ -88,12 +88,12 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
     
     # initial values
     inits_list <- if (TPC_function == "Briere") {list(T0 = 5, Tm = 31, c = 0.00007)
-      } else if (TPC_function == "Quadratic") {list(T0 = 5, Tm = 33, n.qd = 0.005)
+      } else if (TPC_function == "Quadratic") {list(c = 0.005, Tm = 33, T0 = 5)
     } else if (TPC_function == "Linear") {list(z = 0.2, c = 0.005)} # corresponds to Tm = 40
     
     # names of TPC parameters being fit
     variable_names <- if (TPC_function == "Briere") {c("c", "Tm", "T0", "sigma")
-    } else if (TPC_function == "Quadratic") {c("n.qd", "Tm", "T0", "sigma")
+    } else if (TPC_function == "Quadratic") {c("c", "Tm", "T0", "sigma")
     } else if (TPC_function == "Linear") {c("c", "z", "sigma")}
     
     # If you want to use the hyperparameters from Mordecai et al., 2017, load them in
@@ -150,7 +150,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         dplyr::filter(mosquito_species != mosquito_in)
       
       # if such data is unavailable, use data from species outside of the genus
-      if (dim(other_species)[1] == 0) {
+      if (dim(other_species)[1] == 0) { # !!! change to look for *Genus* spp. first, then if there's still nothing, resort to using Other spp.
         other_species <- data %>%
           dplyr::filter(mosquito_species == "Other spp.")
       }
@@ -284,17 +284,16 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
 
 
 # Function: get hyperparameters of informed TPC parammeter prior distributions
-get.prior_hyperparams <- function(data, TPC_function, variable_names,
+get.prior_hyperparams <- function(in_data, TPC_function, variable_names,
                                   jags_model, inits_list,
                                   n.chains, n.adapt, 
                                   scale_factor = 100) {
   # Initialize hyperparameter list
-  print("Trying...")
   hypers <- NULL
   
   # Collect samples
   temp_samples <- run.jags(
-    data, TPC_function, variable_names,
+    in_data, TPC_function, variable_names,
     jags_model, inits_list,
     n.chains, n.adapt, 1000
   )
@@ -331,6 +330,7 @@ run.jags <- function(jags_data, TPC_function, variable_names,
   # The coda.samples() function takes n.samps new samples, and saves
   # them in the coda format, which we use for visualization and
   # analysis.
+  print("Sampling...")
   coda.samps <- coda.samples(jags, variable_names, n.samps)
   
   # This command combines the samples from the n.chains into a format
