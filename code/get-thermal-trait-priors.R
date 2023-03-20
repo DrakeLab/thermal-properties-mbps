@@ -19,8 +19,7 @@
 ##          code - code/Mordecai_2017/mcmc_utils_all.R
 ##                 code/Mordecai_2017/temp_functions_all.R
 ##
-## Outputs: functions:
-##          data - data/clean/ThermalTraitSamples.csv
+## Outputs: data - data/clean/TPC_param_samples.csv
 ##
 ## Written and maintained by: Kyle Dahlin, kydahlin@gmail.com
 ## Initialized February 2023
@@ -52,7 +51,8 @@ source("code/Mordecai_2017/temp_functions_all.R")
 
 ### * Load in data ----
 # Trait data
-data.in <- read_csv("data/clean/data_for_TPC_fitting.csv") # !!! remove this later so this can interact with the main-analysis.R script
+data.in <- data.in.TPC
+# data.in <- read_csv("data/clean/data_for_TPC_fitting.csv") # !!! remove this later so this can interact with the main-analysis.R script
 
 # 1) Define accessory functions -------------------------------------------
 
@@ -366,8 +366,8 @@ run.jags <- function(jags_data, TPC_function, variable_names,
 
 # 2) Calculate prior distributions of thermal trait parameters from data ----
 
-# Set parameters for rjags
-n.chains <-2 # 5
+# Set parameters for MCMC
+n.chains <-3 # 5
 n.adapt <- 100 # 5000
 n.samps <- 100 # 5000
 
@@ -418,15 +418,13 @@ for (sample_num in 1:dim(distinct_combos)[1]) {
 }
 
 
-# 3) Save thermal trait parameter distributions ---------------------------
-
-write_csv(samples, "data/clean/temp_samples.csv")
-
-# 4) Functions to sample from thermal trait parameter distributions -------
-
-
+# 3) Save trait TPC parameter posterior distribution samples --------------
+write_csv(samples, "data/clean/TPC_param_samples.csv")
 
 # *) Diagnostics & visualizations -----------------------------------------
+
+# Do you want to look at diagnostic plots?
+plot_bool <- FALSE
 
 # Do we just want to look at focal species?
 focal_bool <- FALSE
@@ -441,7 +439,7 @@ if (focal_bool) {
     "Anopheles spp. / none"
   ))
 }
-
+if (plot_bool) {
 # Figure: Histograms of parameter distributions of thermal traits ----
 # distributions should be clumped (except for c)
 # logc should be clumped
@@ -460,40 +458,6 @@ parm_hists <- plot_df %>%
   theme_minimal_grid(12)
 
 ###* Figure: TPC curves with 89% high confidence intervals ----
-# Define TPC functions
-# Briere function
-Briere <- function(q, Tmin, Tmax) {
-  function(t) {
-    pmax(q * t * (t - Tmin) * (Tmax - t)^(1 / 2), 0, na.rm = TRUE)
-  }
-}
-# Quadratic function
-Quadratic <- function(q, Tmin, Tmax) {
-  function(t) {
-    pmax(-q * (t - Tmin) * (t - Tmax), 0, na.rm = TRUE)
-  }
-}
-# Linear
-Linear <- function(q, Tmax) {
-  function(t) {
-    pmax(q * (Tmax - t), 0, na.RM = FALSE)
-  }
-}
-
-# Function: designate proper thermal response function # !!! This should go somewhere else
-# - output is a function of temperature
-get.thermal.response <- function(data_in, Temperature) {
-  parms <- dplyr::select(data_in, c, T0, Tm)
-  function_type <- dplyr::select(data_in, func)
-  
-  temp_function <- case_when(
-    function_type == "Briere" ~ Briere(parms$c, parms$T0, parms$Tm),
-    function_type == "Quadratic" ~ Quadratic(parms$c, parms$T0, parms$Tm),
-    function_type == "Linear" ~ Linear(parms$c, parms$Tm)
-  )
-  
-  out <- temp_function(Temperature)
-}
 
 # Temperature vector used for visualizations
 Temps <- seq(0, 50, length.out = 200)
@@ -555,6 +519,4 @@ TPC_plot <- TPC_df %>%
   # geom_point(filter(data_in, trait.name == trait), mapping = aes(x = T, y = trait, color = system_ID)) +
   facet_wrap(~trait, scales = "free", ncol = 2) +
   theme_minimal_grid(12)
-
-
-
+}

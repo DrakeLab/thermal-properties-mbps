@@ -32,7 +32,6 @@ library(tidyverse)
 # 1) Load empirical trait data --------------------------------------------
 
 # # Run this to produce dataset from raw data
-# # data-cleaning.R = produce trait dataset in readable form
 # source("code/data-cleaning.R")
 # data.in.TPC <- data.Reduced
 
@@ -42,26 +41,29 @@ data.in.TPC <- read_csv("data/clean/data_for_TPC_fitting.csv")
 
 # 2) Fit trait thermal performance curves to trait data -------------------
 
-# get-thermal-trait-priors.R = calculate distributions of thermal trait parameters
 
+
+# # Run this to generate samples of trait TPC parameters from informed posterior distributions
+# source(get-thermal-trait-priors.R)
+
+# Run this to load pre-processed data set
+data.in.transform <- read_csv("data/clean/TPC_param_samples.csv")
 
 
 # 3) Translate traits into model parameters -------------------------------
 
 # trait-transform.R = perform necessary transformations to traits to get model parameters
 
-get.thermal.response <- function(data_in, Temperature) {
-  parms <- dplyr::select(data_in, c, T0, Tm)
-  function_type <- dplyr::select(data_in, func)
-  
-  temp_function <- case_when(
-    function_type == "Briere" ~ Briere(parms$c, parms$T0, parms$Tm),
-    function_type == "Quadratic" ~ Quadratic(parms$c, parms$T0, parms$Tm),
-    function_type == "Linear" ~ Linear(parms$c, parms$Tm)
-  )
-  
-  out <- temp_function(Temperature)
-}
+# List of model parameters: sigmaV, f, deltaL, rhoL, muV, etaV, betaV
+
+# List of traits with TPCs fit from data:
+
+# Combine traits into intermediate parameters as necessary
+# i.e. putting together reproductive traits to estimate eggs per female per day (EFD)
+
+# Deal with any duplicates: What do we do if we have two estimates for the same intermediate parameter?
+# i.e. We have e2a for Culex but also pO and EV
+
 
 
 # 4) Build data set incorporating all axes of variation -------------------
