@@ -4,9 +4,9 @@ data_in <- data.in
 distinct_combos <- distinct(data_in, trait.name, system_ID)
 
 
-n.chains <- 5 # 2 # 5
-n.adapt <- 5000 # 100 # 5000
-n.samps <- 1000 # 100 # 5000
+n.chains <-2 # 5
+n.adapt <- 100 # 5000
+n.samps <- 100 # 5000
 
 
 samples <- tibble(
@@ -18,6 +18,7 @@ samples <- tibble(
   sample_num = as.double(),
   func = as.character()
 )
+
 for (sample_num in 1:dim(distinct_combos)[1]) {
   print(paste0("System # ", sample_num, "--------------------------------------------------------"))
   system_sample <- distinct_combos$system_ID[sample_num]
@@ -44,16 +45,17 @@ for (sample_num in 1:dim(distinct_combos)[1]) {
       system_ID = system_sample
     )
   samples <- rbind(samples, temp_sample)
+  
 }
 
 
 # Save samples for now
-write_csv(samples, "data/clean/temp_samples.csv")
+# write_csv(samples, "data/clean/temp_samples.csv")
 
 # -------------------------------------------------------------------------
 
 
-samples <- read_csv("data/clean/temp_samples.csv")
+# samples <- read_csv("data/clean/temp_samples.csv")
 
 library(reshape2)
 library(cowplot)
@@ -63,15 +65,15 @@ plot_df <- samples %>%
   dplyr::select(-func) %>%
   mutate(temp_diff = Tm - T0) %>%
   mutate(logc = log(c)) %>%
-  melt(id = c("system_ID", "trait", "sample_num")) %>%
-  filter(system_ID %in% c(
-    "Aedes aegypti / DENV", "Aedes aegypti / none",
-    "Aedes aegypti / ZIKV", "Aedes aegypti / none",
-    "Aedes albopictus / DENV", "Aedes albopictus / none",
-    "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
-    "Anopheles spp. / Plasmodium spp.",
-    "Anopheles spp. / none"
-  ))
+  melt(id = c("system_ID", "trait", "sample_num")) #%>%
+  # filter(system_ID %in% c(
+  #   "Aedes aegypti / DENV", "Aedes aegypti / none",
+  #   "Aedes aegypti / ZIKV", "Aedes aegypti / none",
+  #   "Aedes albopictus / DENV", "Aedes albopictus / none",
+  #   "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
+  #   "Anopheles spp. / Plasmodium spp.",
+  #   "Anopheles spp. / none"
+  # ))
 
 ###* Figure: thermal trait parameter posterior distributions ----
 parm_hists <- plot_df %>%
@@ -125,7 +127,7 @@ get.thermal.response <- function(data_in, Temperature) {
 }
 
 ### Temperature vector used for visualizations ----
-Temps <- seq(10, 45, length.out = 200)
+Temps <- seq(0, 50, length.out = 200)
 
 # Thinning intervals for samples
 res_reduce <- function(df, new_length) {
@@ -142,7 +144,7 @@ thin_size <- 100
 
 # For each mosquito species, trait, and sample, get a thermal response curve
 TPC_df <- samples %>%
-  filter(sample_num %in% seq(1, thin_size)) %>%
+  # filter(sample_num %in% seq(1, thin_size)) %>%
   full_join(list(Temperature = Temps), by = character(), copy = TRUE) %>%
   # group_by(sample_num) %>%
   # try sapply or lapply

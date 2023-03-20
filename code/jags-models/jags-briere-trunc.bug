@@ -8,10 +8,10 @@ model {
       
   }
   # Prior
-  c ~ dgamma(1,10)
+  c ~ dunif(0, 1E-3)
   Tm ~ dunif(25, 45)
   T0  ~ dunif(0, 24)
-  sigma<-1/tau
+  sigma <- 1/tau
   tau ~ dgamma(0.0001, 0.0001)
 
 }
