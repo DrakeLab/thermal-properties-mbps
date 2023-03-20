@@ -37,10 +37,10 @@
 # Load Libraries
 library(tidyverse)
 library(IDPmisc)
-library("rjags") # Make sure you have installed JAGS-4.x.y.exe (for any x >=0, y>=0) from http://www.sourceforge.net/projects/mcmc-jags/files
-library("MASS")
-library("here")
-library("retry")
+library(rjags) # Make sure you have installed JAGS-4.x.y.exe (for any x >=0, y>=0) from http://www.sourceforge.net/projects/mcmc-jags/files
+library(MASS)
+library(here)
+library(retry)
 
 # Load utility functions (from Mordecai et al., 2017)
 # This file contains tools for analysis and visualization.
@@ -386,8 +386,8 @@ samples <- tibble(
 )
 
 # Go through all trait/system combinations to generate TPC parameter posterior samples
-for (sample_num in 1:dim(distinct_combos)[1]) {
-  print(paste0("System # ", sample_num, "--------------------------------------------------------"))
+for (sample_num in 79:dim(distinct_combos)[1]) {
+  print(paste0("System # ", sample_num, "-------------------------------------------------------------------------------"))
   
   # Pull system information
   system_sample <- distinct_combos$system_ID[sample_num]
@@ -424,7 +424,7 @@ write_csv(samples, "data/clean/TPC_param_samples.csv")
 # *) Diagnostics & visualizations -----------------------------------------
 
 # Do you want to look at diagnostic plots?
-plot_bool <- FALSE
+plot_bool <- TRUE
 
 # Do we just want to look at focal species?
 focal_bool <- FALSE
@@ -440,6 +440,8 @@ if (focal_bool) {
   ))
 }
 if (plot_bool) {
+library(reshape2)
+library(cowplot)
 # Figure: Histograms of parameter distributions of thermal traits ----
 # distributions should be clumped (except for c)
 # logc should be clumped
@@ -477,7 +479,7 @@ thin_size <- 100
 
 # For each mosquito species, trait, and sample, get a thermal response curve
 TPC_df <- samples %>%
-  # filter(sample_num %in% seq(1, thin_size)) %>%
+  filter(sample_num %in% seq(1, thin_size)) %>%
   full_join(list(Temperature = Temps), by = character(), copy = TRUE) %>%
   mutate(Trait_val = case_when(
     func == "Briere" ~ Briere(c, T0, Tm)(Temperature),

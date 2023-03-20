@@ -10,13 +10,14 @@ EIP,PDR,PDR,Inverse,extrinsic incubation period
 PDR,PDR,PDR,Identity,parasite development rate
 GCR,a,a,Identity,development rate (per day) of the first gonotrophic cycle
 1/mu,lf,lf,Identity,inverse of mortality rate (approx. average lifespan)
-TFD,TFD,EFD,Multiply_a,"total fecundity. eggs laid per female per
+TFD,EFOC,EFD,Multiply_a,"total fecundity. eggs laid per female per
 gonotrophic cycle (number/female)"
 GCD,a,a,Inverse,gonotrophic cycle duration
 1/MDR,MDR,MDR,Inverse,average development time (approx. = inverse of mosquito development rate)
 prop.dead,lf,lf,NegativeLogDifference,proportion dead after time T
 a,a,a,Identity,biting rate
 bc,bc,bc,Identity,probability of becoming infectious from feeding on infectious host
+EFGC,EFOC,EFD,Multiply_a,eggs per female per gonotrophic cycle
 EFOC,EFOC,EFD,Multiply_a,eggs per female per oviposition cycle
 EPR,EPR,EFD,Multiply_pO,eggs per raft
 pO,pO,pO,NA,average proportion of females ovipositing at any point in time. Accessory trait used to compute EFD with EPR

@@ -118,7 +118,6 @@ intermediate_df <- temp_df %>%
   )) %>% 
   mutate(EFD = case_when(
     !(is.na(EFD)) ~ EFD,
-    !(is.na(TFD * a)) ~ TFD * a,
     !(is.na(EFOC * a)) ~ EFOC * a,
     !(is.na(EPR * pO)) ~ EPR * pO
   )) %>% 
@@ -126,10 +125,42 @@ intermediate_df <- temp_df %>%
   # throw out traits that are no longer needed
   dplyr::select(system_ID, sample_num, Temperature,
                 a, bc, PDR, e2a, EFD, lf, MDR)
-  
+
+intermediate_df <- intermediate_df %>% 
+  # separate out mosquito species and pathogen names
+  mutate(mosquito_species = stringr::word(system_ID, 1, 2)) %>% 
+  mutate(pathogen = stringr::word(system_ID, 4, 4)) %>% 
+  # "forget" system_ID for now
+  dplyr::select(-system_ID)
+
+# Combine parasite relevant data with mosquito life history
+noInfection_df <- intermediate_df %>% 
+  filter(pathogen == "none") %>% 
+  dplyr::select(-pathogen) %>% 
+  dplyr::select(-c("bc", "PDR"))
+
+Infection_df <- intermediate_df %>% 
+  filter(pathogen != "none") %>% 
+  dplyr::select(-c("a", "e2a", "EFD", "lf", "MDR"))
+
+combined_df <- left_join(Infection_df, noInfection_df)%>% 
+  unite(
+    col = "system_ID",
+    c("mosquito_species", "pathogen"),
+    sep = " / ",
+    remove = FALSE
+  ) %>% 
+  relocate(system_ID, mosquito_species, pathogen, Temperature, sample_num)
+
+
 # Check what data we're missing (we'll go back and use substitutes for these)
-missing_traits_df <- intermediate_df %>% 
-  dplyr::filter(if_any(a:MDR, ~ is.na(.)))
+missing_traits_df <- combined_df %>% 
+  pivot_longer(cols = bc:MDR) %>% 
+  dplyr::filter(is.na(value)) %>% 
+  dplyr::select(-c(sample_num, Temperature)) %>% 
+  unique()
+
+# Following Shocket 2020: use Culex univittatus / WNV / bc for Culex quinquefasciatus / WNV / bc
 
 
 # Deal with any duplicates: What do we do if we have two estimates for the same intermediate parameter?

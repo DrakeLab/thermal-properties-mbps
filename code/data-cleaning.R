@@ -129,14 +129,6 @@ data.Shocket2018 <- read.csv("data/raw/Shocket_2018/RRVTraitData.csv", header = 
   rename(pathogen = paras.code) %>%
   dplyr::select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
 
-
-data.EFD.20 <- subset(data.EFD.proc, T == 20)
-data.EFD.25 <- subset(data.EFD.proc, T == 25)
-data.EFD.30 <- subset(data.EFD.proc, T == 30)
-EFD.means <- data.frame(T = c(20, 25, 30), mean = c(mean(data.EFD.20$trait), mean(data.EFD.25$trait), mean(data.EFD.30$trait)), 
-                        SE = c(sd(data.EFD.20$trait)/sqrt(nrow(data.EFD.20)), sd(data.EFD.25$trait)/sqrt(nrow(data.EFD.25)), sd(data.EFD.30$trait)/sqrt(nrow(data.EFD.30))))
-
-
 ### * Tesla 2018 ----
 # -- InfectionData.csv
 # -- SurvivalData.csv
@@ -213,9 +205,21 @@ data.Shocket2020 <- read.csv("data/raw/Shocket_2020/TraitData_a.csv", header = T
   filter(mosquito_species != "missing code") %>%
   dplyr::select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
 
+### * Anopheles fecundity data ----
+data.Anga_fecundity <- read.csv("data/raw/Anopheles_fecundity.csv", header = TRUE) %>%
+  mutate(lead_author = "Dahlin") %>%
+  mutate(year = "2023") %>%
+  mutate(mosquito_species = case_when(
+    host.code == "Anga" ~ "Anopheles gambiae",
+    host.code == "Ansu" ~ "Anopheles superpictus"
+  )) %>%
+  mutate(pathogen = NA) %>% 
+  dplyr::select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
+
 # 2) Combine data sets ----------------------------------------------------
 # Combine all data frames
-data.All <- rbind(data.Mordecai2013, data.Mordecai2017, data.Shocket2018, data.Tesla2018, data.Shocket2020)
+data.All <- rbind(data.Mordecai2013, data.Mordecai2017, data.Shocket2018, 
+                  data.Tesla2018, data.Shocket2020, data.Anga_fecundity)
 
 # 3) Rename non-focal systems and combine synonymous traits -----------------
 
@@ -235,7 +239,7 @@ data.Reduced <- data.All %>%
   # Reduce non-focal MOSQUITO species to genus level
   mutate(species_label = case_when(
     (Genus == "Aedes" & !(Species %in% c("aegypti", "albopictus"))) ~ "spp.",
-    (Genus == "Culex" & Species != "quinquefasciatus") ~ "spp.",
+    (Genus == "Culex" & !(Species %in% c("quinquefasciatus", "univittatus"))) ~ "spp.",
     Genus == "Anopheles" ~ "spp.",
     # (Genus == "Anopheles" & Species != "gambiae") ~ "spp.", # Not enough data for Anopheles gambiae alone to fit model.
     Genus == "Other" ~ "spp.",
@@ -267,10 +271,6 @@ data.Reduced <- data.All %>%
   ) %>% 
   dplyr::select(-c(Species, Genus, species_label, pathogen_1, pathogen_2))
 
-
-# List of traits for fitting thermal performance curves
-# TPC_trait_list <- c("a", "TFD", "EFD", "MDR", "e2a", "b", "c", "PDR", "lf")
-
 # Load the table explaining how to convert from initial to intermediate traits
 transform_table <- read_csv("data/clean/trait_transforms.csv") %>% 
   dplyr::select(-notes) %>% 
@@ -278,7 +278,7 @@ transform_table <- read_csv("data/clean/trait_transforms.csv") %>%
   arrange(final.trait, trait.to, trait.name)
 
 # Define small value for inverting traits
-eps <- 0#.Machine$double.eps
+eps <- .Machine$double.eps
 
 # Rename synonymous traits
 data.Reduced <- data.Reduced %>% 
