@@ -366,8 +366,24 @@ run.jags <- function(jags_data, TPC_function, variable_names,
 
 # 2) Calculate prior distributions of thermal trait parameters from data ----
 
+# Set parameters for rjags
+n.chains <-2 # 5
+n.adapt <- 100 # 5000
+n.samps <- 100 # 5000
+
 # Identify all distinct combinations of traits and transmission systems
+data_in <- data.in
 distinct_combos <- distinct(data_in, trait.name, system_ID)
+
+samples <- tibble(
+  trait = as.character(),
+  system_ID = as.character(),
+  T0 = as.double(),
+  Tm = as.double(),
+  c = as.double(), # !!! note that we're using c as a generic parameter for Briere or Quadratic
+  sample_num = as.double(),
+  func = as.character()
+)
 
 # Go through all trait/system combinations to generate TPC parameter posterior samples
 for (sample_num in 1:dim(distinct_combos)[1]) {
@@ -376,17 +392,17 @@ for (sample_num in 1:dim(distinct_combos)[1]) {
   # Pull system information
   system_sample <- distinct_combos$system_ID[sample_num]
   trait_in <- distinct_combos$trait.name[sample_num]
-  mosquito_in <- filter(data.in, system_ID == system_sample) %>%
+  mosquito_in <- filter(data_in, system_ID == system_sample) %>%
     dplyr::select(mosquito_species) %>%
     unique() %>%
     as.character()
-  pathogen_in <- filter(data.in, system_ID == system_sample) %>%
+  pathogen_in <- filter(data_in, system_ID == system_sample) %>%
     dplyr::select(pathogen) %>%
     unique() %>%
     as.character()
   
   # generate TPC parameter posterior samples
-  temp_sample <- thermtrait.prior.sample(data.in, trait_in, mosquito_in, pathogen_in,
+  temp_sample <- thermtrait.prior.sample(data_in, trait_in, mosquito_in, pathogen_in,
                                          n.chains, n.adapt, n.samps,
                                          old_informative = FALSE
   )
