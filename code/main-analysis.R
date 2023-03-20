@@ -50,6 +50,20 @@ data.in.TPC <- read_csv("data/clean/data_for_TPC_fitting.csv")
 
 # trait-transform.R = perform necessary transformations to traits to get model parameters
 
+get.thermal.response <- function(data_in, Temperature) {
+  parms <- dplyr::select(data_in, c, T0, Tm)
+  function_type <- dplyr::select(data_in, func)
+  
+  temp_function <- case_when(
+    function_type == "Briere" ~ Briere(parms$c, parms$T0, parms$Tm),
+    function_type == "Quadratic" ~ Quadratic(parms$c, parms$T0, parms$Tm),
+    function_type == "Linear" ~ Linear(parms$c, parms$Tm)
+  )
+  
+  out <- temp_function(Temperature)
+}
+
+
 # 4) Build data set incorporating all axes of variation -------------------
 
 # get-analysis-dfs.R = produce data.frames incorporating all axes of variation

@@ -8,7 +8,7 @@ model {
       
   }
   # Prior
-  c ~ dunif(0, 1E-3)
+  c ~ 10^(dunif(-3, 0))
   Tm ~ dunif(25, 45)
   T0  ~ dunif(0, 24)
   sigma <- 1/tau
