@@ -107,6 +107,13 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
       dplyr::filter(stringr::word(mosquito_species, 1, 1) == stringr::word(mosquito_in, 1, 1)) %>%
       dplyr::filter(mosquito_species != mosquito_in)
     
+    # If data was recorded for infections, use infections in other species to inform priors
+    if (pathogen_in != "none") {
+      other_species <- data %>%
+        dplyr::filter(stringr::word(pathogen, 1, 1) == stringr::word(pathogen_in, 1, 1)) %>% 
+        rbind(other_species)
+    }
+    
     # if data from congeners is unavailable, use data from species outside of the focal genera (that is, not Aedes, Culex, or Anopheles)
     if (dim(other_species)[1] == 0) {
       other_species <- data %>%
@@ -143,7 +150,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         get.prior_hyperparams(
           other_data, TPC_function, variable_names,
           jags_other, inits_list,
-          n.chains, n.adapt, 100
+          n.chains, n.adapt, 100, prob_bool
         ),
         until = function(val, cnd) {
           !is.null(val)
@@ -195,7 +202,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
     samps <- run.jags(
       jags_data, TPC_function, variable_names,
       jags_choice, inits_list,
-      n.chains, n.adapt, n.samps
+      n.chains, n.adapt, n.samps, prob_bool
     )
   }
   # Begin using data on the focal species to create and generate samples from 
@@ -263,7 +270,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
           jags_data, TPC_function, variable_names,
           jags_choice, inits_list,
           n.chains, n.adapt,
-          100
+          100, prob_bool
         ),
         until = function(val, cnd) {
           !is.null(val)
@@ -274,8 +281,45 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
       samps <- run.jags(
         jags_data, TPC_function, variable_names,
         jags_choice, inits_list,
-        n.chains, n.adapt, n.samps
+        n.chains, n.adapt, n.samps, prob_bool
       )
+      # # extra processing if the trait is a probability
+      # if (prob_bool) {
+      #   quad_max_func <- function(c, T0, Tm) {c * ((Tm - T0) / 2)^2}
+      #   briere_max_func <- function(c, T0, Tm) {
+      #     T_star = (1/3) * (T0 + Tm + sqrt((T0 - Tm)^2 + T0 * Tm))
+      #     maxB = c * T_star * (T_star - T0) * sqrt(Tm -T_star)
+      #   }
+      #   linear_max_func <- function(c, T0, Tm) {c * Tm}
+      #   # remove samples which lead to maximum values exceeding one
+      #   temp_samps <- samps %>% 
+      #     mutate(test = case_when(
+      #       TPC_function == "Quadratic" ~ quad_max_func(c, T0, Tm),
+      #       TPC_function == "Briere" ~ briere_max_func(c, T0, Tm),
+      #     )) %>% 
+      #     dplyr::filter(between(test, 0 ,1)) %>% 
+      #     dplyr::select(-test)
+      #   
+      #   # resample until we have a full set of samples leading to maximum values being less than one
+      #   while (dim(temp_samps)[1] < n.samps * n.chains) {
+      #     print("Resampling a probability trait...")
+      #     samps <- run.jags(
+      #       jags_data, TPC_function, variable_names,
+      #       jags_choice, inits_list,
+      #       n.chains, n.adapt, n.samps, prob_bool
+      #     )
+      #     temp_samps <- rbind(temp_samps, samps) %>% 
+      #       mutate(test = case_when(
+      #         TPC_function == "Quadratic" ~ quad_max_func(c, T0, Tm),
+      #         TPC_function == "Briere" ~ briere_max_func(c, T0, Tm),
+      #       )) %>% 
+      #       dplyr::filter(between(test, 0 ,1)) %>% 
+      #       dplyr::select(-test)
+      #     
+      #   }
+      #   samps <- temp_samps[1:n.samps * n.chains,]
+      #   
+      # }
       
       # for the linear model (which doesn't have T0 as a parameter), add NAs)
       if (is.null(samps$T0)) {
@@ -294,7 +338,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
 get.prior_hyperparams <- function(in_data, TPC_function, variable_names,
                                   jags_model, inits_list,
                                   n.chains, n.adapt,
-                                  scale_factor = 100) {
+                                  scale_factor = 100, prob_bool) {
   # Initialize the hyperparameter list
   hypers <- NULL
   
@@ -302,18 +346,18 @@ get.prior_hyperparams <- function(in_data, TPC_function, variable_names,
   temp_samples <- run.jags(
     in_data, TPC_function, variable_names,
     jags_model, inits_list,
-    n.chains, n.adapt, 1000
+    n.chains, n.adapt, 1000, prob_bool
   )
   
   # transform TPC parameters for the Linear TPC
   if (TPC_function == "Linear") {
     temp_samples <- mutate(temp_samples, z = c * Tm) %>%
-      dplyr::select(-Tm)
+      dplyr::select(-c(Tm, T0))
   }
   
   # rescale TPC parameters to ease fitting
   temp_samples <- temp_samples / scale_factor
-  temp_samples <- dplyr::select(temp_samples, -sample_num)
+  temp_samples <- dplyr::select(temp_samples, -system_index)
   
   # calculate hyperparameters of gamma distribution fit to TPC parameter distributions
   hypers <- apply(temp_samples, 2, function(df) {
@@ -332,7 +376,7 @@ get.prior_hyperparams <- function(in_data, TPC_function, variable_names,
 # Function: get samples of trait TPC hyperparameters from running jags
 run.jags <- function(jags_data, TPC_function, variable_names,
                      jags_choice, inits_list,
-                     n.chains, n.adapt, n.samps) {
+                     n.chains, n.adapt, n.samps, prob_bool = FALSE) {
   # initialize jags model
   jags <- jags.model(jags_choice,
                      data = jags_data,
@@ -348,19 +392,80 @@ run.jags <- function(jags_data, TPC_function, variable_names,
   if (TPC_function == "Briere") {
     samps <- make.briere.samps(coda.samps, nchains = n.chains, samp.lims = c(1, n.samps))
   } else if (TPC_function == "Quadratic") {
-    samps <- make.quad.samps(coda.samps, nchains = n.chains, samp.lims = c(1, n.samps), sig = TRUE)
+    samps <- make.quad.samps(coda.samps, nchains = n.chains, samp.lims = c(1, n.samps), sig = TRUE) %>% 
+      mutate(c = qd, .keep = "unused")
   } else {
     samps <- make.linear.samps(coda.samps, nchains = n.chains, samp.lims = c(1, n.samps), sig = TRUE) %>%
       mutate(Tm = n.inter / slope) %>%
       mutate(c = slope) %>%
-      dplyr::select(c, Tm, sigma)
+      mutate(T0 = NA) %>% 
+      dplyr::select(c,T0, Tm, sigma)
+  }
+  
+  # Remove samples where the minimum temperature exceeds the maximum
+  samps <- dplyr::filter(samps, is.na(T0) | Tm>T0)
+  
+  # extra processing if the trait is a probability
+  if (prob_bool) {
+    quad_max_func <- function(c, T0, Tm) {c * ((Tm - T0) / 2)^2}
+    briere_max_func <- function(c, T0, Tm) {
+      T_star = (1/3) * (T0 + Tm + sqrt((T0 - Tm)^2 + T0 * Tm))
+      maxB = c * T_star * (T_star - T0) * sqrt(Tm -T_star)}
+    linear_max_func <- function(c, T0, Tm) {c * Tm}
+    # remove samples which lead to maximum values exceeding one
+    samps <- samps %>% 
+      mutate(test = case_when(
+        TPC_function == "Quadratic" ~ quad_max_func(c, T0, Tm),
+        TPC_function == "Briere" ~ briere_max_func(c, T0, Tm),
+      )) %>% 
+      dplyr::filter(between(test, 0 ,1)) %>% 
+      dplyr::select(-test)
+  }
+  
+  # Resample until we obtain enough real samples
+  while (dim(samps)[1] < n.chains * n.samps) {
+    print("Resampling to ensure T0 < Tm ...")
+    coda.samps <- coda.samples(jags, variable_names, n.samps)
+    if (TPC_function == "Briere") {
+      temp_samps <- make.briere.samps(coda.samps, nchains = n.chains, samp.lims = c(1, n.samps))
+    } else if (TPC_function == "Quadratic") {
+      temp_samps <- make.quad.samps(coda.samps, nchains = n.chains, samp.lims = c(1, n.samps), sig = TRUE) %>% 
+        mutate(c = qd, .keep = "unused")
+    } else {
+      temp_samps <- make.linear.samps(coda.samps, nchains = n.chains, samp.lims = c(1, n.samps), sig = TRUE) %>%
+        mutate(Tm = n.inter / slope) %>%
+        mutate(c = slope) %>%
+        dplyr::select(c, Tm, sigma)
+    }
+    temp_samps <- dplyr::filter(temp_samps, is.na(T0) | Tm > T0)
+    
+    # Resample if the max value for a probability trait exceeds 1 
+    if (prob_bool) {
+      print("...and maximum does not exceed 1 for a probability")
+      temp_samps <- temp_samps %>% 
+        mutate(test = case_when(
+          TPC_function == "Quadratic" ~ quad_max_func(c, T0, Tm),
+          TPC_function == "Briere" ~ briere_max_func(c, T0, Tm),
+        )) %>% 
+        dplyr::filter(between(test, 0 ,1)) %>% 
+        dplyr::select(-test)
+    }
+    
+    
+    print(paste0("***Added an additional ",
+                 ifelse(dim(samps)[1]+dim(temp_samps)[1] > n.chains * n.samps,
+                        n.chains * n.samps - dim(samps)[1],
+                        dim(temp_samps)[1]),
+                 " samples from re-sampling***"))
+    samps <- rbind(samps, temp_samps)
+    samps <- samps[1:(n.chains * n.samps),]
   }
   
   samps$tau <- 1 / samps$sigma
   if (is.null(samps$c)) {
     samps <- mutate(samps, c = qd, .keep = "unused")
   }
-  samps$sample_num <- 1:dim(samps)[1]
+  samps$system_index <- 1:dim(samps)[1]
   return(samps)
 }
 
@@ -372,7 +477,7 @@ n.adapt <- 100 # 5000
 n.samps <- 100 # 5000
 
 # Identify all distinct combinations of traits and transmission systems
-data_in <- data.in
+data_in <- data.in.TPC
 distinct_combos <- distinct(data_in, trait.name, system_ID)
 
 samples <- tibble(
@@ -381,17 +486,17 @@ samples <- tibble(
   T0 = as.double(),
   Tm = as.double(),
   c = as.double(), # !!! note that we're using c as a generic parameter for Briere or Quadratic
-  sample_num = as.double(),
+  system_index = as.double(),
   func = as.character()
 )
 
 # Go through all trait/system combinations to generate TPC parameter posterior samples
-for (sample_num in 79:dim(distinct_combos)[1]) {
-  print(paste0("System # ", sample_num, "-------------------------------------------------------------------------------"))
+for (system_index in 1:dim(distinct_combos)[1]) {
+  print(paste0("System # ", system_index, "-------------------------------------------------------------------------------"))
   
   # Pull system information
-  system_sample <- distinct_combos$system_ID[sample_num]
-  trait_in <- distinct_combos$trait.name[sample_num]
+  system_sample <- distinct_combos$system_ID[system_index]
+  trait_in <- distinct_combos$trait.name[system_index]
   mosquito_in <- filter(data_in, system_ID == system_sample) %>%
     dplyr::select(mosquito_species) %>%
     unique() %>%
@@ -426,99 +531,119 @@ write_csv(samples, "data/clean/TPC_param_samples.csv")
 # Do you want to look at diagnostic plots?
 plot_bool <- TRUE
 
-# Do we just want to look at focal species?
-focal_bool <- FALSE
+# Do you just want to look at focal species?
+focal_bool <- TRUE
 
-if (focal_bool) {
-  samples <- filter(samples, system_ID %in% c(
-    "Aedes aegypti / DENV", "Aedes aegypti / none",
-    "Aedes aegypti / ZIKV", "Aedes aegypti / none",
-    "Aedes albopictus / DENV", "Aedes albopictus / none",
-    "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
-    "Anopheles spp. / Plasmodium spp.",
-    "Anopheles spp. / none"
-  ))
-}
 if (plot_bool) {
-library(reshape2)
-library(cowplot)
-# Figure: Histograms of parameter distributions of thermal traits ----
-# distributions should be clumped (except for c)
-# logc should be clumped
-# temp_diff should be positive
-plot_df <- samples %>%
-  dplyr::select(-func) %>%
-  mutate(temp_diff = Tm - T0) %>%
-  mutate(logc = log(c)) %>%
-  melt(id = c("system_ID", "trait", "sample_num"))
-
-parm_hists <- plot_df %>%
-  filter(variable != "c") %>%
-  ggplot(aes(value, color = system_ID, fill = system_ID)) +
-  geom_histogram(aes(), bins = 100) +
-  facet_grid(trait ~ variable, scales = "free") +
-  theme_minimal_grid(12)
-
-###* Figure: TPC curves with 89% high confidence intervals ----
-
-# Temperature vector used for visualizations
-Temps <- seq(0, 50, length.out = 200)
-
-# Function to thin intervals for samples
-res_reduce <- function(df, new_length) {
-  old_length <- length(unique(df))
-  if (old_length < new_length) {
-    warning("new_length is larger than old length. Vector will be unchanged")
-    new_length <- old_length
+  plot_samples <- read_csv("data/clean/TPC_param_samples.csv", show_col_types = FALSE)
+  if (focal_bool) {
+    plot_samples <- filter(plot_samples, system_ID %in% c(
+      "Aedes aegypti / DENV", "Aedes aegypti / none",
+      "Aedes aegypti / ZIKV", "Aedes aegypti / none",
+      "Aedes albopictus / DENV", "Aedes albopictus / none",
+      "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
+      "Culex univittatus / WNV",
+      "Anopheles spp. / Plasmodium spp.",
+      "Anopheles spp. / none"
+    ))
   }
-  ret <- unique(df)[seq(1, length(unique(df)), length.out = new_length)]
-}
-
-thin_size <- 100
-
-
-# For each mosquito species, trait, and sample, get a thermal response curve
-TPC_df <- samples %>%
-  filter(sample_num %in% seq(1, thin_size)) %>%
-  full_join(list(Temperature = Temps), by = character(), copy = TRUE) %>%
-  mutate(Trait_val = case_when(
-    func == "Briere" ~ Briere(c, T0, Tm)(Temperature),
-    func == "Quadratic" ~ Quadratic(c, T0, Tm)(Temperature),
-    func == "Linear" ~ Linear(c, Tm)(Temperature)
-  )) %>%
-  dplyr::select(-c("c", "T0", "Tm"))
-
-# get mean TPC from samples
-meanTPC_df <- TPC_df %>%
-  group_by(system_ID, trait, Temperature) %>%
-  summarise(mean_val = mean(Trait_val), .groups = "keep") %>%
-  unique()
-
-# get edges of 89% HCI of samples # !!! not calculated correctly?
-quantsTPC_df <- TPC_df %>%
-  group_by(system_ID, trait, Temperature) %>%
-  mutate(lowHCI_val = quantile(Trait_val, 0.055)) %>%
-  mutate(highHCI_val = quantile(Trait_val, 0.945)) %>%
-  dplyr::select(-c("sample_num", "Trait_val", "func")) %>%
-  unique()
-
-TPC_plot <- TPC_df %>%
-  group_by(sample_num) %>%
-  arrange(Temperature) %>%
-  # group_by()
-  ggplot() +
-  # means of TPC curves
-  geom_line(
-    data = meanTPC_df,
-    aes(x = Temperature, y = mean_val, color = system_ID)
-  ) +
-  # 89% HCI of TPC curves
-  geom_ribbon(
-    data = quantsTPC_df,
-    aes(x = Temperature, ymin = lowHCI_val, ymax = highHCI_val, fill = system_ID),
-    alpha = 0.1
-  ) +
-  # geom_point(filter(data_in, trait.name == trait), mapping = aes(x = T, y = trait, color = system_ID)) +
-  facet_wrap(~trait, scales = "free", ncol = 2) +
-  theme_minimal_grid(12)
+  library(reshape2)
+  library(cowplot)
+  # Define TPC functions
+  # Briere function
+  Briere <- function(q, Tmin, Tmax) {
+    function(t) {
+      pmax(q * t * (t - Tmin) * (Tmax - t)^(1 / 2), 0, na.rm = TRUE)
+    }
+  }
+  # Quadratic function
+  Quadratic <- function(q, Tmin, Tmax) {
+    function(t) {
+      pmax(-q * (t - Tmin) * (t - Tmax), 0, na.rm = TRUE)
+    }
+  }
+  # Linear
+  Linear <- function(q, Tmax) {
+    function(t) {
+      pmax(q * (Tmax - t), 0, na.RM = FALSE)
+    }
+  }
+  # Function to thin intervals for samples
+  res_reduce <- function(df, new_length) {
+    old_length <- length(unique(df))
+    if (old_length < new_length) {
+      warning("new_length is larger than old length. Vector will be unchanged")
+      new_length <- old_length
+    }
+    ret <- unique(df)[seq(1, length(unique(df)), length.out = new_length)]
+  }
+  
+  # Figure: Histograms of parameter distributions of thermal traits ----
+  # distributions should be clumped (except for c)
+  # logc should be clumped
+  # temp_diff should be positive
+  plot_df <- plot_samples %>%
+    dplyr::select(-func) %>%
+    mutate(temp_diff = Tm - T0) %>%
+    mutate(logc = log(c)) %>%
+    melt(id = c("system_ID", "trait", "system_index"))
+  
+  parm_hists <- plot_df %>%
+    filter(variable != "c") %>%
+    ggplot(aes(value, color = system_ID, fill = system_ID)) +
+    geom_histogram(aes(), bins = 100) +
+    facet_grid(trait ~ variable, scales = "free") +
+    theme_minimal_grid(12)
+  
+  ###* Figure: TPC curves with 89% high confidence intervals ----
+  
+  # Temperature vector used for visualizations
+  Temps <- seq(0, 50, length.out = 200)
+  
+  # thin_size <- 100
+  
+  # For each mosquito species, trait, and sample, get a thermal response curve
+  TPC_df <- plot_samples %>%
+    # filter(system_index %in% seq(1, thin_size)) %>%
+    full_join(list(Temperature = Temps), by = character(), copy = TRUE) %>%
+    mutate(Trait_val = case_when(
+      func == "Briere" ~ Briere(c, T0, Tm)(Temperature),
+      func == "Quadratic" ~ Quadratic(c, T0, Tm)(Temperature),
+      func == "Linear" ~ Linear(c, Tm)(Temperature)
+    )) %>%
+    dplyr::select(-c("c", "T0", "Tm"))
+  
+  # get mean TPC from samples
+  meanTPC_df <- TPC_df %>%
+    group_by(system_ID, trait, Temperature) %>%
+    summarise(mean_val = mean(Trait_val), .groups = "keep") %>%
+    unique()
+  
+  # get edges of 89% HCI of samples # !!! not calculated correctly?
+  quantsTPC_df <- TPC_df %>%
+    group_by(system_ID, trait, Temperature) %>%
+    mutate(lowHCI_val = quantile(Trait_val, 0.055)) %>%
+    mutate(highHCI_val = quantile(Trait_val, 0.945)) %>%
+    dplyr::select(-c("system_index", "Trait_val", "func")) %>%
+    unique()
+  
+  TPC_plot <- TPC_df %>%
+    group_by(system_index) %>%
+    arrange(Temperature) %>%
+    # group_by()
+    ggplot() +
+    # means of TPC curves
+    geom_line(
+      data = meanTPC_df,
+      aes(x = Temperature, y = mean_val, color = system_ID)
+    ) +
+    # 89% HCI of TPC curves
+    geom_ribbon(
+      data = quantsTPC_df,
+      aes(x = Temperature, ymin = lowHCI_val, ymax = highHCI_val, fill = system_ID),
+      alpha = 0.1
+    ) +
+    ylab("") +
+    facet_wrap(~trait, scales = "free", ncol = 2) +
+    theme_minimal_grid(12)
 }

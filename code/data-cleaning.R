@@ -281,12 +281,13 @@ transform_table <- read_csv("data/clean/trait_transforms.csv") %>%
 eps <- .Machine$double.eps
 
 # Rename synonymous traits
-data.Reduced <- data.Reduced %>% 
+data.Out <- data.Reduced %>% 
   right_join(transform_table) %>% 
   mutate(trait = case_when(
     transform == "Identity" ~ trait,
     transform == "Inverse" ~ 1/(trait + eps),
     transform == "NegativeLogDifference" ~ -log(1-trait), # following Mordecai et al., 2017 for prop.dead data from Alto et al., 2001b
+    NA ~ trait,
     TRUE ~ trait
     # Others will be transformed after fitting thermal performance curves
   )) %>% 
@@ -298,17 +299,25 @@ data.Reduced <- data.Reduced %>%
 # 4) Data visualizations / diagnostics ------------------------------------
 
 ###* Visualize traits as functions of temperature
+plot_bool <- TRUE # decide whether you'd like to generate a diagnostic plot
 
+if (plot_bool) {
+library(cowplot)
 # Set up data frame for visualization
-data.Viz <- data.Reduced
+data.Viz <- data.Out
 
 # show thermal response of all traits across all systems
 trait_plots <- data.Viz %>%
   ggplot(aes(x = T, y = trait, color = as.factor(mosquito_species),
              shape = as.factor(pathogen), group = system_ID)) +
   geom_point() +
-  scale_shape_manual(values = 1:length(unique(data.Viz$pathogen))) +
-  facet_wrap(~ trait.name, scales = "free")
+  scale_shape_manual(name = "Pathogen",
+                     values = 1:length(unique(data.Viz$pathogen))) +
+  scale_color_discrete(name = "Mosquito species") +
+  labs(x = "Temperature",
+       y = "Trait value") +
+  facet_wrap(~ trait.name, scales = "free") +
+  theme_minimal(16)
 
 # show thermal response data for focal systems only
 select_trait_plots <- data.Viz %>% 
@@ -318,14 +327,20 @@ select_trait_plots <- data.Viz %>%
                           "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
                           "Anopheles spp. / Plasmodium spp.",
                           "Anopheles spp. / none"
-  )) %>% 
+  )) %>%
   ggplot(aes(x = T, y = trait, color = as.factor(mosquito_species),
              shape = as.factor(pathogen), group = system_ID)) +
   geom_point() +
-  scale_shape_manual(values = 1:8) +
-  facet_wrap(~ trait.name, scales = "free")
+  scale_shape_manual(name = "Pathogen",
+                     values = 1:length(unique(data.Viz$pathogen))) +
+  scale_color_discrete(name = "Mosquito species") +
+  labs(x = "Temperature",
+       y = "Trait value") +
+  facet_wrap(~ trait.name, scales = "free") +
+  theme_minimal(16)
+}
 
 # 5) Save and export data set ---------------------------------------------
 
 # Save data.frame to file
-write_csv(data.Reduced, "data/clean/data_for_TPC_fitting.csv")
+write_csv(data.Out, "data/clean/data_for_TPC_fitting.csv")

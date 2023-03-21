@@ -37,7 +37,8 @@ library(tidyverse)
 
 # Run this to load pre-processed dataset
 # load dataset for fitting trait TPCs
-data.in.TPC <- read_csv("data/clean/data_for_TPC_fitting.csv")
+data.in.TPC <- read_csv("data/clean/data_for_TPC_fitting.csv",
+                        show_col_types = FALSE)
 
 # 2) Fit trait thermal performance curves to trait data -------------------
 
@@ -45,7 +46,8 @@ data.in.TPC <- read_csv("data/clean/data_for_TPC_fitting.csv")
 # source(get-thermal-trait-priors.R)
 
 # Run this to load pre-processed data set
-data.in.transform <- read_csv("data/clean/TPC_param_samples.csv")
+data.in.transform <- read_csv("data/clean/TPC_param_samples.csv",
+                              show_col_types = FALSE)
 
 
 # 3) Translate traits into model parameters -------------------------------
