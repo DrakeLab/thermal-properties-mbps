@@ -436,13 +436,22 @@ run.jags <- function(jags_data, TPC_function, variable_names,
 # 2) Calculate prior distributions of thermal trait parameters from data ----
 
 # Set parameters for MCMC
-n.chains <-5 #3 # 5
-n.adapt <- 5000# 100 # 5000
-n.samps <-1000 # 100 # 5000
+n.chains <-5 # 3 # 5
+n.adapt <- 5000 # 100 # 5000
+n.samps <-5000 # 100 # 5000
 
 # Identify all distinct combinations of traits and transmission systems
 data_in <- data.in.TPC
-distinct_combos <- distinct(data_in, trait.name, system_ID)
+distinct_combos <- data_in %>% 
+  filter(system_ID %in% c(
+  "Aedes aegypti / DENV", "Aedes aegypti / none",
+  "Aedes aegypti / ZIKV", "Aedes aegypti / none",
+  "Aedes albopictus / DENV", "Aedes albopictus / none",
+  "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
+  "Culex univittatus / WNV",
+  "Anopheles spp. / Plasmodium spp.",
+  "Anopheles spp. / none"
+)) %>% distinct(trait.name, system_ID)
 
 samples <- tibble(
   trait = as.character(),
@@ -558,6 +567,9 @@ if (plot_bool) {
     geom_histogram(aes(), bins = 100) +
     facet_grid(trait ~ variable, scales = "free") +
     theme_minimal_grid(12)
+  # Save figure
+  ggsave("figures/parm_hists.svg", device = "svg",
+         width = 16, height = 9, units = "in")
   
   ###* Figure: TPC curves with 89% high confidence intervals ----
   
@@ -610,4 +622,7 @@ if (plot_bool) {
     ylab("") +
     facet_wrap(~trait, scales = "free", ncol = 2) +
     theme_minimal_grid(12)
+  # Save figure
+  ggsave("figures/TPC_plot.svg", device = "svg",
+         width = 16, height = 9, units = "in")
 }
