@@ -283,44 +283,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         jags_choice, inits_list,
         n.chains, n.adapt, n.samps, prob_bool
       )
-      # # extra processing if the trait is a probability
-      # if (prob_bool) {
-      #   quad_max_func <- function(c, T0, Tm) {c * ((Tm - T0) / 2)^2}
-      #   briere_max_func <- function(c, T0, Tm) {
-      #     T_star = (1/3) * (T0 + Tm + sqrt((T0 - Tm)^2 + T0 * Tm))
-      #     maxB = c * T_star * (T_star - T0) * sqrt(Tm -T_star)
-      #   }
-      #   linear_max_func <- function(c, T0, Tm) {c * Tm}
-      #   # remove samples which lead to maximum values exceeding one
-      #   temp_samps <- samps %>% 
-      #     mutate(test = case_when(
-      #       TPC_function == "Quadratic" ~ quad_max_func(c, T0, Tm),
-      #       TPC_function == "Briere" ~ briere_max_func(c, T0, Tm),
-      #     )) %>% 
-      #     dplyr::filter(between(test, 0 ,1)) %>% 
-      #     dplyr::select(-test)
-      #   
-      #   # resample until we have a full set of samples leading to maximum values being less than one
-      #   while (dim(temp_samps)[1] < n.samps * n.chains) {
-      #     print("Resampling a probability trait...")
-      #     samps <- run.jags(
-      #       jags_data, TPC_function, variable_names,
-      #       jags_choice, inits_list,
-      #       n.chains, n.adapt, n.samps, prob_bool
-      #     )
-      #     temp_samps <- rbind(temp_samps, samps) %>% 
-      #       mutate(test = case_when(
-      #         TPC_function == "Quadratic" ~ quad_max_func(c, T0, Tm),
-      #         TPC_function == "Briere" ~ briere_max_func(c, T0, Tm),
-      #       )) %>% 
-      #       dplyr::filter(between(test, 0 ,1)) %>% 
-      #       dplyr::select(-test)
-      #     
-      #   }
-      #   samps <- temp_samps[1:n.samps * n.chains,]
-      #   
-      # }
-      
+
       # for the linear model (which doesn't have T0 as a parameter), add NAs)
       if (is.null(samps$T0)) {
         samps$T0 <- NA
@@ -336,7 +299,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
 
 # Function: get hyperparameters of informed TPC parameter prior distributions
 get.prior_hyperparams <- function(in_data, TPC_function, variable_names,
-                                  jags_model, inits_list,
+                                  jags_choice, inits_list,
                                   n.chains, n.adapt,
                                   scale_factor = 100, prob_bool) {
   # Initialize the hyperparameter list
@@ -345,7 +308,7 @@ get.prior_hyperparams <- function(in_data, TPC_function, variable_names,
   # get samples from trait TPC parameter distributions
   temp_samples <- run.jags(
     in_data, TPC_function, variable_names,
-    jags_model, inits_list,
+    jags_choice, inits_list,
     n.chains, n.adapt, 1000, prob_bool
   )
   
@@ -357,7 +320,7 @@ get.prior_hyperparams <- function(in_data, TPC_function, variable_names,
   
   # rescale TPC parameters to ease fitting
   temp_samples <- temp_samples / scale_factor
-  temp_samples <- dplyr::select(temp_samples, -system_index)
+  temp_samples <- dplyr::select(temp_samples, -sample_num)
   
   # calculate hyperparameters of gamma distribution fit to TPC parameter distributions
   hypers <- apply(temp_samples, 2, function(df) {
@@ -437,7 +400,8 @@ run.jags <- function(jags_data, TPC_function, variable_names,
         mutate(c = slope) %>%
         dplyr::select(c, Tm, sigma)
     }
-    temp_samps <- dplyr::filter(temp_samps, is.na(T0) | Tm > T0)
+    temp_samps <- dplyr::filter(temp_samps, is.na(T0) | Tm > T0) %>% 
+      dplyr::filter(!is.na(Tm))
     
     # Resample if the max value for a probability trait exceeds 1 
     if (prob_bool) {
@@ -448,9 +412,9 @@ run.jags <- function(jags_data, TPC_function, variable_names,
           TPC_function == "Briere" ~ briere_max_func(c, T0, Tm),
         )) %>% 
         dplyr::filter(between(test, 0 ,1)) %>% 
-        dplyr::select(-test)
+        dplyr::select(-test) %>% 
+        dplyr::filter(!is.na(Tm))
     }
-    
     
     print(paste0("***Added an additional ",
                  ifelse(dim(samps)[1]+dim(temp_samps)[1] > n.chains * n.samps,
@@ -458,23 +422,23 @@ run.jags <- function(jags_data, TPC_function, variable_names,
                         dim(temp_samps)[1]),
                  " samples from re-sampling***"))
     samps <- rbind(samps, temp_samps)
-    samps <- samps[1:(n.chains * n.samps),]
   }
+  samps <- samps[1:(n.chains * n.samps),]
   
   samps$tau <- 1 / samps$sigma
   if (is.null(samps$c)) {
     samps <- mutate(samps, c = qd, .keep = "unused")
   }
-  samps$system_index <- 1:dim(samps)[1]
+  samps$sample_num <- 1:dim(samps)[1]
   return(samps)
 }
 
 # 2) Calculate prior distributions of thermal trait parameters from data ----
 
 # Set parameters for MCMC
-n.chains <-3 # 5
-n.adapt <- 100 # 5000
-n.samps <- 100 # 5000
+n.chains <-5 #3 # 5
+n.adapt <- 5000# 100 # 5000
+n.samps <-1000 # 100 # 5000
 
 # Identify all distinct combinations of traits and transmission systems
 data_in <- data.in.TPC
@@ -486,7 +450,7 @@ samples <- tibble(
   T0 = as.double(),
   Tm = as.double(),
   c = as.double(), # !!! note that we're using c as a generic parameter for Briere or Quadratic
-  system_index = as.double(),
+  sample_num = as.double(),
   func = as.character()
 )
 
@@ -532,7 +496,7 @@ write_csv(samples, "data/clean/TPC_param_samples.csv")
 plot_bool <- TRUE
 
 # Do you just want to look at focal species?
-focal_bool <- TRUE
+focal_bool <- FALSE
 
 if (plot_bool) {
   plot_samples <- read_csv("data/clean/TPC_param_samples.csv", show_col_types = FALSE)
@@ -586,7 +550,7 @@ if (plot_bool) {
     dplyr::select(-func) %>%
     mutate(temp_diff = Tm - T0) %>%
     mutate(logc = log(c)) %>%
-    melt(id = c("system_ID", "trait", "system_index"))
+    melt(id = c("system_ID", "trait", "sample_num"))
   
   parm_hists <- plot_df %>%
     filter(variable != "c") %>%
@@ -604,7 +568,7 @@ if (plot_bool) {
   
   # For each mosquito species, trait, and sample, get a thermal response curve
   TPC_df <- plot_samples %>%
-    # filter(system_index %in% seq(1, thin_size)) %>%
+    # filter(sample_num %in% seq(1, thin_size)) %>%
     full_join(list(Temperature = Temps), by = character(), copy = TRUE) %>%
     mutate(Trait_val = case_when(
       func == "Briere" ~ Briere(c, T0, Tm)(Temperature),
@@ -624,11 +588,11 @@ if (plot_bool) {
     group_by(system_ID, trait, Temperature) %>%
     mutate(lowHCI_val = quantile(Trait_val, 0.055)) %>%
     mutate(highHCI_val = quantile(Trait_val, 0.945)) %>%
-    dplyr::select(-c("system_index", "Trait_val", "func")) %>%
+    dplyr::select(-c("sample_num", "Trait_val", "func")) %>%
     unique()
   
   TPC_plot <- TPC_df %>%
-    group_by(system_index) %>%
+    group_by(sample_num) %>%
     arrange(Temperature) %>%
     # group_by()
     ggplot() +
