@@ -7,15 +7,15 @@
 ##
 ## Contents: 0) Set-up, load in necessary packages and data-sets
 ##           1) Define accessory functions
-##           2) 
-##           3) 
-##           4) 
+##           2) Create TPCs and deal with missing data
+##           3) Create parameters data frame
+##           4) Save parameters data frame
+##           *) Diagnostics and visualizations
 ##
 ##
-## Inputs:  data - data/clean/TPC_param_samples.csv
-##                 data/clean/trait_transforms.csv
+## Inputs:  data - data/clean/trait_transforms.csv
 ##
-## Outputs: data - data/clean/ThermalTraitSamples.csv
+## Outputs: data - data/clean/parameter_TPCs.csv
 ##
 ## Written and maintained by: Kyle Dahlin, kydahlin@gmail.com
 ## Initialized March 2023
@@ -25,6 +25,7 @@
 
 # Load Libraries
 library(tidyverse)
+library(reshape2)
 
 ### * Load in data ----
 # Trait TPC parameter samples 
@@ -67,30 +68,12 @@ get.thermal.response <- function(data_in, Temperature) {
 }
 
 
-# 2)  ----
-
-# Function: restrict to focal systems
-focal_filter_func <- function(df) {
-  df <- filter(df, system_ID %in% c(
-  "Aedes aegypti / DENV", "Aedes aegypti / none",
-  "Aedes aegypti / ZIKV", "Aedes aegypti / none",
-  "Aedes albopictus / DENV", "Aedes albopictus / none",
-  "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
-  "Anopheles spp. / Plasmodium spp.",
-  "Anopheles spp. / none"
-))
-}
-
-# Define temperature range of study
-Temps <- seq(0, 50, length.out = 20)
-
-# Thin samples
-thin_size <-  20
+# 2) Create TPCs and deal with missing data ----
 
 # Create data frame of TPCs
 TPC_df <- data.in %>%
   filter(sample_num %in% seq(1, thin_size)) %>%
-  full_join(list(Temperature = Temps), by = character(), copy = TRUE) %>%
+  cross_join(list(Temperature = Temps), copy = TRUE) %>%
   mutate(Trait_val = case_when(
     func == "Briere" ~ Briere(c, T0, Tm)(Temperature),
     func == "Quadratic" ~ Quadratic(c, T0, Tm)(Temperature),
@@ -113,7 +96,7 @@ temp_df <- TPC_df %>%
 intermediate_df <- temp_df %>% 
   mutate(e2a = case_when(
     !(is.na(e2a)) ~ e2a,
-    !(is.na(pRH * nLR * pLA)) ~ pRH * nLR * pLA,
+    # !(is.na(pRH * nLR * pLA)) ~ pRH * nLR * pLA,
     !(is.na(EV * pLA)) ~ EV * pLA
   )) %>% 
   mutate(EFD = case_when(
@@ -158,17 +141,122 @@ missing_traits_df <- combined_df %>%
   pivot_longer(cols = bc:MDR) %>% 
   dplyr::filter(is.na(value)) %>% 
   dplyr::select(-c(sample_num, Temperature)) %>% 
+  filter(system_ID %in% c(
+    "Aedes aegypti / DENV", "Aedes aegypti / none",
+    "Aedes aegypti / ZIKV", "Aedes aegypti / none",
+    "Aedes albopictus / DENV", "Aedes albopictus / none",
+    "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
+    "Anopheles spp. / Plasmodium spp.",
+    "Anopheles spp. / none"
+  )) %>% 
   unique()
 
 # Following Shocket 2020: use Culex univittatus / WNV / bc for Culex quinquefasciatus / WNV / bc
-
+combined_df <- combined_df %>% 
+  # temporarily remove Cx. quinquefasciatus / WNV rows
+  filter(system_ID != "Culex quinquefasciatus / WNV") %>% 
+  # add rows back in after switching out bc for Cx. univittatus / WNV rows
+  rbind(filter(combined_df, system_ID == "Culex quinquefasciatus / WNV") %>% 
+          # remove original bc values (all NA)
+          dplyr::select(-bc) %>% 
+          # join with Cx. univittatus data
+          right_join(filter(combined_df, system_ID == "Culex univittatus / WNV") %>% 
+                       dplyr::select(Temperature:bc))) %>% 
+  # remove Cx. univittatus data
+  filter(system_ID != "Culex univittatus / WNV") 
 
 # Deal with any duplicates: What do we do if we have two estimates for the same intermediate parameter?
 # i.e. We have e2a for Culex but also pO and EV
 
 
+# 3) Make parameter dataframe ---------------------------------------------
+eps <- .Machine$double.eps
 
-# 3)  --------------
+parameter_df <- combined_df %>%
+  # Biting rate.
+  mutate(sigmaV = a) %>% 
+  # Fecundity. Simplified from a * 0.5 * EFD / a
+  mutate(sigmaV_f = 0.5 * EFD) %>% # = female eggs per female per day
+  # Aquatic-stage mosquito survival probability.
+  mutate(deltaL = e2a) %>% 
+  # Aquatic-stage mosquito development rate.
+  mutate(rhoL = MDR) %>% 
+  mutate(etaL = rhoL / (deltaL + eps)) %>%
+  # Aquatic-stage mosquito mortality rate. This should be ~infinite if deltaL = 0
+  mutate(muL = etaL - rhoL) %>%  
+  # mutate(muL = ifelse(deltaL != 0, rhoL * (1 - deltaL) / (deltaL + eps), Inf)) %>%  
+  # Adult mosquito mortality rate. This should be ~infinite if lf = 0
+  mutate(muV = ifelse(lf != 0, 1/(lf + eps), Inf)) %>% 
+  # Pathogen development rate.
+  mutate(etaV = PDR) %>%
+  # Mosquito infection probability.
+  mutate(betaV = bc) %>% 
+  dplyr::select(system_ID:sample_num, sigmaV:betaV)
+
+
+
+# 4) Save parameter data frame --------------------------------------------
+
+write_csv(parameter_df, "data/clean/parameter_TPCs.csv")
+
 
 
 # *) Diagnostics & visualizations -----------------------------------------
+
+plot_bool = FALSE
+if (plot_bool) {
+library(cowplot)
+# For each mosquito species, trait, and sample, get a thermal response curve
+TPC_df <- parameter_df %>% 
+  ungroup() %>% 
+  mutate(lf = 1/muV, .keep = "unused") %>%
+  select(-c(muL, etaL)) %>% 
+  # mutate(lfL = 1/etaL, .keep = "unused") %>%
+  # select(-c())
+  melt(id = c("system_ID", "mosquito_species","pathogen", "Temperature", "sample_num"),
+       variable.name = "trait",
+       value.name = "Trait_val") #%>% 
+  # mutate(Trait_val = ifelse(is.infinite(Trait_val), 0, Trait_val)) %>%
+  #remove unreasonably long lifespan values
+  # mutate(Trait_val = ifelse(trait %in% c("lfL", "lf"), ifelse(Trait_val>200, NA, Trait_val), Trait_val))
+
+# get mean TPC from samples
+meanTPC_df <- TPC_df %>%
+  group_by(system_ID, trait, Temperature) %>%
+  summarise(mean_val = mean(Trait_val), .groups = "keep") %>%
+  unique() %>% ungroup()
+
+# get edges of 89% HCI of samples # !!! not calculated correctly?
+quantsTPC_df <- TPC_df %>%
+  group_by(system_ID, trait, Temperature) %>%
+  mutate(lowHCI_val = quantile(Trait_val, 0.055, na.rm = TRUE)) %>%
+  mutate(highHCI_val = quantile(Trait_val, 0.945, na.rm = TRUE)) %>%
+  dplyr::select(-c("sample_num", "Trait_val")) %>%
+  unique() %>% ungroup()
+
+TPC_plot <- TPC_df %>%
+  # group_by(sample_num) %>%
+  arrange(Temperature) %>%
+  # group_by()
+  ggplot() +
+  # means of TPC curves
+  geom_line(
+    data = meanTPC_df,
+    aes(x = Temperature, y = mean_val, color = system_ID)
+  ) +
+  # 89% HCI of TPC curves
+  geom_ribbon(
+    data = quantsTPC_df,
+    aes(x = Temperature, ymin = lowHCI_val, ymax = highHCI_val, fill = system_ID),
+    alpha = 0.1
+  ) +
+  ylab("") +
+  facet_wrap(~trait, scales = "free", ncol = 2) +
+  theme_minimal_grid(12)
+
+# Save figure
+ggsave("figures/param_TPC_plot.svg",
+       plot = TPC_plot,
+       device = "svg",
+       width = 16, height = 9, units = "in")
+}

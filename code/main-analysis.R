@@ -43,7 +43,7 @@ data.in.TPC <- read_csv("data/clean/data_for_TPC_fitting.csv",
 # 2) Fit trait thermal performance curves to trait data -------------------
 
 # # Run this to generate samples of trait TPC parameters from informed posterior distributions
-# source(get-thermal-trait-priors.R)
+# source("code/get-thermal-trait-priors.R")
 
 # Run this to load pre-processed data set
 data.in.transform <- read_csv("data/clean/TPC_param_samples.csv",
@@ -65,6 +65,13 @@ data.in.transform <- read_csv("data/clean/TPC_param_samples.csv",
 # i.e. We have e2a for Culex but also pO and EV
 
 
+# Define temperature range of study
+Temps <- seq(5, 50, length.out = 200)
+
+# Thin samples
+thin_size <- 200
+
+source("code/trait-transform.R")
 
 # 4) Build data set incorporating all axes of variation -------------------
 
