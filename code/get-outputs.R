@@ -38,8 +38,6 @@ source("code/output-functions.R")
 
 # 1) Calculate outputs ----------------------------------------------------
 
-Temp_vec_length <- 1
-
 ## Combine all parameter combinations into a large table
 AllOutputs_df <- data.in.analysis %>%
   # Lower the resolution of temperature to length Temp_vec_length
@@ -81,7 +79,8 @@ AllOutputs_df <- AllOutputs_df %>%
   distinct()
 
 # Save data frame---------------------------------------------------------------
-write_rds(AllOutputs_df, "data/clean/AllOutputs.rds")
+write_rds(AllOutputs_df, "data/clean/AllOutputs.rds",
+          compress = "gz")
 
 
 # 3) Build thermal characteristics data frames ----------------------------
@@ -108,7 +107,8 @@ Topt_df <- AllOutputs_df %>%
     Model, system_ID, sigmaH, KH, Topt, R0opt, threshold_bool, CHmin, CHmax
   )
 
-write_rds(Topt_df, "results/Topt_vals.rds")
+write_rds(Topt_df, "results/Topt_vals.rds",
+          compress = "gz")
 
 # Get the thermal range of parasite as a function of host traits
 TempRange_df <- AllOutputs_df %>%
@@ -123,11 +123,13 @@ TempRange_df <- AllOutputs_df %>%
   # remove duplicate rows
   distinct()
 
-write_rds(TempRange_df, "results/TempRange_vals.rds")
+write_rds(TempRange_df, "results/TempRange_vals.rds",
+          compress = "gz")
 
 ThermalCharacteristics_df <- left_join(Topt_df, TempRange_df,
   by = c("Model", "system_ID", "sigmaH", "KH")
 ) 
 
 # Save data frame---------------------------------------------------------------
-write_rds(ThermalCharacteristics_df, "results/AllThermChar_vals.rds")
+write_rds(ThermalCharacteristics_df, "results/AllThermChar_vals.rds",
+          compress = "gz")
