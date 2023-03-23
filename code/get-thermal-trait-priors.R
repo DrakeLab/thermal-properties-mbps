@@ -497,7 +497,7 @@ for (system_index in 1:dim(distinct_combos)[1]) {
 
 
 # 3) Save trait TPC parameter posterior distribution samples --------------
-write_csv(samples, "data/clean/TPC_param_samples.csv")
+write_rds(samples, "data/clean/TPC_param_samples.rds")
 
 # *) Diagnostics & visualizations -----------------------------------------
 

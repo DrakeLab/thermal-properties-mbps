@@ -13,9 +13,9 @@
 ##           *) Diagnostics and visualizations
 ##
 ##
-## Inputs:  data - data/clean/trait_transforms.csv
+## Inputs:  data - data/clean/trait_transforms.rds
 ##
-## Outputs: data - data/clean/parameter_TPCs.csv
+## Outputs: data - data/clean/parameter_TPCs.rds
 ##
 ## Written and maintained by: Kyle Dahlin, kydahlin@gmail.com
 ## Initialized March 2023
@@ -197,7 +197,7 @@ parameter_df <- combined_df %>%
 
 # 4) Save parameter data frame --------------------------------------------
 
-write_csv(parameter_df, "data/clean/parameter_TPCs.csv")
+write_rds(parameter_df, "data/clean/parameter_TPCs.rds")
 
 
 
@@ -210,7 +210,7 @@ library(cowplot)
 TPC_df <- parameter_df %>% 
   ungroup() %>% 
   mutate(lf = 1/muV, .keep = "unused") %>%
-  select(-c(muL, etaL)) %>% 
+  dplyr::select(-c(muL, etaL)) %>% 
   # mutate(lfL = 1/etaL, .keep = "unused") %>%
   # select(-c())
   melt(id = c("system_ID", "mosquito_species","pathogen", "Temperature", "sample_num"),

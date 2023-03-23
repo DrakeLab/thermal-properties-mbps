@@ -19,7 +19,7 @@
 ##          A table explaining how traits are transformed into the ones used in
 ##          analyses
 ##
-## Outputs: data - data/clean/ThermalTraitData.csv
+## Outputs: data - data/clean/ThermalTraitData.rds
 ##
 ## Written and maintained by: Kyle Dahlin, kydahlin@gmail.com
 ## Initialized February 2023
@@ -299,7 +299,7 @@ data.Out <- data.Reduced %>%
 # 4) Data visualizations / diagnostics ------------------------------------
 
 ###* Visualize traits as functions of temperature
-plot_bool <- TRUE # decide whether you'd like to generate a diagnostic plot
+plot_bool <- FALSE # decide whether you'd like to generate a diagnostic plot
 
 if (plot_bool) {
 library(cowplot)
@@ -343,4 +343,4 @@ select_trait_plots <- data.Viz %>%
 # 5) Save and export data set ---------------------------------------------
 
 # Save data.frame to file
-write_csv(data.Out, "data/clean/data_for_TPC_fitting.csv")
+write_rds(data.Out, "data/clean/data_for_TPC_fitting.rds")

@@ -1,0 +1,2273 @@
+trait.name,T,trait,system_ID,mosquito_species,pathogen,lead_author,year,final.trait,transform,trait.from
+a,15,0.078125,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,a,Identity,a
+a,20,0.15625,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,a,Identity,a
+a,23,0.196078,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,a,Identity,a
+a,25,0.285714,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,a,Identity,a
+a,27,0.30303,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,a,Identity,a
+a,29,0.37037,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,a,Identity,a
+a,31,0.47619,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,a,Identity,a
+a,33,0.416667,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,a,Identity,a
+a,35,0.434783,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,a,Identity,a
+bc,32,0,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,bc,Identity,bc
+bc,30,0.78,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,bc,Identity,bc
+bc,28,0.73,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,bc,Identity,bc
+bc,26,1,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,bc,Identity,bc
+bc,23.5,0.79,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,bc,Identity,bc
+bc,22.5,0.89,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,bc,Identity,bc
+bc,16,1,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,bc,Identity,bc
+bc,13,0,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,bc,Identity,bc
+PDR,23,0.06666666666666667,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,PDR,Inverse,EIP
+PDR,26,0.09090909090909091,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,PDR,Inverse,EIP
+PDR,28,0.1111111111111111,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,PDR,Inverse,EIP
+PDR,21.1,0.07142857142857142,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,PDR,Inverse,EIP
+PDR,26.7,0.08333333333333333,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,PDR,Inverse,EIP
+PDR,25,0.1,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,PDR,Inverse,EIP
+PDR,21.1,0.07142857142857142,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,PDR,Inverse,EIP
+PDR,26.7,0.1,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,PDR,Inverse,EIP
+PDR,32.2,0.1111111111111111,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,PDR,Inverse,EIP
+PDR,27,0.07692307692307693,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,PDR,Inverse,EIP
+PDR,22,0.045454545454545456,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,PDR,Inverse,EIP
+PDR,15.3,0,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,PDR,Inverse,EIP
+PDR,34.4,0,Anopheles spp. / Plasmodium spp.,Anopheles spp.,Plasmodium spp.,Mordecai,2013,PDR,Inverse,EIP
+e2a,16,0,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,e2a,Identity,pEA
+e2a,18,0.42,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,e2a,Identity,pEA
+e2a,20,0.7,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,e2a,Identity,pEA
+e2a,22,0.76,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,e2a,Identity,pEA
+e2a,24,0.787,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,e2a,Identity,pEA
+e2a,26,0.727,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,e2a,Identity,pEA
+e2a,28,0.66,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,e2a,Identity,pEA
+e2a,30,0.273,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,e2a,Identity,pEA
+e2a,32,0.347,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,e2a,Identity,pEA
+e2a,34,0,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,e2a,Identity,pEA
+MDR,16,0,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,MDR,Identity,MDR
+MDR,18,0.042918,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,MDR,Identity,MDR
+MDR,20,0.04902,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,MDR,Identity,MDR
+MDR,22,0.057143,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,MDR,Identity,MDR
+MDR,24,0.074074,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,MDR,Identity,MDR
+MDR,26,0.086957,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,MDR,Identity,MDR
+MDR,28,0.102041,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,MDR,Identity,MDR
+MDR,30,0.1,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,MDR,Identity,MDR
+MDR,32,0.098039,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,MDR,Identity,MDR
+MDR,34,0,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,MDR,Identity,MDR
+EFD,20,13.08,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2013,EFD,Identity,EFD
+EFD,25,23.14,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2013,EFD,Identity,EFD
+EFD,30,22.13,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2013,EFD,Identity,EFD
+EFD,35,16.91,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2013,EFD,Identity,EFD
+lf,5,3.4736031013368005,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,lf,Identity,lf
+lf,10,5.879432500011232,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,lf,Identity,lf
+lf,15,15.488749100505007,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,lf,Identity,lf
+lf,20,16.8634526065411,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,lf,Identity,lf
+lf,25,19.647275194331367,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,lf,Identity,lf
+lf,30,7.82835849122116,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,lf,Identity,lf
+lf,35,5.813697684790804,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,lf,Identity,lf
+lf,40,3.4728571873834384,Anopheles spp. / none,Anopheles spp.,none,Mordecai,2013,lf,Identity,lf
+c,20,0.781443299,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,20,0.725773196,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,30,0.641237113,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,30,0.655670103,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,25,0.727835052,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+b,20,0.06185567,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,20,0.037113402,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,30,0.760824742,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,30,0.962886598,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,25,0.672164948,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+lf,18,21.9,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,1/mu
+lf,22,27.52,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,1/mu
+lf,26,25.46,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,1/mu
+lf,28,13.81,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,1/mu
+lf,32,13.44,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,1/mu
+lf,34,13.48,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,1/mu
+lf,18,15.71,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,1/mu
+lf,22,27.3,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,1/mu
+lf,26,40.54,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,1/mu
+lf,28,21.44,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,1/mu
+lf,32,16.76,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,1/mu
+lf,34,12.16,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,1/mu
+lf,18,22.67,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,1/mu
+lf,22,24.74,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,1/mu
+lf,26,38.36,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,1/mu
+lf,28,22.36,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,1/mu
+lf,32,11.22,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,1/mu
+lf,34,10.92,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,1/mu
+EFD,18,2.141552511,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,22,2.449127907,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,26,23.98271799,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,28,4.822592324,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,32,3.764880952,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,34,7.262611276,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,18,0.248249523,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,22,4.318681319,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,26,2.205229403,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,28,3.922574627,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,32,0.799522673,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,34,0.279605263,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,18,3.074547861,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,22,0.598221504,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,26,5.596976017,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,28,17.40608229,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,32,2.254901961,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,34,0.164835165,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+c,16,0.0125,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+b,16,0,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+PDR,20,0.03378378378378378,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,26,0.0900900900900901,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+c,26,0.258,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,20,0.184,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,30,0.64,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,35,0.52,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+PDR,30,0.19379844961240308,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,35,0.19379844961240308,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+MDR,21,0.06161,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,24,0.07599,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,27,0.08688,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,30,0.10081,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+PDR,23.4,0.09091,Aedes aegypti / other flavivirus,Aedes aegypti,other flavivirus,Mordecai,2017,PDR,Identity,PDR
+PDR,36,0.2,Aedes aegypti / other flavivirus,Aedes aegypti,other flavivirus,Mordecai,2017,PDR,Identity,PDR
+PDR,8,0,Aedes aegypti / other flavivirus,Aedes aegypti,other flavivirus,Mordecai,2017,PDR,Identity,PDR
+PDR,36,0.2,Aedes aegypti / other flavivirus,Aedes aegypti,other flavivirus,Mordecai,2017,PDR,Identity,PDR
+PDR,31,0.16667,Aedes aegypti / other flavivirus,Aedes aegypti,other flavivirus,Mordecai,2017,PDR,Identity,PDR
+PDR,21,0.05556,Aedes aegypti / other flavivirus,Aedes aegypti,other flavivirus,Mordecai,2017,PDR,Identity,PDR
+MDR,12,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,39,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+e2a,1,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,7,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,36,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,38,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,9,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,10,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,11,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,12,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,13,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,38,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,40,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,43,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,46,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,49,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,52,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,7,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,9,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,10,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,11,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,12,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,38,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,43,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,44,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,45,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,46,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,47,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,48,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,49,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,52,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+a,21.68742415,0.167518059,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,a,Identity,GCR
+a,22.2943022,0.144213433,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,a,Identity,GCR
+a,22.38953929,0.168599215,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,a,Identity,GCR
+a,22.92476429,0.168082804,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,a,Identity,GCR
+a,24.39558634,0.25167012,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,a,Identity,GCR
+a,25.01425641,0.251952493,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,a,Identity,GCR
+a,25.87751143,0.202140476,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,a,Identity,GCR
+a,26.16176525,0.202270215,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,a,Identity,GCR
+a,27.47748918,0.307846963,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,a,Identity,GCR
+a,28.18628204,0.27698188,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,a,Identity,GCR
+PDR,12.7926332,0.031166237950026786,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,13.0444544,0.039968389767925626,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,23.75322701,0.05006362949634004,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,23.89829743,0.07497572362919004,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,23.95725071,0.09806124927987986,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,30.04481175,0.0829559852216567,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,28.946104,0.2027400551606019,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,31.93480856,0.1435261650610146,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,34.37511156,0.2023555609858345,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,34.95802345,0.20866161996448473,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+MDR,20,0.00104,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,25,0.09634,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,30,0.1218,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,20,0.06215,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,25,0.09285,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,30,0.12804,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,20,0.06427,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,25,0.08467,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,30,0.13333,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+e2a,20,0.56,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,25,0.92,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,30,0.94,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,20,0.54,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,25,0.82,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,30,0.86,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,20,0.7,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,25,0.86,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,30,1,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+c,15,0.68,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,18,0.57,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,22,0.95,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,32,1,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,15,0.73,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,18,0.73,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,22,0.95,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,32,1,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,20,0.96,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,27,0.97,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,20,1,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,27,1,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,20,1,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,27,1,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,10,0.08,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,15,0.6,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,20,0.72,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,25,0.68,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,30,0.72,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,18,1,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,26,1,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,26,0.96,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,18,0.86,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,20,1,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,26,1,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,30,1,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,26,0.92,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,26,0.9,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,26,0.69,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,26,1,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,26,1,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,25,0.3,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,28,0.52,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,30,0.93,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,28,1,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,25,1,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,27,0.96,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,27,1,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+b,14,0.12,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,18,0.45,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,22,0.81,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,26,0.9,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,30,0.85,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,15,0.05,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,18,0.05,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,22,0.25,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,32,0.44,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,15,0,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,18,0.1,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,22,0.51,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,32,0.48,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,20,0.83,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,27,0.83,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,20,0.9,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,27,1,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,20,0.93,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,27,1,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,10,0,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,15,0.17,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,20,0.7,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,25,0.9,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,30,0.8,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,18,0.48,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,26,0.97,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+PDR,13,0.03125,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,21,0.03125,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,32.22,0.16666666666666666,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,26.67,0.07692307692307693,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,12.78,0.02857142857142857,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,35,0.18181818181818182,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,32.22,0.16666666666666666,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,23.89,0.16666666666666666,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,12.78,0.07692307692307693,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+a,16,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,a,Identity,GCR
+a,40,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,a,Identity,GCR
+MDR,15,0.01807,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,20,0.08045,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,27,0.085319999999999993,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,25,0.15723,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,30,0.14577,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,34,0.1626,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+e2a,15,0.0311,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,20,0.918,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,25,0.6258,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,27,0.8976,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,30,0.6634,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,34,0.5914,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+MDR,15,0.02519,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,20,0.07299,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,25,0.10309,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,30,0.11905,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,35,0.13889,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+e2a,10,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,15,0.235,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,20,0.9,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,25,0.88,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,27,0.93,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,30,0.88,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,35,0.67,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,40,0,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+PDR,30,0.04,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,32,0.14285714285714285,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,35,0.14285714285714285,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,30,0.08333333333333333,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,PDR,Inverse,EIP
+c,20,0.25,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,24,0.3913,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,26,0.41667,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,30,0.58333,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,26,0.72,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,30,0.8,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,32,0.9,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+c,35,0.93333,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,c,Identity,c
+b,26,0.3,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,30,0.7,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,32,0.6,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+b,35,0.86667,Aedes aegypti / DENV,Aedes aegypti,DENV,Mordecai,2017,b,Identity,b
+e2a,22,0.90812,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,27,0.9359,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+e2a,32,0.81944,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,e2a,Identity,pEA
+MDR,22,0.09174,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,27,0.13587,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+MDR,32,0.15823,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,MDR,Identity,MDR
+lf,10.82372552,0.091759667,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,p/days
+lf,10.60066603,0.075675353,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,p/days
+lf,15.3309921,0.035920552,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,p/days
+lf,16.55244216,0.032425471,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,p/days
+lf,20.04602109,0.042145005,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,p/days
+lf,21.77042116,0.037210774,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,p/days
+lf,25.61629688,0.030438368,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,p/days
+lf,27.62920948,0.027156001,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,p/days
+lf,31.34186139,0.044093837,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,p/days
+lf,31.66115353,0.034199563,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,p/days
+lf,32.56507293,0.044516297,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,p/days
+lf,33.39482457,0.049883965,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,lf,Identity,p/days
+EFD,10.57413184,0.033741077,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,10.81052189,0.067996215,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,15.30290639,0.373021158,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,16.55096406,1.06293739,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,20.0580655,3.340506817,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,21.84793149,3.58010585,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,25.58830746,6.998562967,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,27.61388198,7.514493008,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,31.6687307,7.232226934,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,33.42559166,7.195214562,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,31.32446579,9.5151239,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+EFD,32.5359161,11.20797261,Aedes aegypti / none,Aedes aegypti,none,Mordecai,2017,EFD,Identity,EFD
+e2a,5,0,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,10,0,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,15,0.363636364,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,20,0.476923077,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,25,0.469230769,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,30,0.385714286,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,35,0.015789474,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,40,0,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,22,0.880885312,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,27,0.984909457,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,32,0.89416499,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,22,0.908119658,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,27,0.935897436,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,32,0.819444444,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,25,0.891891892,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,37,0.298327759,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,15,0.625,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,23,0.712264151,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,31,0.804245283,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,20,0.826839443,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,25,0.994069568,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,30,0.874589509,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,20,0.73096605,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,25,0.70858103,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+e2a,30,0.539920058,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,e2a,Identity,pEA
+MDR,22,0.048077455,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,26,0.054535139,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,30,0.058846719,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,18,0.040816327,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,24,0.090909091,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,32,0.111111111,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,25,0.094382022,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,37,0.130508475,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,20,0.063694268,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,25,0.101626016,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,30,0.121506683,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,20,0.064102564,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,25,0.035335689000000003,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,30,0.063291139,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,22,0.075543232,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,27,0.10843753,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,32,0.121396268,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,22,0.091743119,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,27,0.135869565,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,32,0.158227848,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,12,0.01818,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,17,0.02941,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,27,0.07143,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,32,0.03125,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+b,18,0.523402938,Aedes albopictus / other togavirus,Aedes albopictus,other togavirus,Mordecai,2017,b,Identity,b
+b,24,0.367678287,Aedes albopictus / other togavirus,Aedes albopictus,other togavirus,Mordecai,2017,b,Identity,b
+b,32,0.195509644,Aedes albopictus / other togavirus,Aedes albopictus,other togavirus,Mordecai,2017,b,Identity,b
+c,18,0.370584268,Aedes albopictus / other togavirus,Aedes albopictus,other togavirus,Mordecai,2017,c,Identity,c
+c,24,0.274922311,Aedes albopictus / other togavirus,Aedes albopictus,other togavirus,Mordecai,2017,c,Identity,c
+c,32,0.278106346,Aedes albopictus / other togavirus,Aedes albopictus,other togavirus,Mordecai,2017,c,Identity,c
+c,22,0.643683282,Aedes albopictus / other togavirus,Aedes albopictus,other togavirus,Mordecai,2017,c,Identity,c
+c,27,0.781785426,Aedes albopictus / other togavirus,Aedes albopictus,other togavirus,Mordecai,2017,c,Identity,c
+c,32,0.75627037,Aedes albopictus / other togavirus,Aedes albopictus,other togavirus,Mordecai,2017,c,Identity,c
+EFOC,15,20,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,20,42.63636364,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,20,51.8,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,20,80,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,20,77,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,25,68.61538462,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,25,70.85714286,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,25,74.30769231,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,25,53.66666667,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,25,39.66666667,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,25,101.5,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,25,35,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,25,18,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,30,77.19047619,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,30,98.68421053,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,30,60.3125,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,30,67.90909091,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,30,67.66666667,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,30,41.75,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,30,14.5,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,35,47.93333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,35,51.5,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+a,20,0.14285714285714285,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,20,0.14285714285714285,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,20,0.07142857142857142,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,20,0.09090909090909091,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,20,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,20,0.125,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,20,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,20,0.1111111111111111,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,20,0.05555555555555555,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,20,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,20,0.16666666666666666,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,20,0.1111111111111111,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,20,0.1,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,20,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,20,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,20,0.09090909090909091,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,20,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,20,0.1111111111111111,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,20,0.16666666666666666,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.14285714285714285,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.06666666666666667,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.125,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.16666666666666666,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.125,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.16666666666666666,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.14285714285714285,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,25,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.5,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.5,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.14285714285714285,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.5,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.5,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.5,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.5,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.16666666666666666,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.125,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.5,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.5,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.14285714285714285,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.14285714285714285,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,30,0.9999999999999998,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,35,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,35,0.16666666666666666,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,35,0.07692307692307693,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,35,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,35,0.14285714285714285,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,35,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,35,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,35,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,35,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,35,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,35,0.5,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,35,0.16666666666666666,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,35,0.1,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,35,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,35,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,35,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,35,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,35,0.3333333333333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+a,35,0.25,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,a,Inverse,GCD
+MDR,15,0.032876712,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,15,0.027952481,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,15,0.029813665,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,15,0.032476319,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,15,0.028985507,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,15,0.03033367,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,15,0.033333333,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,15,0.029739777,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,20,0.104347826,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,20,0.082379863,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,20,0.089241448,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,20,0.092273892,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,20,0.071319409,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,20,0.071784646,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,20,0.106904232,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,20,0.082987552,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,25,0.14457831300000001,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,25,0.145228216,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,25,0.131004367,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,25,0.176322418,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,25,0.122511485,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,25,0.108583247,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,25,0.128824477,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,25,0.10552763800000001,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,30,0.211764706,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,30,0.199445983,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,30,0.162162162,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,30,0.171428571,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,30,0.154340836,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,30,0.115226337,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,30,0.147239264,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,30,0.151679307,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,35,0.190800681,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,35,0.181818182,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+c,20,0.781443299,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,c,Identity,c
+c,20,0.725773196,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,c,Identity,c
+c,30,0.641237113,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,c,Identity,c
+c,30,0.655670103,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,c,Identity,c
+c,25,0.727835052,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,c,Identity,c
+b,20,0.06185567,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,b,Identity,b
+b,20,0.037113402,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,b,Identity,b
+b,30,0.760824742,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,b,Identity,b
+b,30,0.962886598,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,b,Identity,b
+b,25,0.672164948,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,b,Identity,b
+lf,15,19.45,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,Identity,1/mu
+lf,20,59.35,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,Identity,1/mu
+lf,25,61.55,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,Identity,1/mu
+lf,30,42.72,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,Identity,1/mu
+EFD,20,1.3,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Identity,EFD
+EFD,25,4.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Identity,EFD
+EFD,30,3.73,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Identity,EFD
+MDR,15,0.012539184952978056,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Inverse,1/MDR
+MDR,20,0.02551020408163265,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Inverse,1/MDR
+MDR,25,0.04208754208754208,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Inverse,1/MDR
+MDR,30,0.05411255411255411,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Inverse,1/MDR
+lf,22,0.006349988570667929,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,NegativeLogDifference,prop.dead
+lf,22,0.007092228501662707,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,NegativeLogDifference,prop.dead
+lf,22,0.008016357306183417,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,NegativeLogDifference,prop.dead
+lf,26,0.012653685265188702,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,NegativeLogDifference,prop.dead
+lf,26,0.013470189012132965,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,NegativeLogDifference,prop.dead
+lf,26,0.017126179380441118,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,NegativeLogDifference,prop.dead
+lf,30,0.027171241454515282,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,NegativeLogDifference,prop.dead
+lf,30,0.03177330455279514,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,NegativeLogDifference,prop.dead
+lf,30,0.02425279889759455,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,NegativeLogDifference,prop.dead
+lf,22,0.007289861592110936,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,NegativeLogDifference,prop.dead
+MDR,20,0.062663185,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,20,0.060913091,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,20,0.054318904,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,27,0.12064632,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,27,0.112511735,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,27,0.095997154,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,34,0.101061142,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,34,0.095663265,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+MDR,34,0.084262451,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Identity,MDR
+EFOC,20,77.8,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,20,73.9,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,27,58.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,27,30.4,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,34,35.7,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,34,7.2,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+lf,20,141,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,Identity,1/mu
+lf,20,102,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,Identity,1/mu
+lf,20,98,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,Identity,1/mu
+lf,27,98,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,Identity,1/mu
+lf,27,76,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,Identity,1/mu
+lf,27,84,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,Identity,1/mu
+lf,34,35,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,Identity,1/mu
+lf,34,42,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,Identity,1/mu
+lf,34,24,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,lf,Identity,1/mu
+MDR,21,0.043767840146405806,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Inverse,1/MDR
+MDR,21,0.04878048780487805,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Inverse,1/MDR
+MDR,21,0.058541257243748826,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Inverse,1/MDR
+MDR,21,0.06326383168784107,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Inverse,1/MDR
+MDR,21,0.060371526373301294,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Inverse,1/MDR
+MDR,21,0.06215140828876042,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Inverse,1/MDR
+MDR,21,0.058823529411764705,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Inverse,1/MDR
+MDR,21,0.06363634628099647,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Inverse,1/MDR
+MDR,25,0.07219252302039078,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Inverse,1/MDR
+MDR,25,0.06524634082209084,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Inverse,1/MDR
+MDR,25,0.09032942237044278,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Inverse,1/MDR
+MDR,25,0.09185444010585306,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Inverse,1/MDR
+MDR,25,0.08905108059033742,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Inverse,1/MDR
+MDR,25,0.08490564435742559,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Inverse,1/MDR
+MDR,25,0.08349148011191197,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Inverse,1/MDR
+MDR,25,0.08512717574420305,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,MDR,Inverse,1/MDR
+EFOC,25,54.47058824,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,25,79.75,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,25,43.0625,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+EFOC,25,55.09091,Aedes albopictus / none,Aedes albopictus,none,Mordecai,2017,EFD,Multiply_a,TFD
+PDR,21,0.1,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,26,0.14285714285714285,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,31,0.25,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,PDR,Inverse,EIP
+PDR,36,0.25,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,PDR,Inverse,EIP
+b,18,0,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,b,Identity,b
+b,21,0.31,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,b,Identity,b
+b,26,0.55,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,b,Identity,b
+b,31,0.7059,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,b,Identity,b
+b,36,0.4706,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,b,Identity,b
+b,18,0.08,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,b,Identity,b
+c,21,0.47,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,c,Identity,c
+c,26,0.68,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,c,Identity,c
+c,31,0.8235,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,c,Identity,c
+c,36,0.4706,Aedes albopictus / DENV,Aedes albopictus,DENV,Mordecai,2017,c,Identity,c
+PDR,10,0,Culex spp. / other togavirus,Culex spp.,other togavirus,Mordecai,2017,PDR,Identity,PDR
+PDR,15,0.053164557,Culex spp. / other togavirus,Culex spp.,other togavirus,Mordecai,2017,PDR,Identity,PDR
+PDR,20,0.120112518,Culex spp. / other togavirus,Culex spp.,other togavirus,Mordecai,2017,PDR,Identity,PDR
+PDR,25,0.153586498,Culex spp. / other togavirus,Culex spp.,other togavirus,Mordecai,2017,PDR,Identity,PDR
+PDR,30,0.287482419,Culex spp. / other togavirus,Culex spp.,other togavirus,Mordecai,2017,PDR,Identity,PDR
+PDR,14,0.028059072,Culex spp. / WNV,Culex spp.,WNV,Mordecai,2017,PDR,Identity,PDR
+PDR,18,0.06350211,Culex spp. / WNV,Culex spp.,WNV,Mordecai,2017,PDR,Identity,PDR
+PDR,26,0.100421941,Culex spp. / WNV,Culex spp.,WNV,Mordecai,2017,PDR,Identity,PDR
+PDR,30,0.079746835,Culex spp. / WNV,Culex spp.,WNV,Mordecai,2017,PDR,Identity,PDR
+PDR,14,0,Culex spp. / WNV,Culex spp.,WNV,Mordecai,2017,PDR,Identity,PDR
+PDR,18,0.03347398,Culex spp. / WNV,Culex spp.,WNV,Mordecai,2017,PDR,Identity,PDR
+PDR,22,0.062517581,Culex spp. / WNV,Culex spp.,WNV,Mordecai,2017,PDR,Identity,PDR
+PDR,26,0.10583685,Culex spp. / WNV,Culex spp.,WNV,Mordecai,2017,PDR,Identity,PDR
+PDR,30,0.14718706,Culex spp. / WNV,Culex spp.,WNV,Mordecai,2017,PDR,Identity,PDR
+PDR,10,0,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Mordecai,2017,PDR,Identity,PDR
+PDR,15,0,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Mordecai,2017,PDR,Identity,PDR
+PDR,20,0.042827004,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Mordecai,2017,PDR,Identity,PDR
+PDR,25,0.086638537,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Mordecai,2017,PDR,Identity,PDR
+PDR,30,0.128481013,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Mordecai,2017,PDR,Identity,PDR
+PDR,18,0.2,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,PDR,Inverse,EIP
+PDR,25,0.25,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,PDR,Inverse,EIP
+PDR,32,0.3333333333333333,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,PDR,Inverse,EIP
+PDR,45,0.01,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,PDR,Inverse,EIP
+bc,18,0.6,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,18,0.8,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,18,0.7,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,18,0.9,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,18,1,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,18,0.6,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,18,0.9,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,18,0.8,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,18,0.9,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,18,1,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,18,0.9,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,25,1,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,25,1,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,25,1,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,25,0.8,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,25,1,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,25,0.825,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,25,0.8,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,25,1,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,25,1,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,25,0.825,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,25,0.825,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,25,1,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,25,1,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,32,0.6,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,32,0.6,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,32,0.8,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,32,1,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,32,0.75,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,32,1,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,32,0.825,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,32,0.8,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,18,0.86,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,25,1,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+bc,32,0.75,Other spp. / other togavirus,Other spp.,other togavirus,Shocket,2018,bc,Identity,bc
+pLA,18,0.045,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,24.5,0.84,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,28.5,0.92,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,35,0.965,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,NA,pLA
+MDR,18,0.03333333333333333,Culex spp. / none,Culex spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,24.5,0.08695652173913043,Culex spp. / none,Culex spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,28.5,0.10810810810810811,Culex spp. / none,Culex spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,35,0.16666666666666666,Culex spp. / none,Culex spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+pLA,10,0,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,15,0.05,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,20,0.59,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,25,0.65,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,30,0.56,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,35,0.25,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,40,0,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,NA,pLA
+pRH,20,0.893,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,Multiply_nLR_pLA,pRH
+pRH,25,0.884,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,Multiply_nLR_pLA,pRH
+pRH,30,0.681,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,Multiply_nLR_pLA,pRH
+MDR,10,0.001,Culex spp. / none,Culex spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,15,0.02702702702702703,Culex spp. / none,Culex spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,20,0.059453032104637336,Culex spp. / none,Culex spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,25,0.07418397626112759,Culex spp. / none,Culex spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,30,0.10810810810810811,Culex spp. / none,Culex spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,35,0.11668611435239207,Culex spp. / none,Culex spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,40,0.001,Culex spp. / none,Culex spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+lf,10,0,Culex spp. / none,Culex spp.,none,Shocket,2018,lf,Identity,1/mu
+lf,20,23.4,Culex spp. / none,Culex spp.,none,Shocket,2018,lf,Identity,1/mu
+lf,25,25.3,Culex spp. / none,Culex spp.,none,Shocket,2018,lf,Identity,1/mu
+lf,30,14.7,Culex spp. / none,Culex spp.,none,Shocket,2018,lf,Identity,1/mu
+lf,40,0,Culex spp. / none,Culex spp.,none,Shocket,2018,lf,Identity,1/mu
+pRH,15,0,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,Multiply_nLR_pLA,pRH
+pRH,20,0.575,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,Multiply_nLR_pLA,pRH
+pRH,25,0.85,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,Multiply_nLR_pLA,pRH
+pRH,30,0.825,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,Multiply_nLR_pLA,pRH
+pRH,35,0.45,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,Multiply_nLR_pLA,pRH
+pRH,40,0,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,Multiply_nLR_pLA,pRH
+nLR,15,0,Culex spp. / none,Culex spp.,none,Shocket,2018,nLR,NA,nLR
+nLR,20,139.8,Culex spp. / none,Culex spp.,none,Shocket,2018,nLR,NA,nLR
+nLR,25,258.8,Culex spp. / none,Culex spp.,none,Shocket,2018,nLR,NA,nLR
+nLR,30,260.8,Culex spp. / none,Culex spp.,none,Shocket,2018,nLR,NA,nLR
+nLR,35,102.6,Culex spp. / none,Culex spp.,none,Shocket,2018,nLR,NA,nLR
+nLR,40,0,Culex spp. / none,Culex spp.,none,Shocket,2018,nLR,NA,nLR
+pLA,15,0,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,20,0.325,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,25,0.835,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,30,0.79,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,35,0.49,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,40,0,Culex spp. / none,Culex spp.,none,Shocket,2018,e2a,NA,pLA
+MDR,15,0.001,Culex spp. / none,Culex spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,20,0.039525691699604744,Culex spp. / none,Culex spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,25,0.059880239520958084,Culex spp. / none,Culex spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,30,0.09259259259259259,Culex spp. / none,Culex spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,35,0.14084507042253522,Culex spp. / none,Culex spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,40,0.001,Culex spp. / none,Culex spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+a,18.5,0.2,Culex spp. / none,Culex spp.,none,Shocket,2018,a,Inverse,GCD
+a,18.5,0.14285714285714285,Culex spp. / none,Culex spp.,none,Shocket,2018,a,Inverse,GCD
+a,21,0.2,Culex spp. / none,Culex spp.,none,Shocket,2018,a,Inverse,GCD
+a,21,0.16666666666666666,Culex spp. / none,Culex spp.,none,Shocket,2018,a,Inverse,GCD
+a,23.5,0.25,Culex spp. / none,Culex spp.,none,Shocket,2018,a,Inverse,GCD
+a,23.5,0.16666666666666666,Culex spp. / none,Culex spp.,none,Shocket,2018,a,Inverse,GCD
+a,24.5,0.25,Culex spp. / none,Culex spp.,none,Shocket,2018,a,Inverse,GCD
+a,24.5,0.2,Culex spp. / none,Culex spp.,none,Shocket,2018,a,Inverse,GCD
+a,23.5,0.25,Culex spp. / none,Culex spp.,none,Shocket,2018,a,Inverse,GCD
+a,23.5,0.2,Culex spp. / none,Culex spp.,none,Shocket,2018,a,Inverse,GCD
+a,21.5,0.25,Culex spp. / none,Culex spp.,none,Shocket,2018,a,Inverse,GCD
+a,21.5,0.16666666666666666,Culex spp. / none,Culex spp.,none,Shocket,2018,a,Inverse,GCD
+a,19,0.2,Culex spp. / none,Culex spp.,none,Shocket,2018,a,Inverse,GCD
+a,19,0.14285714285714285,Culex spp. / none,Culex spp.,none,Shocket,2018,a,Inverse,GCD
+a,14,0.14285714285714285,Culex spp. / none,Culex spp.,none,Shocket,2018,a,Inverse,GCD
+a,14,0.08333333333333333,Culex spp. / none,Culex spp.,none,Shocket,2018,a,Inverse,GCD
+a,40,0.001,Culex spp. / none,Culex spp.,none,Shocket,2018,a,Inverse,GCD
+PDR,20,0.1,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,PDR,Inverse,EIP
+PDR,20,0.07142857142857142,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,PDR,Inverse,EIP
+PDR,27,0.1,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,PDR,Inverse,EIP
+PDR,27,0.14285714285714285,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,PDR,Inverse,EIP
+PDR,33.5,0.25,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,PDR,Inverse,EIP
+PDR,45,0.001,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,PDR,Inverse,EIP
+bc,0,0,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+bc,20,0.7,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+bc,20,0.77,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+bc,20,0.75,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+bc,20,0.9,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+bc,20,0.92,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+bc,20,0.87,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+bc,20,0.93,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+bc,20,0.93,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+bc,27,0.75,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+bc,27,0.84,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+bc,27,1,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+bc,27,0.5,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+bc,27,0.52,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+bc,27,0.83,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+bc,27,0.87,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+bc,27,1,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+bc,33.5,0.78,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+bc,33.5,1,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+bc,33.5,0.9,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+bc,50,0,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2018,bc,Identity,bc
+pLA,0,0,Aedes spp. / none,Aedes spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,15,1,Aedes spp. / none,Aedes spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,18,0.73,Aedes spp. / none,Aedes spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,25,0.67,Aedes spp. / none,Aedes spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,29,1,Aedes spp. / none,Aedes spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,35,0,Aedes spp. / none,Aedes spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,0,0,Aedes spp. / none,Aedes spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,15,1,Aedes spp. / none,Aedes spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,18,0.867,Aedes spp. / none,Aedes spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,25,1,Aedes spp. / none,Aedes spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,29,1,Aedes spp. / none,Aedes spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,35,0,Aedes spp. / none,Aedes spp.,none,Shocket,2018,e2a,NA,pLA
+MDR,15,0.020491803278688527,Aedes spp. / none,Aedes spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,18,0.02450980392156863,Aedes spp. / none,Aedes spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,25,0.036101083032490974,Aedes spp. / none,Aedes spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,29,0.13157894736842105,Aedes spp. / none,Aedes spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,40,0.001,Aedes spp. / none,Aedes spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,15,0.06451612903225806,Aedes spp. / none,Aedes spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,18,0.0617283950617284,Aedes spp. / none,Aedes spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,25,0.1,Aedes spp. / none,Aedes spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,29,0.14705882352941177,Aedes spp. / none,Aedes spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,40,0.001,Aedes spp. / none,Aedes spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,15,0.026954177897574122,Other spp. / none,Other spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,20,0.03773584905660377,Other spp. / none,Other spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,25,0.04950495049504951,Other spp. / none,Other spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,30,0.07518796992481203,Other spp. / none,Other spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,35,0.08264462809917356,Other spp. / none,Other spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+MDR,40,0.001,Other spp. / none,Other spp.,none,Shocket,2018,MDR,Inverse,1/MDR
+pLA,15,0.689,Other spp. / none,Other spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,20,0.844,Other spp. / none,Other spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,25,0.761,Other spp. / none,Other spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,30,0.528,Other spp. / none,Other spp.,none,Shocket,2018,e2a,NA,pLA
+pLA,35,0.356,Other spp. / none,Other spp.,none,Shocket,2018,e2a,NA,pLA
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,20,1.3575757575757577,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,25,3.8060606060606057,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,30,0.6754285714285715,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,30,0.6754285714285715,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,30,0.6754285714285715,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,30,0.6754285714285715,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,30,0.6754285714285715,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,30,0.6754285714285715,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,30,0.6754285714285715,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,30,0.6754285714285715,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,30,0.6754285714285715,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,30,0.6754285714285715,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,30,0.6754285714285715,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,30,0.6754285714285715,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,30,0.6754285714285715,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,30,0.6754285714285715,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,30,0.6754285714285715,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,30,0.6754285714285715,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,30,0.6754285714285715,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+EFD,30,0.6754285714285715,Culex spp. / none,Culex spp.,none,Shocket,2018,EFD,Identity,EFD
+bc,16,0,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,bc,Identity,bc
+bc,20,0.0071,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,bc,Identity,bc
+bc,24,0.0429,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,bc,Identity,bc
+bc,28,0.2571,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,bc,Identity,bc
+bc,32,0.2,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,bc,Identity,bc
+bc,34,0.1857,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,bc,Identity,bc
+bc,36,0.117,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,bc,Identity,bc
+bc,38,0.1,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,bc,Identity,bc
+bc,16,0,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,bc,Identity,bc
+bc,20,0,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,bc,Identity,bc
+bc,24,0.0288,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,bc,Identity,bc
+bc,28,0.2,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,bc,Identity,bc
+bc,32,0.1286,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,bc,Identity,bc
+bc,34,0.1857,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,bc,Identity,bc
+bc,36,0.0556,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,bc,Identity,bc
+bc,38,0,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,bc,Identity,bc
+PDR,16,0,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,PDR,Identity,EIR
+PDR,20,0.054896794,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,PDR,Identity,EIR
+PDR,24,0.075278531,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,PDR,Identity,EIR
+PDR,28,0.13724952,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,PDR,Identity,EIR
+PDR,32,0.222222222,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,PDR,Identity,EIR
+PDR,34,0.227608968,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,PDR,Identity,EIR
+PDR,36,0.25789813,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,PDR,Identity,EIR
+PDR,38,0.666666667,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,PDR,Identity,EIR
+PDR,16,0,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,PDR,Identity,EIR
+PDR,20,0,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,PDR,Identity,EIR
+PDR,24,0.063035804,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,PDR,Identity,EIR
+PDR,28,0.125,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,PDR,Identity,EIR
+PDR,32,0.143585326,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,PDR,Identity,EIR
+PDR,34,0.172801106,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,PDR,Identity,EIR
+PDR,36,0.281214848,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,PDR,Identity,EIR
+PDR,38,0,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,PDR,Identity,EIR
+lf,16,25.7,Aedes aegypti / none,Aedes aegypti,none,Tesla,2018,lf,Identity,lf
+lf,20,24.32,Aedes aegypti / none,Aedes aegypti,none,Tesla,2018,lf,Identity,lf
+lf,24,47.91,Aedes aegypti / none,Aedes aegypti,none,Tesla,2018,lf,Identity,lf
+lf,28,37.4,Aedes aegypti / none,Aedes aegypti,none,Tesla,2018,lf,Identity,lf
+lf,32,28.62,Aedes aegypti / none,Aedes aegypti,none,Tesla,2018,lf,Identity,lf
+lf,34,20.02,Aedes aegypti / none,Aedes aegypti,none,Tesla,2018,lf,Identity,lf
+lf,36,11.31,Aedes aegypti / none,Aedes aegypti,none,Tesla,2018,lf,Identity,lf
+lf,38,0.33,Aedes aegypti / none,Aedes aegypti,none,Tesla,2018,lf,Identity,lf
+lf,16,31.32,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,lf,Identity,lf
+lf,20,24.51,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,lf,Identity,lf
+lf,24,93.19,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,lf,Identity,lf
+lf,28,78.61,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,lf,Identity,lf
+lf,32,22.61,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,lf,Identity,lf
+lf,34,20.21,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,lf,Identity,lf
+lf,36,12.94,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,lf,Identity,lf
+lf,38,0.44,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,lf,Identity,lf
+lf,16,41.46,Aedes aegypti / none,Aedes aegypti,none,Tesla,2018,lf,Identity,lf
+lf,20,24.35,Aedes aegypti / none,Aedes aegypti,none,Tesla,2018,lf,Identity,lf
+lf,24,26.48,Aedes aegypti / none,Aedes aegypti,none,Tesla,2018,lf,Identity,lf
+lf,28,52.6,Aedes aegypti / none,Aedes aegypti,none,Tesla,2018,lf,Identity,lf
+lf,32,22.08,Aedes aegypti / none,Aedes aegypti,none,Tesla,2018,lf,Identity,lf
+lf,34,15.95,Aedes aegypti / none,Aedes aegypti,none,Tesla,2018,lf,Identity,lf
+lf,36,11.32,Aedes aegypti / none,Aedes aegypti,none,Tesla,2018,lf,Identity,lf
+lf,38,0.27,Aedes aegypti / none,Aedes aegypti,none,Tesla,2018,lf,Identity,lf
+lf,16,27.38,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,lf,Identity,lf
+lf,20,29.41,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,lf,Identity,lf
+lf,24,80.34,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,lf,Identity,lf
+lf,28,29.43,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,lf,Identity,lf
+lf,32,25.46,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,lf,Identity,lf
+lf,34,20.59,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,lf,Identity,lf
+lf,36,8.31,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,lf,Identity,lf
+lf,38,0.41,Aedes aegypti / ZIKV,Aedes aegypti,ZIKV,Tesla,2018,lf,Identity,lf
+a,10,0.06997900629811057,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,15,0.12004801920768307,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,20,0.2298850574712644,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,25,0.25,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,30,0.19011406844106465,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,10,0.04,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,a,Inverse,GCD
+a,15,0.06997900629811057,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,a,Inverse,GCD
+a,20,0.11001100110011001,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,a,Inverse,GCD
+a,25,0.11001100110011001,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,a,Inverse,GCD
+a,30,0.13003901170351104,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,a,Inverse,GCD
+a,16,0.11872586869263464,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,16,0.07113938692433469,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,16,0.09549689436841749,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,27,0.32610837404367005,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,27,0.3261083742563634,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,27,0.32058111405139733,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,31,0.278911564677079,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,31,0.33153638809637387,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,31,0.48809523804875277,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,31,0.3253968253658352,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,35,0.4849816851564915,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,10,0.03920031360250882,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,15,0.09354536950420955,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,20,0.14285714285714285,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,25,0.1579778830963665,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,30,0.22573363431151244,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,35,0.3257328990228013,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,40,0.001,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,10,0.001,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,25,0.2222222222222222,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,a,Inverse,GCD
+a,20,0.11764705882352941,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,a,Inverse,GCD
+a,15,0.05263157894736842,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,a,Inverse,GCD
+a,10,0.02666666666666667,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,a,Inverse,GCD
+a,5,0.001,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,a,Inverse,GCD
+a,25,0.2222222222222222,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,20,0.11764705882352941,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,15,0.05714285714285714,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,10,0.03076923076923077,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,5,0.001,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,30,0.2857142857142857,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,25,0.20833333333333334,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,22,0.17857142857142858,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,20,0.1639344262295082,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,17,0.06578947368421052,Culex spp. / none,Culex spp.,none,Shocket,2020,a,Inverse,GCD
+a,2,0.001,Other spp. / none,Other spp.,none,Shocket,2020,a,Inverse,GCD
+a,10,0.04310344827586207,Other spp. / none,Other spp.,none,Shocket,2020,a,Inverse,GCD
+a,16,0.08695652173913043,Other spp. / none,Other spp.,none,Shocket,2020,a,Inverse,GCD
+a,22,0.17543859649122806,Other spp. / none,Other spp.,none,Shocket,2020,a,Inverse,GCD
+a,28,0.2222222222222222,Other spp. / none,Other spp.,none,Shocket,2020,a,Inverse,GCD
+a,32,0.001,Other spp. / none,Other spp.,none,Shocket,2020,a,Inverse,GCD
+a,34,0.001,Other spp. / none,Other spp.,none,Shocket,2020,a,Inverse,GCD
+b,10,0,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,b,Identity,b
+b,15,0.17,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,b,Identity,b
+b,20,0.709,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,b,Identity,b
+b,20,0.407,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,b,Identity,b
+b,20,0.581,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,b,Identity,b
+b,25,0.54,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,b,Identity,b
+b,25,0.617,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,b,Identity,b
+b,25,0.791,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,b,Identity,b
+b,25,0.908,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,b,Identity,b
+b,25,0.929,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,b,Identity,b
+b,25,0.789,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,b,Identity,b
+b,30,0.395,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,b,Identity,b
+b,30,0.801,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,b,Identity,b
+b,30,0.673,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,b,Identity,b
+b,30,0.755,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,b,Identity,b
+b,30,0.763,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,b,Identity,b
+b,30,0.502,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,b,Identity,b
+b,10,0.081,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,10,0.041,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,10,0.003,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,10,0.14,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,15,0.362,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,15,0.485,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,15,0.603,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,15,0.361,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,15,0.486,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,15,0.562,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,15,0.681,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,20,0.723,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,20,0.62,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,20,0.651,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,20,0.519,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,20,0.419,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,20,0.197,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,20,0.438,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,25,0.603,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,25,0.509,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,25,0.393,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,25,0.394,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,25,0.202,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,25,0.163,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,30,0.523,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,30,0.69,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,30,0.374,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,30,0.123,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,30,0.08,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,30,0.002,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+b,30,0.001,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,b,Identity,b
+c,30,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,30,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,30,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,30,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,30,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,30,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,30,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,25,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,25,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,25,0.97,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,25,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,25,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,25,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,25,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,20,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,20,0.96,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,20,0.96,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,20,0.92,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,20,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,20,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,20,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,20,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,15,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,15,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,15,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,15,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,15,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,15,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,15,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,15,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,15,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,10,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,10,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,10,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,10,0.96,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,10,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,10,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,10,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,10,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,30,0.58,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,30,0.66,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,30,0.42,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,30,0.52,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,30,0.64,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,30,0.71,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,30,0.48,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,25,0.56,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,25,0.62,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,25,0.66,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,25,0.56,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,25,0.56,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,25,0.65,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,25,0.52,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,25,0.56,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,20,0.72,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,20,0.4,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,20,0.72,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,20,0.66,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,20,0.46,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,20,0.68,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,20,0.68,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,20,0.52,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,15,0.36,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,15,0.32,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,15,0.2,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,15,0.36,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,15,0.21,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,15,0.28,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,15,0.51,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,15,0.6,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,10,0.04,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,10,0.04,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,10,0,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+c,10,0.08,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,c,Identity,c
+b,10,0,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,b,Identity,b
+b,14,0.12,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,b,Identity,b
+b,18,0.3,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,b,Identity,b
+b,18,0.45,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,b,Identity,b
+b,18,0.45,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,b,Identity,b
+b,22,0.59,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,b,Identity,b
+b,22,0.81,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,b,Identity,b
+b,26,0.42,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,b,Identity,b
+b,26,0.79,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,b,Identity,b
+b,26,0.46,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,b,Identity,b
+b,26,0.9,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,b,Identity,b
+b,30,0.6,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,b,Identity,b
+b,30,0.85,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,b,Identity,b
+b,30,0.75,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,b,Identity,b
+b,30,0.75,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,b,Identity,b
+c,18,0.6,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,25,0.7,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,32,0.2,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+bc,25,0.28,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,32,0.07,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,bc,Identity,bc
+c,18,0.89,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,18,0.94,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,18,0.94,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,25,1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,25,0.86,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,25,0.8,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,32,0.72,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,32,0.21,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+bc,18,0.27,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,25,0.31,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,25,0.34,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,32,0.21,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,32,0.04,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,bc,Identity,bc
+c,15,0.08,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,15,0.04,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,15,0.04,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,15,0.08,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,15,0,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,18,0.12,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,18,0.24,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,18,0.24,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,18,0.2,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,18,0.36,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,22,0.604,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,22,0.765,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,22,0.484,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,22,0.764,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,22,0.336,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,32,0.644,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,32,0.845,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,32,0.965,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,32,0.924,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,32,0.933,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,15,0.082,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,15,0,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,15,0,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,15,0,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,18,0.122,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,18,0.04,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,18,0.162,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,22,0.322,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,22,0.122,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,22,0.364,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,22,0.244,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,22,0.524,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,22,0.322,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,22,0.253,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,32,0.964,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,32,0.884,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,32,1,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,32,1,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+bc,15,0.04,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,15,0.04,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,15,0,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,15,0,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,18,0.08,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,18,0.08,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,18,0,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,18,0.04,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,22,0.28,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,22,0.52,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,22,0.319,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,22,0.519,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,32,0.241,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,32,0.281,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,32,0.281,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,32,0.481,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,15,0.04,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,15,0,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,15,0,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,15,0,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,18,0.04,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,18,0,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,18,0,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,18,0,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,22,0.24,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,22,0.2,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,32,0.241,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,32,0.161,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+bc,32,0.441,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,bc,Identity,bc
+c,10,0.089,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,c,Identity,c
+c,17,0.563,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,c,Identity,c
+c,17,0.573,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,c,Identity,c
+c,17,0.691,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,c,Identity,c
+c,24,0.501,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,c,Identity,c
+c,24,0.88,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,c,Identity,c
+bc,21.1,0.329,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,21.1,0.571,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,21.1,0.5,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,21.1,0.569,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,21.1,0.76,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,21.1,0.639,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,26.7,0.4,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,26.7,0.651,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,26.7,0.865,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,26.7,0.865,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,26.7,0.552,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,32.2,0.645,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,32.2,0.82,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,32.2,0.851,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,13,0.25,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,26,0.462,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,bc,Identity,bc
+bc,33,0.357,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,bc,Identity,bc
+c,10,0.431,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,10,0.372,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,10,0.333,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,10,0.3,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,17,0.55,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,17,0.65,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,17,0.431,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,17,0.302,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,17,0.23,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,24,0.301,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,24,0.24,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,24,0.331,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,c,Identity,c
+c,18,0.136,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,18,0.289,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,18,0.29,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,20,0.422,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,20,0.243,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,20,0.425,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,26,0.331,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,26,0.599,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,26,0.361,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,26,0.774,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,26,0.852,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,26,1,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,26,1,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,26,0.71,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,30,0.832,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,30,0.62,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,30,1,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,30,0.88,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,30,1,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+c,30,1,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,c,Identity,c
+bc,14,0.603,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,14,0.8,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,14,0.402,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,14,0.749,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,14,1,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,14,0.602,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,14,1,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,14,1,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,14,0.334,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,14,1,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,18,0.598,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,18,1,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,18,1,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,18,0.898,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,18,1,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,18,0.799,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,18,0.9,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,18,1,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,18,0.8,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,18,1,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,26,0.75,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,26,0.799,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,26,1,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,26,1,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,26,0.8,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,30,0.798,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,30,1,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,30,1,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+bc,30,1,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,bc,Identity,bc
+EFOC,10,82.1,Culex spp. / none,Culex spp.,none,Shocket,2020,EFD,Multiply_a,EFOC
+EFOC,15,112.9,Culex spp. / none,Culex spp.,none,Shocket,2020,EFD,Multiply_a,EFOC
+EFOC,20,155.88,Culex spp. / none,Culex spp.,none,Shocket,2020,EFD,Multiply_a,EFOC
+EFOC,25,248.62,Culex spp. / none,Culex spp.,none,Shocket,2020,EFD,Multiply_a,EFOC
+EFOC,30,93.74,Culex spp. / none,Culex spp.,none,Shocket,2020,EFD,Multiply_a,EFOC
+EFOC,35,40.9,Culex spp. / none,Culex spp.,none,Shocket,2020,EFD,Multiply_a,EFOC
+EFOC,40,0,Culex spp. / none,Culex spp.,none,Shocket,2020,EFD,Multiply_a,EFOC
+EPR,21,163,Aedes spp. / none,Aedes spp.,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,21,157,Aedes spp. / none,Aedes spp.,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,21,166,Aedes spp. / none,Aedes spp.,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,21,152,Aedes spp. / none,Aedes spp.,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,25,134,Aedes spp. / none,Aedes spp.,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,25,150,Aedes spp. / none,Aedes spp.,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,25,131,Aedes spp. / none,Aedes spp.,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,25,163,Aedes spp. / none,Aedes spp.,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,30,107,Aedes spp. / none,Aedes spp.,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,30,124,Aedes spp. / none,Aedes spp.,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,30,104,Aedes spp. / none,Aedes spp.,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,30,115,Aedes spp. / none,Aedes spp.,none,Shocket,2020,EFD,Multiply_pO,EPR
+pO,21,0.8,Aedes spp. / none,Aedes spp.,none,Shocket,2020,pO,NA,pO
+pO,21,0.75,Aedes spp. / none,Aedes spp.,none,Shocket,2020,pO,NA,pO
+pO,21,0.8,Aedes spp. / none,Aedes spp.,none,Shocket,2020,pO,NA,pO
+pO,21,0.9,Aedes spp. / none,Aedes spp.,none,Shocket,2020,pO,NA,pO
+pO,25,0.85,Aedes spp. / none,Aedes spp.,none,Shocket,2020,pO,NA,pO
+pO,25,0.9,Aedes spp. / none,Aedes spp.,none,Shocket,2020,pO,NA,pO
+pO,25,0.75,Aedes spp. / none,Aedes spp.,none,Shocket,2020,pO,NA,pO
+pO,25,0.7,Aedes spp. / none,Aedes spp.,none,Shocket,2020,pO,NA,pO
+pO,30,0.7,Aedes spp. / none,Aedes spp.,none,Shocket,2020,pO,NA,pO
+pO,30,0.7,Aedes spp. / none,Aedes spp.,none,Shocket,2020,pO,NA,pO
+pO,30,0.5,Aedes spp. / none,Aedes spp.,none,Shocket,2020,pO,NA,pO
+pO,30,0.55,Aedes spp. / none,Aedes spp.,none,Shocket,2020,pO,NA,pO
+EPR,21,276.29,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,25,283.24,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,30,239.81,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,21,115.73,Culex spp. / none,Culex spp.,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,25,110.47,Culex spp. / none,Culex spp.,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,28,65.92,Culex spp. / none,Culex spp.,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,30,42.74,Culex spp. / none,Culex spp.,none,Shocket,2020,EFD,Multiply_pO,EPR
+pO,21,1,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,pO,NA,pO
+pO,25,1,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,pO,NA,pO
+pO,30,0.96,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,pO,NA,pO
+pO,21,0.31,Culex spp. / none,Culex spp.,none,Shocket,2020,pO,NA,pO
+pO,25,1,Culex spp. / none,Culex spp.,none,Shocket,2020,pO,NA,pO
+pO,28,0.96,Culex spp. / none,Culex spp.,none,Shocket,2020,pO,NA,pO
+pO,30,0.9,Culex spp. / none,Culex spp.,none,Shocket,2020,pO,NA,pO
+EPR,28,119.9,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,20,124.2,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,15,106.9,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,28,128.9,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,20,135.5,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,15,110.4,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,28,110.5,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,20,114.7,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,15,109.2,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,28,176.2,Culex spp. / none,Culex spp.,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,20,165.4,Culex spp. / none,Culex spp.,none,Shocket,2020,EFD,Multiply_pO,EPR
+EPR,15,150.9,Culex spp. / none,Culex spp.,none,Shocket,2020,EFD,Multiply_pO,EPR
+pO,25,1,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,pO,NA,pO
+pO,20,1,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,pO,NA,pO
+pO,15,0.627,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,pO,NA,pO
+pO,10,0.132,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,pO,NA,pO
+pO,5,0,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,pO,NA,pO
+pO,25,1,Culex spp. / none,Culex spp.,none,Shocket,2020,pO,NA,pO
+pO,20,1,Culex spp. / none,Culex spp.,none,Shocket,2020,pO,NA,pO
+pO,15,0.7,Culex spp. / none,Culex spp.,none,Shocket,2020,pO,NA,pO
+pO,10,0.233,Culex spp. / none,Culex spp.,none,Shocket,2020,pO,NA,pO
+pO,5,0,Culex spp. / none,Culex spp.,none,Shocket,2020,pO,NA,pO
+pO,16,0.28,Culex spp. / none,Culex spp.,none,Shocket,2020,pO,NA,pO
+pO,20,0.58,Culex spp. / none,Culex spp.,none,Shocket,2020,pO,NA,pO
+pO,24,0.54,Culex spp. / none,Culex spp.,none,Shocket,2020,pO,NA,pO
+pO,28,0.14,Culex spp. / none,Culex spp.,none,Shocket,2020,pO,NA,pO
+pO,32,0,Culex spp. / none,Culex spp.,none,Shocket,2020,pO,NA,pO
+pO,16,0.6,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,pO,NA,pO
+pO,20,0.72,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,pO,NA,pO
+pO,24,0.92,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,pO,NA,pO
+pO,28,0.77,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,pO,NA,pO
+pO,32,0,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,pO,NA,pO
+pO,16,0.57,Culex spp. / none,Culex spp.,none,Shocket,2020,pO,NA,pO
+pO,20,1,Culex spp. / none,Culex spp.,none,Shocket,2020,pO,NA,pO
+pO,24,0.4,Culex spp. / none,Culex spp.,none,Shocket,2020,pO,NA,pO
+pO,28,0.45,Culex spp. / none,Culex spp.,none,Shocket,2020,pO,NA,pO
+pO,32,0.17,Culex spp. / none,Culex spp.,none,Shocket,2020,pO,NA,pO
+pO,2,0,Other spp. / none,Other spp.,none,Shocket,2020,pO,NA,pO
+pO,10,0.15,Other spp. / none,Other spp.,none,Shocket,2020,pO,NA,pO
+pO,16,0.96,Other spp. / none,Other spp.,none,Shocket,2020,pO,NA,pO
+pO,22,0.91,Other spp. / none,Other spp.,none,Shocket,2020,pO,NA,pO
+pO,28,0.73,Other spp. / none,Other spp.,none,Shocket,2020,pO,NA,pO
+pO,32,0.16,Other spp. / none,Other spp.,none,Shocket,2020,pO,NA,pO
+pO,34,0,Other spp. / none,Other spp.,none,Shocket,2020,pO,NA,pO
+EV,21,0.821,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,25,0.932,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,28,0.495,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,30,0.074,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,21,0.959,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,25,0.87,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,30,0.943,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,10,0.506,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,15,0.652,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,20,0.817,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,25,0.811,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,30,0.723,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,35,0.701,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,40,0,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,32,0.929,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,32,0.928,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,25,0.856,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,25,0.658,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,10,0.343,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,10,0.4,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,32,0.997,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,32,0.996,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,25,0.964,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,25,0.972,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,10,0.532,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,10,0.31,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,32,0.936,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,32,0.953,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,25,0.916,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,25,0.91,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,10,0.53,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,10,0.646,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,0,0,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,10,0,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,12,0,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,13,0,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,15,0.077,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,17,0.168,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,19,0.206,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,22,0.249,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,24,0.319,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,26,0.383,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,28,0.62,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,30,0.719,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,32,0.855,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,33,0.774,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,34,0.614,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,35,0.546,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,37,0.286,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,38,0.157,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,39,0,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,9,0.382,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,12,0.984,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,15,0.712,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,18,0.944,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,21,0.889,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,24,0.911,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,27,0.984,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,30,0.958,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,33,0.804,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,36,0.951,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,39,0.924,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,9,0,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,12,0.478,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,15,0.875,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,18,0.933,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,21,0.882,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,24,0.773,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,27,0.967,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,30,0.962,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,33,0.948,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,36,0.993,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+EV,39,0,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,Multiply_pLA,Egg viability
+lf,16,86.9,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,112.2,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,24,43,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,28,34.7,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,32,23.8,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,16,72.4,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,43.6,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,24,26,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,28,7.3,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,32,3.5,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,16,94.2,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,lf,Identity,1/mu
+lf,20,80.3,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,lf,Identity,1/mu
+lf,24,44.7,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,lf,Identity,1/mu
+lf,28,22.8,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,lf,Identity,1/mu
+lf,32,7.4,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,lf,Identity,1/mu
+lf,16,57,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,lf,Identity,1/mu
+lf,20,61.4,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,lf,Identity,1/mu
+lf,24,27.8,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,lf,Identity,1/mu
+lf,28,23.8,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,lf,Identity,1/mu
+lf,32,7.7,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,lf,Identity,1/mu
+lf,16,76,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,43.9,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,24,16.6,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,28,10.6,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,32,6.4,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,21,54.3,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,25,29,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,30,14.2,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,21,54.3,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,lf,Identity,1/mu
+lf,25,64.4,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,lf,Identity,1/mu
+lf,30,30.1,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,lf,Identity,1/mu
+lf,21,33.4,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,25,27.6,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,30,6.9,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,21,41.1,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,lf,Identity,1/mu
+lf,25,39.8,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,lf,Identity,1/mu
+lf,30,24.7,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,lf,Identity,1/mu
+lf,15,58.1,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,66.7,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,25,32.6,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,30,22.8,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,35,12.8,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,15,58,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,58.3,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,25,16.9,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,30,14.1,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,35,8.8,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,15,59.1,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,45.3,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,25,23.4,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,30,18.4,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,35,12.9,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,15,60.2,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,27.4,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,25,16.5,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,30,14.9,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,35,8.3,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,14,46,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,59,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,26,35,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,32,15,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,14,32,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,28,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,26,17,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,32,14,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,14,37,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,19,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,26,21,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,32,18,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,14,55,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,17,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,26,16,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,32,6,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,14,38,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,24,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,26,11,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,32,8,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,14,40,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,21,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,26,19,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,32,12,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,14,43,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,32,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,26,19,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,32,8,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,27,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,26,24,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,32,12,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,14,48,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,17,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,26,26,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,32,21,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,14,43,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,49,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,26,36,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,32,14,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,31,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,26,11,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,32,11,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,14,47,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,25,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,26,25,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,32,15,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,22,41.2,Aedes spp. / none,Aedes spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,27,31,Aedes spp. / none,Aedes spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,32,22,Aedes spp. / none,Aedes spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,22,21.9,Aedes spp. / none,Aedes spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,27,17.1,Aedes spp. / none,Aedes spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,32,12.05,Aedes spp. / none,Aedes spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,15,92.3,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,55.7,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,25,29.4,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,27.5,22.8,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,30,11.3,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,15,65.9,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,45.1,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,25,21.9,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,27.5,17.9,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,30,8.2,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,16,94.65,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,24,62.47,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,27,45.93,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,31,17.27,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,35,8.59,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,16,124.06,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,27,45.59,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,31,15.21,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,35,7.44,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,16,99.95,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,27,41.51,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,31,19.11,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,35,6.04,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,16,144.82,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,27,40.25,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,31,17.21,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,35,8.38,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,18.9,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,24,13.5,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,28,7.7,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,20,29.2,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,24,9.7,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+lf,28,8.6,Culex spp. / none,Culex spp.,none,Shocket,2020,lf,Identity,1/mu
+MDR,25,0.054824561403508776,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.06305170239596469,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,37,0.06675567423230974,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.04604051565377532,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.05455537370430988,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,37,0.061614294516327786,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.05170630816959669,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.06872852233676975,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,37,0.07032348804500703,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.04985044865403789,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.06060606060606061,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,37,0.07892659826361484,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,16,0.034013605442176874,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.06622516556291391,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,24,0.0819672131147541,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,28,0.10989010989010989,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,32,0.10101010101010101,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,16,0.0510204081632653,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.06211180124223602,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,24,0.08403361344537814,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,28,0.10526315789473684,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,32,0.11363636363636363,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,16,0.03968253968253968,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.05434782608695653,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,24,0.08403361344537814,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,28,0.09345794392523366,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,32,0.1075268817204301,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,16,0.04032258064516129,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.06410256410256411,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,24,0.08849557522123894,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,28,0.10309278350515465,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,32,0.10526315789473684,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,16,0.054945054945054944,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.07194244604316546,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,24,0.09259259259259259,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,28,0.10416666666666667,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,32,0.10638297872340426,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.025207965717166624,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.017442874585731728,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.014925373134328358,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,22,0.05194805194805195,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,22,0.05263157894736842,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,22,0.03895597974289053,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.07363770250368189,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.07112375533428164,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.06472491909385114,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.020942408376963352,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.021427040925648167,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.02,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,22,0.04233700254022015,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,22,0.03225806451612903,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,22,0.02666666666666667,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.07535795026375283,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.07042253521126761,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.06666666666666667,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,12,0.039525691699604744,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.07692307692307693,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.09803921568627452,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,23,0.1111111111111111,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,26,0.14925373134328357,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,29,0.15625,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,32,0.001,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,35,0.001,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,12,0.05970149253731343,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.08703220191470844,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.12562814070351758,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,23,0.12547051442910917,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,26,0.13386880856760375,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,29,0.15503875968992248,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,32,0.14347202295552366,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,35,0.001,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,12,0.001,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.052083333333333336,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.06711409395973154,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,23,0.1111111111111111,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,26,0.14492753623188406,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,29,0.1724137931034483,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,32,0.18867924528301888,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,35,0.18867924528301888,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,12,0.001,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.046296296296296294,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.07246376811594203,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,23,0.09090909090909091,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,26,0.09259259259259259,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,29,0.09090909090909091,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,32,0.1,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,35,0.001,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.03189792663476874,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.08285004142502071,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.09505703422053233,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,27,0.14144271570014144,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.13869625520110956,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,34,0.14124293785310735,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.04995004995004995,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.06086427267194157,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,37,0.07905138339920949,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.05070993914807303,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.06064281382656156,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,37,0.07830853563038372,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.03745318352059925,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.0510204081632653,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.07936507936507936,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.09433962264150944,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,35,0.1020408163265306,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.034364261168384876,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.044642857142857144,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.0617283950617284,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.09615384615384615,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,35,0.09259259259259259,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,14,0.029411764705882353,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.04,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,26,0.08333333333333333,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,32,0.1111111111111111,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,14,0.03333333333333333,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.05263157894736842,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,26,0.09090909090909091,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,32,0.1111111111111111,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,14,0.02857142857142857,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.04,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,26,0.07142857142857142,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,32,0.09090909090909091,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,14,0.027777777777777776,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.04,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,26,0.07142857142857142,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,32,0.125,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.05,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,26,0.08333333333333333,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,32,0.09090909090909091,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,14,0.02857142857142857,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.041666666666666664,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,26,0.06666666666666667,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,32,0.08333333333333333,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,19,0.06410256410256411,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.1,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,MDR,Inverse,1/MDR
+MDR,31,0.10869565217391305,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,MDR,Inverse,1/MDR
+MDR,19,0.058823529411764705,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.1020408163265306,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,MDR,Inverse,1/MDR
+MDR,31,0.09433962264150944,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,MDR,Inverse,1/MDR
+MDR,19,0.058823529411764705,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.09803921568627452,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,MDR,Inverse,1/MDR
+MDR,31,0.13157894736842105,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,MDR,Inverse,1/MDR
+MDR,19,0.07352941176470588,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.1,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,MDR,Inverse,1/MDR
+MDR,31,0.13157894736842105,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,MDR,Inverse,1/MDR
+MDR,5,0.001,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,10,0.023255813953488372,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.058823529411764705,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.125,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.16666666666666666,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.16666666666666666,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,21,0.03136762860727729,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,26.5,0.06226650062266501,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,32,0.07680491551459294,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,21,0.027382256297918947,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,26.5,0.0646830530401035,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,32,0.05497526113249038,Aedes spp. / none,Aedes spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,10,0.02512562814070352,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.046296296296296294,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.07518796992481203,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.09803921568627452,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.125,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,33,0.08695652173913043,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,16,0.04878048780487805,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.07633587786259542,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,24,0.10101010101010101,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,27,0.11235955056179775,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,31,0.12048192771084336,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,16,0.044444444444444446,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.07092198581560284,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,24,0.09090909090909091,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,27,0.09345794392523366,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,31,0.10526315789473684,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,16,0.04672897196261683,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.07352941176470588,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,24,0.09803921568627452,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,27,0.11235955056179775,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,31,0.12048192771084336,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,16,0.044642857142857144,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.06993006993006992,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,24,0.09345794392523366,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,27,0.1020408163265306,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,31,0.10526315789473684,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,10,0.02068680182043856,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.033145508783559825,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.04539264639128461,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.06009615384615384,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.0855431993156544,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,35,0.09615384615384615,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,40,0.001,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,10,0.001,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,10,0.001,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,10,0.001,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,10,0.001,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,35,0.125,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.09090909090909091,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.07692307692307693,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.045454545454545456,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.024390243902439025,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,10,0.016666666666666666,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,35,0.001,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.08333333333333333,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.07142857142857142,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.038461538461538464,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.020833333333333332,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,10,0.015625,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.028901734104046242,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.054945054945054944,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.078125,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.045454545454545456,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.08620689655172414,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.1234567901234568,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.04152823920265781,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,24,0.05672149744753262,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,28,0.0851063829787234,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.0380517503805175,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,24,0.05144032921810699,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,28,0.0778816199376947,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.14492753623188406,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.14285714285714285,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,23,0.08695652173913043,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.08620689655172414,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,17,0.0625,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.03690036900369004,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.136986301369863,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.11764705882352941,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,23,0.08928571428571429,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.06993006993006992,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,18,0.0625,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,15,0.03773584905660377,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,20,0.08,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,25,0.12820512820512822,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,30,0.13333333333333333,Culex spp. / none,Culex spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,32,0.04405286343612335,Other spp. / none,Other spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,28,0.052083333333333336,Other spp. / none,Other spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,26,0.0308641975308642,Other spp. / none,Other spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,22,0.036101083032490974,Other spp. / none,Other spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,16,0.009891196834817014,Other spp. / none,Other spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+MDR,10,0.004093327875562832,Other spp. / none,Other spp.,none,Shocket,2020,MDR,Inverse,1/MDR
+PDR,10,0.001,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,PDR,Inverse,EIP
+PDR,15,0.013888888888888888,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,PDR,Inverse,EIP
+PDR,20,0.047619047619047616,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,PDR,Inverse,EIP
+PDR,25,0.1,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,PDR,Inverse,EIP
+PDR,30,0.14285714285714285,Culex spp. / other flavivirus,Culex spp.,other flavivirus,Shocket,2020,PDR,Inverse,EIP
+PDR,10,0.041666666666666664,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,PDR,Inverse,EIP
+PDR,15,0.07692307692307693,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,PDR,Inverse,EIP
+PDR,18,0.08333333333333333,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,PDR,Inverse,EIP
+PDR,20,0.1,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,PDR,Inverse,EIP
+PDR,25,0.14285714285714285,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,PDR,Inverse,EIP
+PDR,30,0.25,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,PDR,Inverse,EIP
+PDR,10,0.001,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,14,0.027777777777777776,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,18,0.038461538461538464,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,22,0.058823529411764705,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,26,0.1111111111111111,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,30,0.14285714285714285,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,18,0.05263157894736842,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,PDR,Inverse,EIP
+PDR,25,0.08333333333333333,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,PDR,Inverse,EIP
+PDR,32,0.16666666666666666,Culex spp. / other togavirus,Culex spp.,other togavirus,Shocket,2020,PDR,Inverse,EIP
+PDR,15,0.03571428571428571,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,18,0.03571428571428571,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,22,0.041666666666666664,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,32,0.25,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,15,0.03571428571428571,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,18,0.03571428571428571,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,22,0.03225806451612903,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,32,0.16666666666666666,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,21.1,0.07692307692307693,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,PDR,Inverse,EIP
+PDR,26.7,0.1,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,PDR,Inverse,EIP
+PDR,32.2,0.16666666666666666,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,PDR,Inverse,EIP
+PDR,10,0.03571428571428571,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,PDR,Inverse,EIP
+PDR,17,0.07142857142857142,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,PDR,Inverse,EIP
+PDR,24,0.07142857142857142,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,PDR,Inverse,EIP
+PDR,13,0.047619047619047616,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,PDR,Inverse,EIP
+PDR,26,0.3333333333333333,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,PDR,Inverse,EIP
+PDR,33,0.3333333333333333,Aedes spp. / other togavirus,Aedes spp.,other togavirus,Shocket,2020,PDR,Inverse,EIP
+PDR,18,0.04,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,20,0.07142857142857142,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,26,0.09090909090909091,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,30,0.16666666666666666,Culex spp. / WNV,Culex spp.,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,14,0.027777777777777776,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,18,0.058823529411764705,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,26,0.09090909090909091,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,30,0.07692307692307693,Culex univittatus / WNV,Culex univittatus,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,15,0.001,Culex quinquefasciatus / WNV,Culex quinquefasciatus,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,20,0.001,Culex quinquefasciatus / WNV,Culex quinquefasciatus,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,24,0.03571428571428571,Culex quinquefasciatus / WNV,Culex quinquefasciatus,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,27,0.07142857142857142,Culex quinquefasciatus / WNV,Culex quinquefasciatus,WNV,Shocket,2020,PDR,Inverse,EIP
+PDR,32,0.1,Culex quinquefasciatus / WNV,Culex quinquefasciatus,WNV,Shocket,2020,PDR,Inverse,EIP
+pLA,16,0.92,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.87,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,24,0.87,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,28,0.82,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,32,0.83,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,16,0.87,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.77,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,24,0.61,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,28,0.83,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,32,0.46,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,16,0.96,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.84,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,24,0.86,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,28,0.95,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,32,0.77,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,16,0.81,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.89,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,24,0.7,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,28,0.53,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,32,0.38,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,16,0.83,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.82,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,24,0.81,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,28,0.61,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,32,0.34,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.39,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.43,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,37,0.19,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.8383,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.9445,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,37,0.4867,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.4833,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.5056,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,37,0.1667,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.9,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.525,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,37,0.2083,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.32,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.11,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.07,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,22,0.3,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,22,0.27,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,22,0.22,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.43,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.27,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.16,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.31,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.37,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.05,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,22,0.7,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,22,0.57,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,22,0.47,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.45,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.1,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.08,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,21,0.906,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.89,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.502,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,21,0.782,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.796,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.954,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,12,0.87,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.85,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.9,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,23,0.85,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.85,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.5,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,32,0,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,35,0,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,12,0.57,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.87,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.9,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,23,1,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,26,0.91,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,29,0.86,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,32,0.47,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,35,0,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,12,0,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.5,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.62,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,23,0.76,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,26,0.75,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,29,0.78,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,32,0.7,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,35,0.5,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,12,0,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,1,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.95,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,23,0.97,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,26,0.94,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,29,0.4,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,32,0.2,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,35,0,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.901,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.524,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,37,0.206,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.82,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.467,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,37,0.247,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.382,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.853,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.903,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,27,0.849,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.831,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,34,0.421,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,10,0,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.583,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.88,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,28,0.867,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,10,0,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.499,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.844,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,28,0.862,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,10,0,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.376,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.67,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,28,0.744,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,10,0,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.445,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.54,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,28,0.887,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.871,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.854,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.867,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.794,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,35,0.491,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.805,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.932,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.685,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.833,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,35,0.617,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,14,0.36,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.87,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,26,0.71,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,32,0.79,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,14,0.75,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.56,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,26,0.76,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,32,0.72,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,14,0.53,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.49,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,26,0.62,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,32,0.71,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,14,0.45,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.79,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,26,0.7,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,32,0.83,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.49,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,26,0.73,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,32,0.82,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,14,0.41,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.36,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,26,0.68,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,32,0.7,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,19,0.67,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.69,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,31,0.56,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,19,0.58,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.74,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,31,0.57,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,19,0.59,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.58,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,31,0.22,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,19,0.67,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.68,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,31,0.3,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.276,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.243,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,23,0.331,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,23,0.357,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,31,0.184,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,31,0.143,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.48,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,23,0.62,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,31,0.2,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,5,0,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,10,0,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15.5,0.35,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,21,0.82,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,26.5,0.77,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,32,0.72,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,5,0,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,10,0.04,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15.5,0.43,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,21,0.78,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,26.5,0.85,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,32,0.7,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,7,0,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,10,0.5,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.396,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.494,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.764,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.288,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,33,0.016,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,16,0.88,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.88,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,24,0.93,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,27,0.92,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,31,0.74,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,35,0,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,16,0.69,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.88,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,24,0.91,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,27,0.92,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,31,0.81,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,35,0,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,16,0.82,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.93,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,24,0.97,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,27,0.96,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,31,0.78,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,35,0,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,10,0.0648,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.63664,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.73625,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.776,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.80025,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,35,0.6822,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,40,0,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,5,0,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,10,0.17,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.56,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.74,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.86,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.71,Aedes spp. / none,Aedes spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,35,0.29,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.7,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.9,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.86,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.86,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,10,0.05,Culex quinquefasciatus / none,Culex quinquefasciatus,none,Shocket,2020,e2a,NA,pLA
+pLA,35,0.65,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.91,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.85,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.83,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.32,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,10,0,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.362,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.782,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.926,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.981,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.95,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.916,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.74,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.953,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,23,0.8,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.727,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,17,0.847,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.72,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.607,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.58,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,23,0.873,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.993,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,18,0.953,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,15,0.933,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.728,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.709,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.542,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.721,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.814,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.464,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,20,0.735,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,25,0.735,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,30,0.515,Culex spp. / none,Culex spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,10,0.06,Other spp. / none,Other spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,16,0.076,Other spp. / none,Other spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,22,0.46,Other spp. / none,Other spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,26,0.783,Other spp. / none,Other spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,28,0.596,Other spp. / none,Other spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,32,0.01,Other spp. / none,Other spp.,none,Shocket,2020,e2a,NA,pLA
+pLA,34,0,Other spp. / none,Other spp.,none,Shocket,2020,e2a,NA,pLA
+EFOC,23,43,Anopheles spp. / none,Anopheles spp.,none,Dahlin,2023,EFD,Multiply_a,EFGC
+EFOC,27,50,Anopheles spp. / none,Anopheles spp.,none,Dahlin,2023,EFD,Multiply_a,EFGC
+EFOC,31,25,Anopheles spp. / none,Anopheles spp.,none,Dahlin,2023,EFD,Multiply_a,EFGC
+EFOC,23,47,Anopheles spp. / none,Anopheles spp.,none,Dahlin,2023,EFD,Multiply_a,EFGC
+EFOC,27,47,Anopheles spp. / none,Anopheles spp.,none,Dahlin,2023,EFD,Multiply_a,EFGC
+EFOC,31,18,Anopheles spp. / none,Anopheles spp.,none,Dahlin,2023,EFD,Multiply_a,EFGC
+EFOC,23,47,Anopheles spp. / none,Anopheles spp.,none,Dahlin,2023,EFD,Multiply_a,EFGC
+EFOC,27,51,Anopheles spp. / none,Anopheles spp.,none,Dahlin,2023,EFD,Multiply_a,EFGC
+EFOC,31,10,Anopheles spp. / none,Anopheles spp.,none,Dahlin,2023,EFD,Multiply_a,EFGC
+EFOC,20,0,Anopheles spp. / none,Anopheles spp.,none,Dahlin,2023,EFD,Multiply_a,TFD
+EFOC,25,20.66,Anopheles spp. / none,Anopheles spp.,none,Dahlin,2023,EFD,Multiply_a,TFD
+EFOC,27,15.27,Anopheles spp. / none,Anopheles spp.,none,Dahlin,2023,EFD,Multiply_a,TFD
+EFOC,27,15.97,Anopheles spp. / none,Anopheles spp.,none,Dahlin,2023,EFD,Multiply_a,TFD
+EFOC,30,0,Anopheles spp. / none,Anopheles spp.,none,Dahlin,2023,EFD,Multiply_a,TFD
+EFOC,35,0,Anopheles spp. / none,Anopheles spp.,none,Dahlin,2023,EFD,Multiply_a,TFD

@@ -35,35 +35,19 @@ library(tidyverse)
 # source("code/data-cleaning.R")
 # data.in.TPC <- data.Reduced
 
-# Run this to load pre-processed dataset
-# load dataset for fitting trait TPCs
-data.in.TPC <- read_csv("data/clean/data_for_TPC_fitting.csv",
-                        show_col_types = FALSE)
+# # Run this to load pre-processed dataset
+# # load dataset for fitting trait TPCs
+# data.in.TPC <- read_rds("data/clean/data_for_TPC_fitting.rds")
 
 # 2) Fit trait thermal performance curves to trait data -------------------
 
 # # Run this to generate samples of trait TPC parameters from informed posterior distributions
 # source("code/get-thermal-trait-priors.R")
 
-# Run this to load pre-processed data set
-data.in.transform <- read_csv("data/clean/TPC_param_samples.csv",
-                              show_col_types = FALSE)
-
+# # Run this to load pre-processed data set
+# data.in.transform <- read_rds("data/clean/TPC_param_samples.rds")
 
 # 3) Translate traits into model parameters -------------------------------
-
-# trait-transform.R = perform necessary transformations to traits to get model parameters
-
-# List of model parameters: sigmaV, f, deltaL, rhoL, muV, etaV, betaV
-
-# List of traits with TPCs fit from data:
-
-# Combine traits into intermediate parameters as necessary
-# i.e. putting together reproductive traits to estimate eggs per female per day (EFD)
-
-# Deal with any duplicates: What do we do if we have two estimates for the same intermediate parameter?
-# i.e. We have e2a for Culex but also pO and EV
-
 
 # Define temperature range of study
 Temps <- seq(5, 50, length.out = 200)
@@ -75,17 +59,16 @@ thin_size <- 200
 
 # 4) Build data set incorporating all axes of variation -------------------
 
-data.in.params <- read_csv("data/clean/parameter_TPCs.csv",
-                              show_col_types = FALSE)
+# data.in.params <- read_rds("data/clean/parameter_TPCs.rds")
+# 
+# source("code/trait-variation.R")
 
-source("code/trait-variation.R")
-
-
-# get-analysis-dfs.R = produce data.frames incorporating all axes of variation
 
 # 5) Calculate model outputs ----------------------------------------------
 
-# !!! get-analysis-dfs.R = compute model outputs on data.frames from above. needs to be separate script
+data.in.analysis <- read_rds("data/clean/full_traitset.rds")
+
+source("code/get-outputs.R")
 
 # 6) Illustrate model outputs (might be done separately) ------------------
 

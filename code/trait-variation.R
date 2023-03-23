@@ -14,9 +14,9 @@
 ##           *) Diagnostics and visualizations
 ##
 ##
-## Inputs:  data - data/clean/trait_transforms.csv
+## Inputs:  data - data/clean/trait_transforms.rds
 ##
-## Outputs: data - data/clean/parameter_TPCs.csv
+## Outputs: data - data/clean/parameter_TPCs.rds
 ##
 ## Written and maintained by: Kyle Dahlin, kydahlin@gmail.com
 ## Initialized March 2023
@@ -110,9 +110,7 @@ data.Vec <- data.in.params %>%
 
 data.Out <- expand_grid(data.Vec, data.Host)
 
-write_rds(data.Out, "data/clean/parameter_TPCs.csv")
-
-
+write_rds(data.Out, "data/clean/full_traitset.rds", compress = "gz")
 
 
 # *) Diagnostics & visualizations -----------------------------------------
