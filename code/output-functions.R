@@ -37,7 +37,7 @@ compute.V0 <- function(input) {
   with(input, {
     eps <- .Machine$double.eps
     if(is.null(lf)) {lf = 1 / (muV + eps)}
-    temp <- sigmaV * fecundity * deltaL
+    temp <- sigmaV_f * deltaL
     # check if net reproduction rate exceeds mortality rate
     temp_bool <- temp > (1 / lf)
     ifelse(temp_bool,
