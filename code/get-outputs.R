@@ -35,12 +35,20 @@ require(tidyverse)
 # Functions for computing transmission measures
 source("code/output-functions.R")
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 167dc1d043a200210102a7ab771924d222ca6727
 # 1) Calculate outputs ----------------------------------------------------
 
 ## Combine all parameter combinations into a large table
 AllOutputs_df <- data.in.analysis %>%
   # Lower the resolution of temperature to length Temp_vec_length
+<<<<<<< HEAD
   # filter(Temperature %in% res_reduce(Temperature, Temp_vec_length)) %>%
+=======
+  filter(Temperature %in% res_reduce(Temperature, Temp_vec_length)) %>%
+>>>>>>> 167dc1d043a200210102a7ab771924d222ca6727
   # Name the model (just in case this is handier than referring to sigmaH)
   mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
   ## Compute outputs ##
@@ -79,9 +87,9 @@ AllOutputs_df <- AllOutputs_df %>%
 
 # Save data frame---------------------------------------------------------------
 
+
 # write_rds(AllOutputs_df, "data/clean/AllOutputs.rds",
 #           compress = "gz")
-
 
 # 3) Build thermal characteristics data frames ----------------------------
 
