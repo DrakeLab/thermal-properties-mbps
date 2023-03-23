@@ -51,3 +51,5 @@ results/AllOutputs.csv
 results/MosquitoThermalResponse.csv
 results/ThermalCharacteristics.csv
 results/VectorTraits.csv
+results/old/AllOutputs.csv
+data/clean/AllOutputs.rds

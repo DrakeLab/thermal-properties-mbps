@@ -172,7 +172,7 @@ combined_df <- combined_df %>%
 # 3) Make parameter dataframe ---------------------------------------------
 eps <- .Machine$double.eps
 
-parameter_df <- combined_df %>%
+data.in.params <- combined_df %>%
   # Biting rate.
   mutate(sigmaV = a) %>% 
   # Fecundity. Simplified from a * 0.5 * EFD / a
@@ -197,7 +197,7 @@ parameter_df <- combined_df %>%
 
 # 4) Save parameter data frame --------------------------------------------
 
-write_rds(parameter_df, "data/clean/parameter_TPCs.rds")
+# write_rds(data.in.params, "data/clean/parameter_TPCs.rds")
 
 
 

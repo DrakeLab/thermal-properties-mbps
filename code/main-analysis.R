@@ -44,8 +44,8 @@ library(tidyverse)
 # # Run this to generate samples of trait TPC parameters from informed posterior distributions
 # source("code/get-thermal-trait-priors.R")
 
-# # Run this to load pre-processed data set
-# data.in.transform <- read_rds("data/clean/TPC_param_samples.rds")
+# Run this to load pre-processed data set
+data.in.transform <- read_rds("data/clean/TPC_param_samples.rds")
 
 # 3) Translate traits into model parameters -------------------------------
 
@@ -53,20 +53,20 @@ library(tidyverse)
 Temps <- seq(5, 50, length.out = 200)
 
 # Thin samples
-thin_size <- 200
+thin_size <- 100
 
-# source("code/trait-transform.R")
+source("code/trait-transform.R")
 
 # 4) Build data set incorporating all axes of variation -------------------
 
 # data.in.params <- read_rds("data/clean/parameter_TPCs.rds")
 # 
-# source("code/trait-variation.R")
+source("code/trait-variation.R")
 
 
 # 5) Calculate model outputs ----------------------------------------------
 
-data.in.analysis <- read_rds("data/clean/full_traitset.rds")
+# data.in.analysis <- read_rds("data/clean/full_traitset.rds")
 
 source("code/get-outputs.R")
 

@@ -108,9 +108,9 @@ data.Vec <- data.in.params %>%
 
 # 4) Combine and save data frames -----------------------------------------
 
-data.Out <- expand_grid(data.Vec, data.Host)
+data.in.analysis <- expand_grid(data.Vec, data.Host)
 
-write_rds(data.Out, "data/clean/full_traitset.rds", compress = "gz")
+# write_rds(data.in.analysis, "data/clean/full_traitset.rds", compress = "gz")
 
 
 # *) Diagnostics & visualizations -----------------------------------------
