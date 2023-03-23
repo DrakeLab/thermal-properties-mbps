@@ -71,9 +71,15 @@ Temps <- seq(5, 50, length.out = 200)
 # Thin samples
 thin_size <- 200
 
-source("code/trait-transform.R")
+# source("code/trait-transform.R")
 
 # 4) Build data set incorporating all axes of variation -------------------
+
+data.in.params <- read_csv("data/clean/parameter_TPCs.csv",
+                              show_col_types = FALSE)
+
+source("code/trait-variation.R")
+
 
 # get-analysis-dfs.R = produce data.frames incorporating all axes of variation
 
