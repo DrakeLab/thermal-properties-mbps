@@ -465,9 +465,6 @@ samples <- tibble(
 
 # Go through all trait/system combinations to generate TPC parameter posterior samples
 for (system_index in 1:dim(distinct_combos)[1]) {
-  print(paste0("System # ", system_index, ": ", mosquito_in, " / ", pathogen_in, " / ", trait_in, 
-               " -------------------------------------------------------------------------------"))
-  
   # Pull system information
   system_sample <- distinct_combos$system_ID[system_index]
   trait_in <- distinct_combos$trait.name[system_index]
@@ -479,6 +476,11 @@ for (system_index in 1:dim(distinct_combos)[1]) {
     dplyr::select(pathogen) %>%
     unique() %>%
     as.character()
+  
+  # Give a progress report
+  print(paste0("System # ", system_index, ": ", mosquito_in, " / ", pathogen_in, " / ", trait_in, 
+               " -------------------------------------------------------------------------------"))
+
   
   # generate TPC parameter posterior samples
   temp_sample <- thermtrait.prior.sample(data_in, trait_in, mosquito_in, pathogen_in,
