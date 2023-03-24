@@ -281,12 +281,12 @@ transform_table <- read_csv("data/clean/trait_transforms.csv") %>%
 eps <- .Machine$double.eps
 
 # Rename synonymous traits
-data.Out <- data.Reduced %>% 
+data.in.TPC <- data.Reduced %>% 
   right_join(transform_table) %>% 
   mutate(trait = case_when(
     transform == "Identity" ~ trait,
     transform == "Inverse" ~ 1/(trait + eps),
-    transform == "NegativeLogDifference" ~ -log(1-trait), # following Mordecai et al., 2017 for prop.dead data from Alto et al., 2001b
+    transform == "NegativeLogDifference" ~ 1/(-log(1-trait)), # following Mordecai et al., 2017 for prop.dead data from Alto et al., 2001b
     NA ~ trait,
     TRUE ~ trait
     # Others will be transformed after fitting thermal performance curves
@@ -295,8 +295,21 @@ data.Out <- data.Reduced %>%
   mutate(trait.name = trait.to, .keep = "unused") %>% 
   filter(!is.na(trait))
 
+# Combine lifespan data for Aedes aegypti with and without ZIKV (we don't account for virulence in the model)
+data.in.TPC <- data.in.TPC %>% 
+  mutate(pathogen = ifelse(mosquito_species == "Aedes aegypti" & final.trait == "lf",
+    "none",
+    pathogen
+  ))
 
-# 4) Data visualizations / diagnostics ------------------------------------
+# 4) Save and export data set ---------------------------------------------
+
+# Save data.frame to file
+write_rds(data.in.TPC, "data/clean/data_for_TPC_fitting.rds")
+
+
+
+# 5) Data visualizations / diagnostics ------------------------------------
 
 ###* Visualize traits as functions of temperature
 plot_bool <- FALSE # decide whether you'd like to generate a diagnostic plot
@@ -339,8 +352,3 @@ select_trait_plots <- data.Viz %>%
   facet_wrap(~ trait.name, scales = "free") +
   theme_minimal(16)
 }
-
-# 5) Save and export data set ---------------------------------------------
-
-# Save data.frame to file
-write_rds(data.in.TPC, "data/clean/data_for_TPC_fitting.rds")
