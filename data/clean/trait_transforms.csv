@@ -2,17 +2,16 @@ trait.from,trait.to,final.trait,transform,notes
 e2a,e2a,e2a,Identity,probability of egg developing into an adult
 pEA,e2a,e2a,Identity,probability of egg developing into an adult
 MDR,MDR,MDR,Identity,mosquito development rate
-p/days,lf,lf,Identity,mortality rate
+p/days,lf,lf,Inverse,mortality rate
 EFD,EFD,EFD,Identity,eggs per female per day
 c,c,c,Identity,probability of transferring infection to host
 b,b,b,Identity,probability of becoming infected from feeding on infectious host
 EIP,PDR,PDR,Inverse,extrinsic incubation period
 PDR,PDR,PDR,Identity,parasite development rate
-GCR,a,a,Identity,development rate (per day) of the first gonotrophic cycle
+GCR,a,a,Identity,"gonotrophic cycle rate, development rate (per day) of the first gonotrophic cycle"
 1/mu,lf,lf,Identity,inverse of mortality rate (approx. average lifespan)
-TFD,EFOC,EFD,Multiply_a,"total fecundity. eggs laid per female per
-gonotrophic cycle (number/female)"
-GCD,a,a,Inverse,gonotrophic cycle duration
+TFD,EFOC,EFD,Multiply_a,"total fecundity, eggs laid per female per gonotrophic cycle (number/female)"
+GCD,a,a,Inverse,"gonotrophic cycle duration, inverse of the gonotrophic cycle rate"
 1/MDR,MDR,MDR,Inverse,average development time (approx. = inverse of mosquito development rate)
 prop.dead,lf,lf,NegativeLogDifference,proportion dead after time T
 a,a,a,Identity,biting rate

@@ -436,9 +436,9 @@ run.jags <- function(jags_data, TPC_function, variable_names,
 # 2) Calculate prior distributions of thermal trait parameters from data ----
 
 # Set parameters for MCMC
-n.chains <-5 # 3 # 5
-n.adapt <- 5000 # 100 # 5000
-n.samps <-5000 # 100 # 5000
+n.chains <-3# 5 # 3 # 5
+n.adapt <- 100#5000 # 100 # 5000
+n.samps <-100#5000 # 100 # 5000
 
 # Identify all distinct combinations of traits and transmission systems
 data_in <- data.in.TPC
@@ -497,7 +497,7 @@ for (system_index in 1:dim(distinct_combos)[1]) {
 
 
 # 3) Save trait TPC parameter posterior distribution samples --------------
-write_rds(samples, "data/clean/TPC_param_samples.rds")
+# write_rds(samples, "data/clean/TPC_param_samples.rds")
 
 # *) Diagnostics & visualizations -----------------------------------------
 
@@ -508,7 +508,7 @@ plot_bool <- TRUE
 focal_bool <- FALSE
 
 if (plot_bool) {
-  plot_samples <- read_csv("data/clean/TPC_param_samples.csv", show_col_types = FALSE)
+  plot_samples <- samples# read_csv("data/clean/TPC_param_samples.csv", show_col_types = FALSE)
   if (focal_bool) {
     plot_samples <- filter(plot_samples, system_ID %in% c(
       "Aedes aegypti / DENV", "Aedes aegypti / none",

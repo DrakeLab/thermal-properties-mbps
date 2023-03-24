@@ -1,6 +1,3 @@
-## For questions, contact Kyle Dahlin, kydahlin@gmail.com
-## Originated September 2021
-##
 ## Title: Analysis code for "Thermal optima" manuscript ########################
 ##
 ## Project: Global zoonoses - spillover of mosquito-borne pathogens
@@ -28,32 +25,24 @@
 ## Initialized March 2023
 # _______________________________________________________________________________
 
-# 0) Load in necessary packages, functions, settings ###########################
+
+# 0) Load in necessary packages, functions, settings ----------------------
 # Packages
-require(tidyverse)
+library(tidyverse)
 
 # Functions for computing transmission measures
 source("code/output-functions.R")
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 167dc1d043a200210102a7ab771924d222ca6727
 # 1) Calculate outputs ----------------------------------------------------
 
 ## Combine all parameter combinations into a large table
 AllOutputs_df <- data.in.analysis %>%
-  # Lower the resolution of temperature to length Temp_vec_length
-<<<<<<< HEAD
-  # filter(Temperature %in% res_reduce(Temperature, Temp_vec_length)) %>%
-=======
-  filter(Temperature %in% res_reduce(Temperature, Temp_vec_length)) %>%
->>>>>>> 167dc1d043a200210102a7ab771924d222ca6727
   # Name the model (just in case this is handier than referring to sigmaH)
   mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
   ## Compute outputs ##
   # Vector lifespan !!! do this in an earlier dataset instead
-  mutate(lf = 1/muV) %>% 
+  mutate(test = sigmaV_f * deltaL * lf)
+  
   # Vector abundance
   mutate(V0 = compute.V0(.)) %>%
   # Basic reproduction number
@@ -72,6 +61,8 @@ AllOutputs_df <- AllOutputs_df %>%
   dplyr::select(
     # Characteristics
     Model, system_ID, Temperature,
+    # Uncertainty (sample number)
+    sample_num,
     # Host traits
     KH, sigmaH,
     # Vector abundance
@@ -87,9 +78,12 @@ AllOutputs_df <- AllOutputs_df %>%
 
 # Save data frame---------------------------------------------------------------
 
-
 # write_rds(AllOutputs_df, "data/clean/AllOutputs.rds",
 #           compress = "gz")
+
+write_rds(AllOutputs_df, "data/clean/AllOutputs_thin.rds",
+          compress = "gz")
+
 
 # 3) Build thermal characteristics data frames ----------------------------
 
@@ -101,7 +95,7 @@ AllOutputs_df <- AllOutputs_df %>%
 
 # Estimate the thermal optimum for transmission
 Topt_df <- AllOutputs_df %>%
-  group_by(system_ID, sigmaH, KH) %>%
+  group_by(system_ID, sample_num, sigmaH, KH) %>%
   filter(R0 == max(R0)) %>%
   # Get temperature at which R0 is maximized
   mutate(Topt = Temperature) %>%
@@ -112,32 +106,34 @@ Topt_df <- AllOutputs_df %>%
   # remove duplicate rows
   distinct() %>%
   dplyr::select(
-    Model, system_ID, sigmaH, KH, Topt, R0opt, threshold_bool, CHmin, CHmax
+    Model, system_ID, sample_num, sigmaH, KH, Topt, R0opt, threshold_bool, CHmin, CHmax
   )
 
-write_rds(Topt_df, "results/Topt_vals.rds",
-          compress = "gz")
+# write_rds(Topt_df, "results/Topt_vals.rds",
+#           compress = "gz")
 
 # Get the thermal range of parasite as a function of host traits
 TempRange_df <- AllOutputs_df %>%
   # Restrict to rows where R0 exceeds one
   filter(R0 > 1) %>%
-  group_by(system_ID, sigmaH, KH) %>%
+  group_by(system_ID, sample_num, sigmaH, KH) %>%
   # Get lowest temperature at which R0 exceeds one
   mutate(CTmin = min(Temperature)) %>%
   # Get highest temperature at which R0 exceeds one
   mutate(CTmax = max(Temperature)) %>%
-  dplyr::select(Model, system_ID, sigmaH, KH, CTmin, CTmax) %>%
+  dplyr::select(Model, system_ID, sample_num, sigmaH, KH, CTmin, CTmax) %>%
   # remove duplicate rows
   distinct()
 
-write_rds(TempRange_df, "results/TempRange_vals.rds",
-          compress = "gz")
+# write_rds(TempRange_df, "results/TempRange_vals.rds",
+#           compress = "gz")
 
 ThermalCharacteristics_df <- left_join(Topt_df, TempRange_df,
-  by = c("Model", "system_ID", "sigmaH", "KH")
+  by = c("Model", "system_ID", "sample_num", "sigmaH", "KH")
 ) 
 
 # Save data frame---------------------------------------------------------------
-write_rds(ThermalCharacteristics_df, "results/AllThermChar_vals.rds",
+# write_rds(ThermalCharacteristics_df, "results/AllThermChar_vals.rds",
+#           compress = "gz")
+write_rds(ThermalCharacteristics_df, "results/AllThermChar_thin.rds",
           compress = "gz")

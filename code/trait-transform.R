@@ -186,18 +186,19 @@ data.in.params <- combined_df %>%
   mutate(muL = etaL - rhoL) %>%  
   # mutate(muL = ifelse(deltaL != 0, rhoL * (1 - deltaL) / (deltaL + eps), Inf)) %>%  
   # Adult mosquito mortality rate. This should be ~infinite if lf = 0
-  mutate(muV = ifelse(lf != 0, 1/(lf + eps), Inf)) %>% 
+  mutate(lf = lf) %>% 
+  # mutate(muV = ifelse(lf != 0, 1/(lf + eps), Inf)) %>% 
   # Pathogen development rate.
   mutate(etaV = PDR) %>%
   # Mosquito infection probability.
   mutate(betaV = bc) %>% 
-  dplyr::select(system_ID:sample_num, sigmaV:betaV)
+  dplyr::select(system_ID:sample_num, lf, sigmaV:betaV)
 
 
 
 # 4) Save parameter data frame --------------------------------------------
 
-# write_rds(data.in.params, "data/clean/parameter_TPCs.rds")
+write_rds(data.in.params, "data/clean/parameter_TPCs_thin.rds")
 
 
 
