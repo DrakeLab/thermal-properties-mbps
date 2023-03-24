@@ -309,7 +309,7 @@ get.prior_hyperparams <- function(in_data, TPC_function, variable_names,
   temp_samples <- run.jags(
     in_data, TPC_function, variable_names,
     jags_choice, inits_list,
-    n.chains, n.adapt, 1000, prob_bool
+    n.chains, n.adapt, n.samps, prob_bool
   )
   
   # transform TPC parameters for the Linear TPC
@@ -436,9 +436,9 @@ run.jags <- function(jags_data, TPC_function, variable_names,
 # 2) Calculate prior distributions of thermal trait parameters from data ----
 
 # Set parameters for MCMC
-n.chains <-3# 5 # 3 # 5
-n.adapt <- 100#5000 # 100 # 5000
-n.samps <-100#5000 # 100 # 5000
+n.chains <-5 # 3 # 5
+n.adapt <- 5000 # 100 # 5000
+n.samps <-5000 # 100 # 5000
 
 # Identify all distinct combinations of traits and transmission systems
 data_in <- data.in.TPC
@@ -465,7 +465,8 @@ samples <- tibble(
 
 # Go through all trait/system combinations to generate TPC parameter posterior samples
 for (system_index in 1:dim(distinct_combos)[1]) {
-  print(paste0("System # ", system_index, "-------------------------------------------------------------------------------"))
+  print(paste0("System # ", system_index, ": ", mosquito_in, " / ", pathogen_in, " / ", trait_in, 
+               " -------------------------------------------------------------------------------"))
   
   # Pull system information
   system_sample <- distinct_combos$system_ID[system_index]
@@ -498,11 +499,12 @@ for (system_index in 1:dim(distinct_combos)[1]) {
 
 # 3) Save trait TPC parameter posterior distribution samples --------------
 # write_rds(samples, "data/clean/TPC_param_samples.rds")
+write_rds(samples, "data/clean/TPC_param_thin.rds")
 
 # *) Diagnostics & visualizations -----------------------------------------
 
 # Do you want to look at diagnostic plots?
-plot_bool <- TRUE
+plot_bool <- FALSE
 
 # Do you just want to look at focal species?
 focal_bool <- FALSE
