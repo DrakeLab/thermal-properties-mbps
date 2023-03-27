@@ -506,7 +506,7 @@ write_rds(samples, "data/clean/TPC_param_thin.rds")
 # *) Diagnostics & visualizations -----------------------------------------
 
 # Do you want to look at diagnostic plots?
-plot_bool <- FALSE
+plot_bool <- TRUE
 
 # Do you just want to look at focal species?
 focal_bool <- FALSE
