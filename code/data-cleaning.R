@@ -239,9 +239,9 @@ data.Reduced <- data.All %>%
   # Reduce non-focal MOSQUITO species to genus level
   mutate(species_label = case_when(
     (Genus == "Aedes" & !(Species %in% c("aegypti", "albopictus"))) ~ "spp.",
-    (Genus == "Culex" & !(Species %in% c("quinquefasciatus", "univittatus"))) ~ "spp.",
+    (Genus == "Culex" & !(Species %in% "quinquefasciatus")) ~ "spp.",
     Genus == "Anopheles" ~ "spp.",
-    # (Genus == "Anopheles" & Species != "gambiae") ~ "spp.", # Not enough data for Anopheles gambiae alone to fit model.
+    # (Genus == "Anopheles" & Species != "gambiae") ~ "spp.", # Not enough data for Anopheles gambiae alone to fit model, expand to genus level
     Genus == "Other" ~ "spp.",
     TRUE ~ Species
   )) %>%

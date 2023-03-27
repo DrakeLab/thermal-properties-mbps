@@ -61,7 +61,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
                                     n.chains = 5, n.adapt = 5000, n.samps = 5000,
                                     old_informative = FALSE) {
   # restrict the dataset to the trait we care about
-  data <- dplyr::filter(data_in, trait.name == trait_in)
+  working_data <- dplyr::filter(data_in, trait.name == trait_in)
   
   # check if the trait is a probability
   prob_bool <- trait_in %in% c("b", "c", "bc", "e2a", "pLA", "pRH", "pO", "EV")
@@ -103,20 +103,21 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
   # 3) sequentially update with more recent datasets
   if (old_informative != TRUE) { # U
     # Gather data from other species of the same genus
-    other_species <- data %>%
+    other_species <- working_data %>%
       dplyr::filter(stringr::word(mosquito_species, 1, 1) == stringr::word(mosquito_in, 1, 1)) %>%
       dplyr::filter(mosquito_species != mosquito_in)
     
     # If data was recorded for infections, use infections in other species to inform priors
     if (pathogen_in != "none") {
-      other_species <- data %>%
+      other_species <- working_data  %>%
+        dplyr::filter(mosquito_species != mosquito_in) %>%
         dplyr::filter(stringr::word(pathogen, 1, 1) == stringr::word(pathogen_in, 1, 1)) %>% 
         rbind(other_species)
     }
     
     # if data from congeners is unavailable, use data from species outside of the focal genera (that is, not Aedes, Culex, or Anopheles)
     if (dim(other_species)[1] == 0) {
-      other_species <- data %>%
+      other_species <- working_data %>%
         dplyr::filter(mosquito_species == "Other spp.")
     }
     
@@ -195,8 +196,8 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
     }
     
     jags_data <- list(
-      "Y" = data$trait, "T" = data$T,
-      "N" = length(data$T), "hypers" = prev_hypers
+      "Y" = working_data$trait, "T" = working_data$T,
+      "N" = length(working_data$T), "hypers" = prev_hypers
     )
     
     samps <- run.jags(
@@ -209,7 +210,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
   # the TPC parameter posterior distributions
   
   # get all of studies with data reported for the particular trait and mosquito species
-  other_studies <- data %>%
+  other_studies <- working_data %>%
     dplyr::filter(mosquito_species == mosquito_in) %>%
     arrange(year, lead_author) %>%
     distinct(lead_author, year)
@@ -247,7 +248,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
     index_author <- other_studies$lead_author[ii]
     index_year <- other_studies$year[ii]
     
-    data_temp <- dplyr::filter(data, lead_author == index_author, year == index_year)
+    data_temp <- dplyr::filter(working_data, lead_author == index_author, year == index_year)
     
     jags_data <- if (is.null(prev_hypers)) {
       list(
@@ -423,7 +424,7 @@ run.jags <- function(jags_data, TPC_function, variable_names,
                  " samples from re-sampling***"))
     
     samps <- rbind(samps, temp_samps)
-    print(paste0(100*round(dim(samps)[1]/(n.chains*n.samps),2), "% complete with resampling"))
+    print(paste0(min(100,100*round(dim(samps)[1]/(n.chains*n.samps),2)), "% complete with resampling"))
   }
   samps <- samps[1:(n.chains * n.samps),]
   
@@ -445,7 +446,7 @@ distinct_combos <- data_in %>%
   "Aedes aegypti / ZIKV", "Aedes aegypti / none",
   "Aedes albopictus / DENV", "Aedes albopictus / none",
   "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
-  "Culex univittatus / WNV",
+  "Culex spp. / WNV",
   "Anopheles spp. / Plasmodium spp.",
   "Anopheles spp. / none"
 )) %>% distinct(trait.name, system_ID)
@@ -498,7 +499,8 @@ for (system_index in 1:dim(distinct_combos)[1]) {
 
 # 3) Save trait TPC parameter posterior distribution samples --------------
 
-write_rds(samples, "data/clean/TPC_param_samples.rds")
+# write_rds(samples, "data/clean/TPC_param_samples.rds")
+write_rds(samples, "data/clean/TEST_TPC_param_samples.rds")
 
 # *) Diagnostics & visualizations -----------------------------------------
 

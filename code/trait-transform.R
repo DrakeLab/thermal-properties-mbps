@@ -137,12 +137,13 @@ missing_traits_df <- combined_df %>%
   unique()
 # Should just show: Culex quinquefasciatus / WNV / bc
 
-# Following Shocket 2020: use Culex univittatus / WNV / bc for Culex quinquefasciatus / WNV / bc
+# Similar to Shocket 2020: use Culex spp. / WNV / bc data for Culex quinquefasciatus / WNV / bc
+# This combines data for Culex univittatus, tarsalis, and pipiens
 combined_df <- combined_df %>% 
   # temporarily remove Cx. quinquefasciatus / WNV rows
   filter(system_ID != "Culex quinquefasciatus / WNV") %>% 
   # add rows back in after switching in "bc" values from Cx. univittatus / WNV
-  rbind(filter(combined_df, system_ID == "Culex quinquefasciatus / WNV") %>% 
+  rbind(filter(combined_df, system_ID == "Culex spp. / WNV") %>% 
           # remove original bc values (all NA)
           dplyr::select(-bc) %>% 
           # join with Cx. univittatus data

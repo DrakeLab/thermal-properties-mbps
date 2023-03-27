@@ -22,8 +22,10 @@
 ## Initialized March 2023
 # _______________________________________________________________________________
 
-# 0) Load libraries and define helper functions ----
 
+# 0) Load libraries and data sets. Define helper functions ----------------
+
+# Load libraries
 library(tidyverse)
 library(latex2exp) # nec
 library(viridis) # nec
@@ -32,6 +34,7 @@ library(modeest)
 library(MetBrewer) #nec
 library(svglite) #nec
 
+# Load in data sets
 data.in.thermchars <- read_rds("results/AllThermChar_thin.rds") #%>% 
   # Focus on two systems for now
   # filter(system_ID %in% c("Aedes albopictus / DENV", "Anopheles spp. / Plasmodium"))
@@ -52,8 +55,24 @@ shift_legend <- function(p) {
   lemon::reposition_legend(p, "center", panel = names(pnls))
 }
 
-# 1) -----
+# Figure 3: Trait TPCs ----------------------------------------------------
 
+
+
+# Figure 4: R0 TPCs -------------------------------------------------------
+# R0 as a function of temperature, seperate curves across values of KH and sigmaH
+
+# Plot R0 vs. temperature curves. One plot for each system
+# One curve for Ross-Macdonald, a few for Chitnis
+
+# x-axes = temperature
+# y-axes = R0 (normalized so that max(R0) = 1)
+# plots = one for each mosquito+pathogen combination, "system_ID"
+# curve 1 = Ross-Macdonald R0 (shape doesn't depend on KH)
+# curves  = Chitnis dynamic R0,
+#   - colour = value of KH. place it on a color scale in the bottom right corner
+
+# Create data frame for plotting
 R0_df <- data.in.outputs %>%
   # To set num. of curves, change "length.out" to be the number of curves you want
   filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 21)]) %>%
@@ -89,17 +108,6 @@ quantsR0TPC_df <- R0_df %>%
   arrange(system_ID, sigmaH, KH, Temperature, lowHCI_val, highHCI_val) %>%
   dplyr::select(-c("sample_num")) %>% 
   distinct()
-
-###* Figure: R0 vs. temperature with HCIs ----
-# Plot R0 vs. temperature curves. One plot for each mosquito+pathogen pair.
-# One curve for Ross-Macdonald, a few for Chitnis
-
-# x-axes = temperature
-# y-axes = R0 (normalized so that max(R0) = 1)
-# plots = one for each mosquito+pathogen combination, "system_ID"
-# curve 1 = Ross-Macdonald R0 (shape doesn't depend on KH)
-# curves  = Chitnis dynamic R0,
-#   - colour = value of KH. place it on a color scale in the bottom right corner
 
 ## PLOTTING ##
 R0_plot <- ggplot(mapping = aes(x = Temperature,group = KH)) +
@@ -198,128 +206,8 @@ R0_plot <- shift_legend(R0_plot)
 ggsave("figures/R0_TPCs.svg", R0_plot,
        width = 16, height = 9)
 
-###* Figure: Topt curves with HCIs ----
-
-Topt_df <- data.in.thermchars %>% 
-  select(-c(R0opt, threshold_bool, CHmin, CHmax, CTmin, CTmax)) %>%
-  # filter(KH > 0.01) %>%
-  filter(sigmaH %in% 10^seq(0, 2) | is.infinite(sigmaH)) %>%
-  group_by(KH) %>%
-  # Arrange along the plotting variables
-  arrange(system_ID, KH, Topt) %>%
-  arrange(sigmaH) %>%
-  ungroup()
-
-meanTopt_df <- Topt_df %>%
-  group_by(system_ID, Model, sigmaH, KH) %>%
-  summarise(
-    mean_val = mean(Topt),
-    median_val = median(Topt),
-    # mode_val = mlv(norm_R0, method = 'mfv'),
-    .groups = "keep"
-  ) %>%
-  arrange(system_ID, sigmaH, KH, mean_val, median_val)# , mode_val)
-
-quantsTopt_df <- Topt_df %>%
-  group_by(system_ID, Model, sigmaH, KH) %>%
-  mutate(lowHCI_val = quantile(Topt, 0.055)) %>%
-  mutate(highHCI_val = quantile(Topt, 0.945)) %>%
-  arrange(system_ID, sigmaH, KH, lowHCI_val, highHCI_val) %>%
-  dplyr::select(-c("sample_num"))
-
-Topt_plot <- meanTopt_df %>%
-  ## Set up plot ##
-  # color = sigmaH
-  ggplot(aes(
-    x = KH
-  )) +
-  # Topt curves:
-  geom_path(aes(y = mean_val, colour = as.factor(sigmaH)), lwd = 1) +
-  # 89% HCI of R0 TPC curves
-  geom_ribbon(
-    data = quantsTopt_df,
-    aes(ymin = lowHCI_val, ymax = highHCI_val, 
-        fill = as.factor(sigmaH)),
-    alpha = 0.05
-  ) +
-  # Add dotted lines showing limits of ribbons
-  geom_path(
-    data = quantsTopt_df,
-    aes(y = lowHCI_val,
-        color = as.factor(sigmaH)),
-    linetype = "dashed"
-  ) +
-  geom_path(
-    data = quantsTopt_df,
-    aes(y = highHCI_val,
-        color = as.factor(sigmaH)),
-    linetype = "dashed"
-  ) +
-  # x-axis: log10 scale, no buffer space
-  scale_x_log10(
-    name = TeX("Vertebrate host population density (ind/ha)"),
-    expand = c(0, 0),
-    limits = c(0.01, 2E4),
-    breaks = 10^seq(-2, 4),
-    labels = TeX(c(
-      "0.01", "0.1", "$1$", "$10$", "$100$", "$10^3$", "$10^4$"
-    ))
-  ) +
-  # y-axis
-  scale_y_continuous(
-    name = expression("Thermal optimum "(degree * C)),
-    expand = c(0.05, 0.05)
-  ) +
-  # color:
-  scale_colour_manual(
-    name = "Vertebrate host biting tolerance\n(bites per host per day)",
-    values = c(met.brewer("VanGogh3", 3, direction = 1), "black"),
-    # values = c(brewer.pal(9, "YlOrRd")[c(3, 5, 7)], "black"),
-    breaks = c(1, 10, 100, Inf),
-    labels = unname(c("1 (Chitnis)", "10 (Chitnis)", "100 (Chitnis)", TeX("$\\infty$ (Ross-Macdonald)")))
-  ) +
-  scale_fill_manual(
-    name = "Vertebrate host biting tolerance\n(bites per host per day)",
-    values = c(met.brewer("VanGogh3", 3, direction = 1), "black"),
-    # values = c(brewer.pal(9, "YlOrRd")[c(3, 5, 7)], "black"),
-    breaks = c(1, 10, 100, Inf),
-    labels = unname(c("1 (Chitnis)", "10 (Chitnis)", "100 (Chitnis)", TeX("$\\infty$ (Ross-Macdonald)")))
-  ) +
-  # faceting:
-  facet_wrap(~system_ID,
-             scales = "free",
-             nrow = 2,
-             labeller = labeller()  ) +
-  # theme options:
-  theme_minimal_hgrid(11) +
-  guides(color = guide_legend(override.aes = list(size = 4))) +
-  theme(
-    legend.position = "bottom",
-    legend.margin = margin(),
-    legend.direction = "vertical",
-    legend.title = element_text(size = 10),
-    legend.text = element_text(
-      size = 10,
-      hjust = 0
-    ),
-    legend.justification = "left",
-    axis.title.x = element_text(hjust = 0.5),
-    strip.text = ggtext::element_markdown(
-      size = 11,
-      hjust = 0,
-      padding = margin(0, 0, 0, 0),
-      margin = margin(1, 1, 1, 1)
-    )
-  )
-
-
-# Plot
-Topt_plot <- shift_legend(Topt_plot)
-ggsave("figures/Topt_plot.svg", Topt_plot,
-       width = 16, height = 9)
-
-###* Figure: Topt mean as function of KH and sigmaH ----
-
+# Figure 5) Topt heatmap --------------------------------------------------
+# Mean value of Topt as a function of KH and sigmaH
 Topt_heat_df <- data.in.thermchars %>% 
   select(-c(threshold_bool, CHmin, CHmax, CTmin, CTmax)) %>%
   group_by(system_ID, Model, sigmaH, KH) %>%
@@ -484,83 +372,7 @@ ggsave("figures/Topt_mean.svg", Toptalt_plots,
        width = 16, height = 9)
 
 
-###* Figure: Topt variance as function of KH and sigmaH ----
-Toptstdev_df <- Toptalt_df %>% 
-  select(system_ID, sigmaH_proxy, KH, std_Topt, mean_Topt) %>% 
-  distinct()
-
-# Plot standard deviation of Topt heat map
-Toptstdev_plots <- Toptalt_df %>% 
-  select(system_ID, sigmaH_proxy, KH, std_Topt, mean_Topt) %>% 
-  distinct() %>% 
-  ## Set up plot ##
-  # x = biting tolerance (with a point at infinity),
-  # y = vertebrate host population density,
-  # color = transmission thermal optimum
-  ggplot(aes(x = KH, y = sigmaH_proxy, z = std_Topt)) +
-  # Topt for FINITE sigmaH:
-  geom_contour_filled(
-    data = filter(Toptstdev_df, sigmaH_proxy < infinite_divide**0.98)
-  ) +
-  # Topt for INFINITE sigmaH:
-  geom_contour_filled(
-    data = filter(Toptstdev_df, sigmaH_proxy > infinite_divide**1.02),
-    size = 1
-  ) +
-  # x-axis: log10-scale with no buffer space
-  scale_x_log10(
-    name = TeX("Vertebrate host population density (ind/ha)"),
-    expand = c(0, 0),
-    # limits = c(0.05, 1E4),
-    # breaks = 10^seq(-1, 4, 1),
-    # labels = TeX(c("$0.1$", "$1$", "$10", "$100$", "$10^3$", "$10^4$"))
-  ) +
-  # y-axis: log10-scale y axis, with no buffer space
-  scale_y_log10(
-    name = TeX("Biting tolerance (bites per host per day)"),
-    expand = c(0, 0),
-    breaks = sigmaH_breaks,
-    labels = sigmaH_labels
-  ) +
-  # fill:
-  scale_fill_manual(
-    name = "Standard deviation\nof transmission thermal\noptimum (°C)",
-    values = met.brewer("Johnson",
-                        n = 13,
-                        direction = -1)) +
-  # color:
-  # faceting:
-  facet_wrap(~system_ID, scales = "free", nrow = 2, labeller = labeller()) +
-  # legend:
-  guides(fill = guide_coloursteps(
-    title.position = "top", title.hjust = 0,
-    barheight = unit(5, "cm"),
-    show.limits = TRUE
-  )) +
-  # theme options:
-  theme_minimal(11) +
-  theme(
-    legend.box = "vertical",
-    legend.position = "right",
-    legend.margin = margin(0, 0, 0, 0),
-    legend.title = element_text(size = 10),
-    legend.direction = "vertical",
-    legend.justification = "left",
-    axis.title.x = element_text(hjust = 0.5),
-    strip.text = ggtext::element_markdown(
-      size = 11,
-      hjust = 0,
-      padding = margin(0, 0, 0, 0),
-      margin = margin(1, 1, 1, 1)
-    )
-  )
-
-# Plot
-Toptstdev_plots <- shift_legend(Toptstdev_plots)
-ggsave("figures/Topt_stdev.svg", Toptstdev_plots,
-       width = 16, height = 9)
-
-###* Figure: mean CT_range as a function of KH and sigmaH ----
+# Figure 6) CTwidth heatmap -----------------------------------------------
 # Shows how the parasite thermal niche (temperatures between CT_min and CT_max) 
 # depends on vertebrate host availability (density and biting tolerance) in each
 # of the focal systems.
@@ -702,3 +514,335 @@ CTWidth_heat_plots <- CTwidth_df %>%
 CTWidth_heat_plots <- shift_legend(CTWidth_heat_plots)
 ggsave("figures/CTwidth_mean.svg", CTWidth_heat_plots,
        width = 16, height = 9)
+
+# *Supplementary Figures* ----
+
+
+# Figure S1: mean R0 as function of temperature and biting tolerance --------
+
+
+# Figure S2: Topt as a function of KH -------------------------------------
+Topt_df <- data.in.thermchars %>% 
+  select(-c(R0opt, threshold_bool, CHmin, CHmax, CTmin, CTmax)) %>%
+  # filter(KH > 0.01) %>%
+  filter(sigmaH %in% 10^seq(0, 2) | is.infinite(sigmaH)) %>%
+  group_by(KH) %>%
+  # Arrange along the plotting variables
+  arrange(system_ID, KH, Topt) %>%
+  arrange(sigmaH) %>%
+  ungroup()
+
+meanTopt_df <- Topt_df %>%
+  group_by(system_ID, Model, sigmaH, KH) %>%
+  summarise(
+    mean_val = mean(Topt),
+    median_val = median(Topt),
+    # mode_val = mlv(norm_R0, method = 'mfv'),
+    .groups = "keep"
+  ) %>%
+  arrange(system_ID, sigmaH, KH, mean_val, median_val)# , mode_val)
+
+quantsTopt_df <- Topt_df %>%
+  group_by(system_ID, Model, sigmaH, KH) %>%
+  mutate(lowHCI_val = quantile(Topt, 0.055)) %>%
+  mutate(highHCI_val = quantile(Topt, 0.945)) %>%
+  arrange(system_ID, sigmaH, KH, lowHCI_val, highHCI_val) %>%
+  dplyr::select(-c("sample_num"))
+
+# PLOTTING
+Topt_plot <- meanTopt_df %>%
+  ## Set up plot ##
+  # color = sigmaH
+  ggplot(aes(
+    x = KH
+  )) +
+  # Topt curves:
+  geom_path(aes(y = mean_val, colour = as.factor(sigmaH)), lwd = 1) +
+  # 89% HCI of R0 TPC curves
+  geom_ribbon(
+    data = quantsTopt_df,
+    aes(ymin = lowHCI_val, ymax = highHCI_val, 
+        fill = as.factor(sigmaH)),
+    alpha = 0.05
+  ) +
+  # Add dotted lines showing limits of ribbons
+  geom_path(
+    data = quantsTopt_df,
+    aes(y = lowHCI_val,
+        color = as.factor(sigmaH)),
+    linetype = "dashed"
+  ) +
+  geom_path(
+    data = quantsTopt_df,
+    aes(y = highHCI_val,
+        color = as.factor(sigmaH)),
+    linetype = "dashed"
+  ) +
+  # x-axis: log10 scale, no buffer space
+  scale_x_log10(
+    name = TeX("Vertebrate host population density (ind/ha)"),
+    expand = c(0, 0),
+    limits = c(0.01, 2E4),
+    breaks = 10^seq(-2, 4),
+    labels = TeX(c(
+      "0.01", "0.1", "$1$", "$10$", "$100$", "$10^3$", "$10^4$"
+    ))
+  ) +
+  # y-axis
+  scale_y_continuous(
+    name = expression("Thermal optimum "(degree * C)),
+    expand = c(0.05, 0.05)
+  ) +
+  # color:
+  scale_colour_manual(
+    name = "Vertebrate host biting tolerance\n(bites per host per day)",
+    values = c(met.brewer("VanGogh3", 3, direction = 1), "black"),
+    # values = c(brewer.pal(9, "YlOrRd")[c(3, 5, 7)], "black"),
+    breaks = c(1, 10, 100, Inf),
+    labels = unname(c("1 (Chitnis)", "10 (Chitnis)", "100 (Chitnis)", TeX("$\\infty$ (Ross-Macdonald)")))
+  ) +
+  scale_fill_manual(
+    name = "Vertebrate host biting tolerance\n(bites per host per day)",
+    values = c(met.brewer("VanGogh3", 3, direction = 1), "black"),
+    # values = c(brewer.pal(9, "YlOrRd")[c(3, 5, 7)], "black"),
+    breaks = c(1, 10, 100, Inf),
+    labels = unname(c("1 (Chitnis)", "10 (Chitnis)", "100 (Chitnis)", TeX("$\\infty$ (Ross-Macdonald)")))
+  ) +
+  # faceting:
+  facet_wrap(~system_ID,
+             scales = "free",
+             nrow = 2,
+             labeller = labeller()  ) +
+  # theme options:
+  theme_minimal_hgrid(11) +
+  guides(color = guide_legend(override.aes = list(size = 4))) +
+  theme(
+    legend.position = "bottom",
+    legend.margin = margin(),
+    legend.direction = "vertical",
+    legend.title = element_text(size = 10),
+    legend.text = element_text(
+      size = 10,
+      hjust = 0
+    ),
+    legend.justification = "left",
+    axis.title.x = element_text(hjust = 0.5),
+    strip.text = ggtext::element_markdown(
+      size = 11,
+      hjust = 0,
+      padding = margin(0, 0, 0, 0),
+      margin = margin(1, 1, 1, 1)
+    )
+  )
+
+
+# Plot
+Topt_plot <- shift_legend(Topt_plot)
+
+ggsave("figures/ToptKH_plot.svg", Topt_plot,
+       width = 16, height = 9)
+
+# Figure S3: Topt as a function of sigmaH ---------------------------------
+# Mean Topt as a function of sigmaH, across discrete values of KH
+
+Topt_plot <- Toptalt_df %>%
+  # Choose appropriate pop. dens. values and group
+  # filter(KH %in% 10^seq(0, 4)) %>%
+  group_by(KH) %>%
+  # Arrange along the plotting variables
+  arrange(system_ID, sigmaH, mean_Topt) %>%
+  arrange(KH) %>%
+  ungroup()%>%
+  ## Set up plot ##
+  # color = sigmaH
+  ggplot(aes(
+    x = sigmaH
+  )) +
+  # Topt curves:
+  geom_path(aes(y = mean_Topt, colour = as.factor(KH)), lwd = 1) +
+  # 89% HCI of R0 TPC curves
+  geom_ribbon(
+    data = quantsTopt_df,
+    aes(ymin = lowHCI_val, ymax = highHCI_val, 
+        fill = as.factor(KH)),
+    alpha = 0.05
+  ) +
+  # Add dotted lines showing limits of ribbons
+  geom_path(
+    data = quantsTopt_df,
+    aes(y = lowHCI_val,
+        color = as.factor(KH)),
+    linetype = "dashed"
+  ) +
+  geom_path(
+    data = quantsTopt_df,
+    aes(y = highHCI_val,
+        color = as.factor(KH)),
+    linetype = "dashed"
+  ) +
+  # white lines breaking up finite/infinite sigmaH values:
+  geom_vline(
+    aes(xintercept = 0.95 * infinite_divide),
+    colour = "white",
+    lwd = .9,
+    show.legend = FALSE
+  ) +
+  geom_vline(
+    aes(xintercept = 1.05 * infinite_divide),
+    colour = "white",
+    lwd = .9,
+    show.legend = FALSE
+  ) +
+  geom_vline(
+    aes(xintercept = 1.15 * infinite_divide),
+    colour = "white",
+    lwd = .9,
+    show.legend = FALSE
+  ) +
+  # x-axis: Use a log10-scale with no buffer space
+  scale_x_log10(
+    name = TeX("Vertebrate host biting tolerance (bites per host per day)"),
+    expand = c(0, 0),
+    limits = c(5, 3500),
+    breaks = sigmaH_breaks,
+    labels = sigmaH_labels
+  ) +
+  # y-axis
+  scale_y_continuous(
+    name = expression("Thermal optimum "(degree * C)),
+    expand = c(0.05, 0.05)
+  ) +
+  
+  # color:
+  scale_colour_manual(
+    name = "Vertebrate host population\ndensity (ind/ha)",
+    values = met.brewer("Hokusai3", 11,
+                        # option = "plasma"
+    )) +
+  scale_fill_manual(
+    name = "Vertebrate host population\ndensity (ind/ha)",
+    values = met.brewer("Hokusai3", 11,
+                        # option = "plasma"
+    )) +
+  # faceting:
+  facet_wrap(~system_ID,
+             scales = "free",
+             nrow = 2,
+             labeller = labeller()  ) +
+  # theme options:
+  theme_minimal_hgrid(11) +
+  guides(color = guide_legend(override.aes = list(size = 4))) +
+  theme(
+    legend.position = "bottom",
+    legend.margin = margin(),
+    legend.direction = "vertical",
+    legend.title = element_text(size = 10),
+    legend.text = element_text(
+      size = 10,
+      hjust = 0
+    ),
+    legend.justification = "left",
+    axis.title.x = element_text(hjust = 0.5),
+    strip.text = ggtext::element_markdown(
+      size = 11,
+      hjust = 0,
+      padding = margin(0, 0, 0, 0),
+      margin = margin(1, 1, 1, 1)
+    )
+  )
+
+
+# Plot
+Topt_plot <- shift_legend(Topt_plot)
+
+ggsave("figures/ToptsigmaH_plot.svg", Topt_plot,
+       width = 16, height = 9)
+
+# Figure S4: CTmin heatmap ------------------------------------------------
+
+
+# Figure S5: CTmax heatmap ------------------------------------------------
+
+
+# Figure S6: CTmin/max as functions of KH ---------------------------------
+
+
+# Figure S7: CHmin/max as functions of KH ---------------------------------
+
+
+###* Figure: Topt variance as function of KH and sigmaH ----
+Toptstdev_df <- Toptalt_df %>% 
+  select(system_ID, sigmaH_proxy, KH, std_Topt, mean_Topt) %>% 
+  distinct()
+
+# Plot standard deviation of Topt heat map
+Toptstdev_plots <- Toptalt_df %>% 
+  select(system_ID, sigmaH_proxy, KH, std_Topt, mean_Topt) %>% 
+  distinct() %>% 
+  ## Set up plot ##
+  # x = biting tolerance (with a point at infinity),
+  # y = vertebrate host population density,
+  # color = transmission thermal optimum
+  ggplot(aes(x = KH, y = sigmaH_proxy, z = std_Topt)) +
+  # Topt for FINITE sigmaH:
+  geom_contour_filled(
+    data = filter(Toptstdev_df, sigmaH_proxy < infinite_divide**0.98)
+  ) +
+  # Topt for INFINITE sigmaH:
+  geom_contour_filled(
+    data = filter(Toptstdev_df, sigmaH_proxy > infinite_divide**1.02),
+    size = 1
+  ) +
+  # x-axis: log10-scale with no buffer space
+  scale_x_log10(
+    name = TeX("Vertebrate host population density (ind/ha)"),
+    expand = c(0, 0),
+    # limits = c(0.05, 1E4),
+    # breaks = 10^seq(-1, 4, 1),
+    # labels = TeX(c("$0.1$", "$1$", "$10", "$100$", "$10^3$", "$10^4$"))
+  ) +
+  # y-axis: log10-scale y axis, with no buffer space
+  scale_y_log10(
+    name = TeX("Biting tolerance (bites per host per day)"),
+    expand = c(0, 0),
+    breaks = sigmaH_breaks,
+    labels = sigmaH_labels
+  ) +
+  # fill:
+  scale_fill_manual(
+    name = "Standard deviation\nof transmission thermal\noptimum (°C)",
+    values = met.brewer("Johnson",
+                        n = 13,
+                        direction = -1)) +
+  # color:
+  # faceting:
+  facet_wrap(~system_ID, scales = "free", nrow = 2, labeller = labeller()) +
+  # legend:
+  guides(fill = guide_coloursteps(
+    title.position = "top", title.hjust = 0,
+    barheight = unit(5, "cm"),
+    show.limits = TRUE
+  )) +
+  # theme options:
+  theme_minimal(11) +
+  theme(
+    legend.box = "vertical",
+    legend.position = "right",
+    legend.margin = margin(0, 0, 0, 0),
+    legend.title = element_text(size = 10),
+    legend.direction = "vertical",
+    legend.justification = "left",
+    axis.title.x = element_text(hjust = 0.5),
+    strip.text = ggtext::element_markdown(
+      size = 11,
+      hjust = 0,
+      padding = margin(0, 0, 0, 0),
+      margin = margin(1, 1, 1, 1)
+    )
+  )
+
+# Plot
+Toptstdev_plots <- shift_legend(Toptstdev_plots)
+ggsave("figures/Topt_stdev.svg", Toptstdev_plots,
+       width = 16, height = 9)
+
