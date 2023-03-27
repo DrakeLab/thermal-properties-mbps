@@ -28,26 +28,11 @@
 library(tidyverse)
 library(reshape2)
 
-### * Load in data ----
-# Trait TPC parameter samples 
-data.in <- data.in.transform
-
-
 # 1) Define accessory functions -------------------------------------------
 
 
 
-
-
-
 # 2) Set *host* parameters --------------------------------
-
-## Set resolution for host trait variation ----
-# Host density vector: Number of values to include to consider for vertebrate host density
-KH_vec_length <- 5
-
-# Biting tolerance vector: Number of values to consider for biting tolerance
-sigmaH_vec_length <- 5
 
 ## Host life history & behavioral traits ----
 # Host recruitment rate:
@@ -80,7 +65,6 @@ betaH_baseline <- 1
 gammaH_vec <- 1 / c(5, 14)
 gammaH_baseline <- 1 / 5
 
-
 # 3) Create host trait data frame -----------------------------------------
 
 data.Host <- expand_grid(
@@ -94,7 +78,6 @@ data.Host <- expand_grid(
   betaH = betaH_baseline
 )
 
-
 # 3) Set non-TPC *mosquito* parameters ------------------------------------
 
 ## Carrying capacity for larval mosquitoes
@@ -107,10 +90,19 @@ data.Vec <- data.in.params %>%
 
 
 # 4) Combine and save data frames -----------------------------------------
+Vec_dim <- dim(data.Vec)[1]
+Host_dim <- dim(data.Host)[1]
 
-data.in.analysis <- expand_grid(data.Vec, data.Host)
 
-write_rds(data.in.analysis, "data/clean/full_traitset.rds", compress = "gz")
+data.AeDENV <- filter(data.Vec, system_ID == "Aedes aegypti / DENV")
+data.AeZIKV <- filter(data.Vec, system_ID == "Aedes aegypti / ZIKV")
+data.AlDENV <- filter(data.Vec, system_ID == "Aedes albopictus / DENV")
+data.CxWNV <- filter(data.Vec, system_ID == "Culex quinquefasciatus / WNV")
+data.AnPlas <- filter(data.Vec, system_ID == "Anopheles spp. / Plasmodium")
+
+# data.in.analysis <- expand_grid(data.Vec, data.Host)
+
+# write_rds(data.in.analysis, "data/clean/full_traitset.rds", compress = "gz")
 
 
 # *) Diagnostics & visualizations -----------------------------------------

@@ -421,7 +421,9 @@ run.jags <- function(jags_data, TPC_function, variable_names,
                         n.chains * n.samps - dim(samps)[1],
                         dim(temp_samps)[1]),
                  " samples from re-sampling***"))
+    
     samps <- rbind(samps, temp_samps)
+    print(paste0(100*round(dim(samps)[1]/(n.chains*n.samps),2), "% complete with resampling"))
   }
   samps <- samps[1:(n.chains * n.samps),]
   
@@ -434,11 +436,6 @@ run.jags <- function(jags_data, TPC_function, variable_names,
 }
 
 # 2) Calculate prior distributions of thermal trait parameters from data ----
-
-# Set parameters for MCMC
-n.chains <-5 # 3 # 5
-n.adapt <- 5000 # 100 # 5000
-n.samps <-5000 # 100 # 5000
 
 # Identify all distinct combinations of traits and transmission systems
 data_in <- data.in.TPC
@@ -472,7 +469,7 @@ for (system_index in 1:dim(distinct_combos)[1]) {
     dplyr::select(mosquito_species) %>%
     unique() %>%
     as.character()
-  pathogen_in <- filter(data_in, system_ID == system_sample) %>%
+  pathogen_in <- filter(data_in, system_ID == system_sample, trait.name == trait_in) %>%
     dplyr::select(pathogen) %>%
     unique() %>%
     as.character()
@@ -500,8 +497,8 @@ for (system_index in 1:dim(distinct_combos)[1]) {
 
 
 # 3) Save trait TPC parameter posterior distribution samples --------------
-# write_rds(samples, "data/clean/TPC_param_samples.rds")
-write_rds(samples, "data/clean/TPC_param_thin.rds")
+
+write_rds(samples, "data/clean/TPC_param_samples.rds")
 
 # *) Diagnostics & visualizations -----------------------------------------
 

@@ -27,10 +27,6 @@
 library(tidyverse)
 library(reshape2)
 
-### * Load in data ----
-# Trait TPC parameter samples 
-data.in <- data.in.transform
-
 # 1) Define accessory functions -------------------------------------------
 # Define TPC functions
 # Briere function
@@ -71,7 +67,7 @@ get.thermal.response <- function(data_in, Temperature) {
 # 2) Create TPCs and deal with missing data ----
 
 # Create data frame of TPCs
-TPC_df <- data.in %>%
+TPC_df <- data.in.transform %>%
   filter(sample_num %in% seq(1, thin_size)) %>%
   cross_join(list(Temperature = Temps), copy = TRUE) %>%
   mutate(Trait_val = case_when(
@@ -79,21 +75,12 @@ TPC_df <- data.in %>%
     func == "Quadratic" ~ Quadratic(c, T0, Tm)(Temperature),
     func == "Linear" ~ Linear(c, Tm)(Temperature)
   )) %>%
-  dplyr::select(-c("c", "T0", "Tm"))
-
-temp_df <- TPC_df %>% 
+  dplyr::select(-c("c", "T0", "Tm")) %>% 
   pivot_wider(id_cols = c("system_ID", "sample_num", "Temperature"), 
               names_from = "trait",
-              values_from = "Trait_val")
-# List of model parameters: sigmaV, f, deltaL, rhoL, muV, etaV, betaV
-
-# List of traits with TPCs fit from data: a, bc, PDR, e2a, MDR, EFD, lf, c, b, 
-#                                         TFD, pLA, pRH, nLR, EFOC, EPR, pO, EV
-
-
-# Combine traits into intermediate parameters as necessary
-# i.e. putting together reproductive traits to estimate eggs per female per day (EFD)
-intermediate_df <- temp_df %>% 
+              values_from = "Trait_val")  %>% 
+  # Combine traits into intermediate parameters as necessary
+  # i.e. putting together reproductive traits to estimate eggs per female per day (EFD)
   mutate(e2a = case_when(
     !(is.na(e2a)) ~ e2a,
     # !(is.na(pRH * nLR * pLA)) ~ pRH * nLR * pLA,
@@ -107,22 +94,20 @@ intermediate_df <- temp_df %>%
   mutate(bc = ifelse(is.na(bc), b * c, bc)) %>% 
   # throw out traits that are no longer needed
   dplyr::select(system_ID, sample_num, Temperature,
-                a, bc, PDR, e2a, EFD, lf, MDR)
-
-intermediate_df <- intermediate_df %>% 
+                a, bc, PDR, e2a, EFD, lf, MDR) %>% 
   # separate out mosquito species and pathogen names
   mutate(mosquito_species = stringr::word(system_ID, 1, 2)) %>% 
   mutate(pathogen = stringr::word(system_ID, 4, 4)) %>% 
   # "forget" system_ID for now
   dplyr::select(-system_ID)
 
-# Combine parasite relevant data with mosquito life history
-noInfection_df <- intermediate_df %>% 
+# Combine parasite relevant traits with mosquito life history traits according to system
+noInfection_df <- TPC_df %>% 
   filter(pathogen == "none") %>% 
   dplyr::select(-pathogen) %>% 
   dplyr::select(-c("bc", "PDR"))
 
-Infection_df <- intermediate_df %>% 
+Infection_df <- TPC_df %>% 
   filter(pathogen != "none") %>% 
   dplyr::select(-c("a", "e2a", "EFD", "lf", "MDR"))
 
@@ -146,16 +131,17 @@ missing_traits_df <- combined_df %>%
     "Aedes aegypti / ZIKV", "Aedes aegypti / none",
     "Aedes albopictus / DENV", "Aedes albopictus / none",
     "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
-    "Anopheles spp. / Plasmodium spp.",
+    "Anopheles spp. / Plasmodium",
     "Anopheles spp. / none"
   )) %>% 
   unique()
+# Should just show: Culex quinquefasciatus / WNV / bc
 
 # Following Shocket 2020: use Culex univittatus / WNV / bc for Culex quinquefasciatus / WNV / bc
 combined_df <- combined_df %>% 
   # temporarily remove Cx. quinquefasciatus / WNV rows
   filter(system_ID != "Culex quinquefasciatus / WNV") %>% 
-  # add rows back in after switching out bc for Cx. univittatus / WNV rows
+  # add rows back in after switching in "bc" values from Cx. univittatus / WNV
   rbind(filter(combined_df, system_ID == "Culex quinquefasciatus / WNV") %>% 
           # remove original bc values (all NA)
           dplyr::select(-bc) %>% 
@@ -195,13 +181,13 @@ data.in.params <- combined_df %>%
   dplyr::select(system_ID:sample_num, lf, sigmaV:betaV)
 
 
-
 # 4) Save parameter data frame --------------------------------------------
 
-write_rds(data.in.params, "data/clean/parameter_TPCs.rds", compress = "gz")
-# write_rds(data.in.params, "data/clean/parameter_TPCs_thin.rds", compress = "gz")
+# write_rds(data.in.params, "data/clean/parameter_TPCs.rds", compress = "gz")
+write_rds(data.in.params, "data/clean/parameter_TPCs_thin.rds", compress = "gz")
 
-
+# remove work sets
+rm("combined_df", "data.in.params", "Infection_df", "noInfection_df", "TPC_df", "missing_traits_df", "data.in.transform")
 
 # *) Diagnostics & visualizations -----------------------------------------
 
