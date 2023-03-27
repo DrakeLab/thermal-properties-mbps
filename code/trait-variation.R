@@ -110,7 +110,7 @@ data.Vec <- data.in.params %>%
 
 data.in.analysis <- expand_grid(data.Vec, data.Host)
 
-# write_rds(data.in.analysis, "data/clean/full_traitset.rds", compress = "gz")
+write_rds(data.in.analysis, "data/clean/full_traitset.rds", compress = "gz")
 
 
 # *) Diagnostics & visualizations -----------------------------------------

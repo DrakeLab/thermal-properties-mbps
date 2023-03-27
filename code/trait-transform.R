@@ -198,7 +198,8 @@ data.in.params <- combined_df %>%
 
 # 4) Save parameter data frame --------------------------------------------
 
-write_rds(data.in.params, "data/clean/parameter_TPCs_thin.rds")
+write_rds(data.in.params, "data/clean/parameter_TPCs.rds", compress = "gz")
+# write_rds(data.in.params, "data/clean/parameter_TPCs_thin.rds", compress = "gz")
 
 
 

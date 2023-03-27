@@ -36,7 +36,7 @@ library(tidyverse)
 
 # # Run this to load pre-processed dataset
 # # load dataset for fitting trait TPCs
-data.in.TPC <- read_rds("data/clean/data_for_TPC_fitting.rds")
+# data.in.TPC <- read_rds("data/clean/data_for_TPC_fitting.rds")
 
 # 2) Fit trait thermal performance curves to trait data -------------------
 
@@ -49,10 +49,10 @@ data.in.transform <- read_rds("data/clean/TPC_param_samples.rds")
 # 3) Translate traits into model parameters -------------------------------
 
 # Define temperature range of study
-Temps <- seq(5, 50, length.out = 100)
+Temps <- seq(5, 50, length.out = 200)
 
 # Thin samples
-thin_size <- 20
+thin_size <- 200
 
 source("code/trait-transform.R")
 

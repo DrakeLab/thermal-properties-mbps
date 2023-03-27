@@ -295,7 +295,7 @@ data.in.TPC <- data.Reduced %>%
   mutate(trait.name = trait.to, .keep = "unused") %>% 
   filter(!is.na(trait))
 
-# Combine lifespan data for Aedes aegypti with and without ZIKV (we don't account for virulence in the model)
+# Combine lifespan data for Aedes aegypti with and without ZIKV since we don't account for virulence in this model
 data.in.TPC <- data.in.TPC %>% 
   mutate(pathogen = ifelse(mosquito_species == "Aedes aegypti" & final.trait == "lf",
     "none",

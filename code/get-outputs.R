@@ -41,7 +41,7 @@ AllOutputs_df <- data.in.analysis %>%
   mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
   ## Compute outputs ##
   # Vector lifespan !!! do this in an earlier dataset instead
-  mutate(test = sigmaV_f * deltaL * lf)
+  # mutate(test = sigmaV_f * deltaL * lf)
   
   # Vector abundance
   mutate(V0 = compute.V0(.)) %>%
