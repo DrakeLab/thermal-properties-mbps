@@ -41,9 +41,9 @@ library(tidyverse)
 # 2) Fit trait thermal performance curves to trait data -------------------
 
 # Set parameters for MCMC
-n.chains <-3 # 5
-n.adapt <- 100 # 5000
-n.samps <-100 # 5000
+n.chains <-5 # 3 # 5
+n.adapt <- 5000 # 100 # 5000
+n.samps <-5000 # 100 # 5000
 
 # # Run this to generate samples of trait TPC parameters from informed posterior distributions
 # source("code/get-thermal-trait-priors.R")
@@ -57,7 +57,7 @@ n.samps <-100 # 5000
 Temps <- seq(5, 50, by = 0.5) #0.1)
 
 # Thin samples
-thin_size <- 100#1000
+thin_size <- 20#1000
 
 source("code/trait-transform.R")
 
@@ -65,10 +65,10 @@ source("code/trait-transform.R")
 
 ## Set resolution for host trait variation
 # Host density vector: Number of values to include to consider for vertebrate host density
-KH_vec_length <- 50
+KH_vec_length <- 100
 
 # Biting tolerance vector: Number of values to consider for biting tolerance
-sigmaH_vec_length <- 50
+sigmaH_vec_length <- 100
 
 # data.in.params <- read_rds("data/clean/parameter_TPCs.rds")
 # 
