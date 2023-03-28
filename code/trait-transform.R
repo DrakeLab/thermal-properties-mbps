@@ -143,14 +143,14 @@ combined_df <- combined_df %>%
   # temporarily remove Cx. quinquefasciatus / WNV rows
   filter(system_ID != "Culex quinquefasciatus / WNV") %>% 
   # add rows back in after switching in "bc" values from Cx. univittatus / WNV
-  rbind(filter(combined_df, system_ID == "Culex spp. / WNV") %>% 
+  rbind(filter(combined_df, system_ID == "Culex quinquefasciatus / WNV") %>% 
           # remove original bc values (all NA)
           dplyr::select(-bc) %>% 
           # join with Cx. univittatus data
-          right_join(filter(combined_df, system_ID == "Culex univittatus / WNV") %>% 
+          right_join(filter(combined_df, system_ID == "Culex spp. / WNV") %>% 
                        dplyr::select(Temperature:bc))) %>% 
   # remove Cx. univittatus data
-  filter(system_ID != "Culex univittatus / WNV") 
+  filter(system_ID != "Culex spp. / WNV") 
 
 # Deal with any duplicates: What do we do if we have two estimates for the same intermediate parameter?
 # i.e. We have e2a for Culex but also pO and EV
@@ -196,9 +196,8 @@ plot_bool = FALSE
 if (plot_bool) {
 library(cowplot)
 # For each mosquito species, trait, and sample, get a thermal response curve
-TPC_df <- parameter_df %>% 
+TPC_df <- data.in.params %>% 
   ungroup() %>% 
-  mutate(lf = 1/muV, .keep = "unused") %>%
   dplyr::select(-c(muL, etaL)) %>% 
   # mutate(lfL = 1/etaL, .keep = "unused") %>%
   # select(-c())

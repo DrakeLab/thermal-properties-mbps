@@ -476,7 +476,7 @@ for (system_index in 1:dim(distinct_combos)[1]) {
     as.character()
   
   # Give a progress report
-  print(paste0("System # ", system_index, ": ", mosquito_in, " / ", pathogen_in, " / ", trait_in, 
+  print(paste0("System #", system_index, " / ", dim(distinct_combos)[1], ": ", mosquito_in, " / ", pathogen_in, " / ", trait_in, 
                " -------------------------------------------------------------------------------"))
 
   
@@ -499,8 +499,8 @@ for (system_index in 1:dim(distinct_combos)[1]) {
 
 # 3) Save trait TPC parameter posterior distribution samples --------------
 
-# write_rds(samples, "data/clean/TPC_param_samples.rds")
-write_rds(samples, "data/clean/TEST_TPC_param_samples.rds")
+write_rds(samples, "data/clean/TPC_param_samples.rds")
+# write_rds(samples, "data/clean/TEST_TPC_param_samples.rds")
 
 # *) Diagnostics & visualizations -----------------------------------------
 
