@@ -308,7 +308,6 @@ data.in.TPC <- data.in.TPC %>%
 write_rds(data.in.TPC, "data/clean/data_for_TPC_fitting.rds")
 
 
-
 # 5) Data visualizations / diagnostics ------------------------------------
 
 ###* Visualize traits as functions of temperature
@@ -317,7 +316,7 @@ plot_bool <- FALSE # decide whether you'd like to generate a diagnostic plot
 if (plot_bool) {
 library(cowplot)
 # Set up data frame for visualization
-data.Viz <- data.Out
+data.Viz <- data.in.TPC
 
 # show thermal response of all traits across all systems
 trait_plots <- data.Viz %>%

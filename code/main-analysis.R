@@ -54,21 +54,21 @@ n.samps <-100 # 5000
 # 3) Translate traits into model parameters -------------------------------
 
 # Define temperature range of study
-Temps <- seq(5, 50, by = 0.5) #0.1)
+Temps <- seq(5, 50, by = 0.2) #0.1)
 
 # Thin samples
 thin_size <- 100#1000
 
-source("code/trait-transform.R")
+# source("code/trait-transform.R")
 
 # 4) Build data set incorporating all axes of variation -------------------
 
 ## Set resolution for host trait variation
 # Host density vector: Number of values to include to consider for vertebrate host density
-KH_vec_length <- 50
+KH_vec_length <- 100
 
 # Biting tolerance vector: Number of values to consider for biting tolerance
-sigmaH_vec_length <- 50
+sigmaH_vec_length <- 100
 
 # data.in.params <- read_rds("data/clean/parameter_TPCs.rds")
 # 
