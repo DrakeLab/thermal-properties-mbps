@@ -65,7 +65,7 @@ data.Mordecai2017.Aegypti <- read.csv("data/raw/Mordecai_2017/aegyptiDENVmodelTe
     ref == "McLeah_et_al_1975_MosquitoNews" ~ "DENV",
     ref == "McLean_et_al_1974_CanJMicobiol" ~ "DENV",
     ref == "Watts_et_al_1987_AJTMH" ~ "DENV"
-    ), NA)) %>% 
+  ), NA)) %>% 
   # mutate(pathogen = ifelse(trait.name %in% c("b", "c", "PDR"), "DENV", NA)) %>%
   dplyr::select(-c("trait2", "trait2.name"))
 
@@ -86,7 +86,7 @@ data.Mordecai2017.Albopictus <- read.csv("data/raw/Mordecai_2017/albopictusCHIKV
 
 data.Mordecai2017.PDRaddl <- read.csv("data/raw/Mordecai_2017/EIP_priors_2015-12-04.csv", header = TRUE) %>%
   rename(pathogen = virus, mosquito_species = mosquito)
-  
+
 data.Mordecai2017 <- rbind(data.Mordecai2017.Aegypti, 
                            data.Mordecai2017.Albopictus,
                            data.Mordecai2017.PDRaddl) %>%
@@ -142,7 +142,7 @@ data.Tesla2018 <- read.csv("data/raw/Tesla_2018/zikv_traits.csv", header = TRUE)
   mutate(pathogen = case_when(
     trait.name %in% c("bc", "EIR") ~ "ZIKV",
     infection_status == "inf" ~ "ZIKV")
-    ) %>%
+  ) %>%
   mutate(lead_author = "Tesla") %>%
   mutate(year = "2018") %>%
   dplyr::select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
@@ -263,6 +263,13 @@ data.Reduced <- data.All %>%
     TRUE ~ pathogen
     # TRUE ~ NA
   )) %>% 
+  # Combine lifespan data for Aedes aegypti with and without ZIKV since we don't account for virulence in this model
+  mutate(pathogen = ifelse((mosquito_species == "Aedes aegypti" & trait.name == "lf"),
+                           "none",pathogen)) %>% 
+  # Combine MDR data for Culex spp. with and without WNV since we don't account for virulence in this model
+  mutate(pathogen = ifelse((mosquito_species == "Culex spp." & trait.name == "MDR"),
+                           "none",pathogen)) %>% 
+  # Combine species and pathogen names for easier reference
   unite(
     col = "system_ID",
     c("mosquito_species", "pathogen"),
@@ -295,18 +302,10 @@ data.in.TPC <- data.Reduced %>%
   mutate(trait.name = trait.to, .keep = "unused") %>% 
   filter(!is.na(trait))
 
-# Combine lifespan data for Aedes aegypti with and without ZIKV since we don't account for virulence in this model
-data.in.TPC <- data.in.TPC %>% 
-  mutate(pathogen = ifelse(mosquito_species == "Aedes aegypti" & final.trait == "lf",
-    "none",
-    pathogen
-  ))
-
 # 4) Save and export data set ---------------------------------------------
 
 # Save data.frame to file
 write_rds(data.in.TPC, "data/clean/data_for_TPC_fitting.rds")
-
 
 # 5) Data visualizations / diagnostics ------------------------------------
 
@@ -314,40 +313,40 @@ write_rds(data.in.TPC, "data/clean/data_for_TPC_fitting.rds")
 plot_bool <- FALSE # decide whether you'd like to generate a diagnostic plot
 
 if (plot_bool) {
-library(cowplot)
-# Set up data frame for visualization
-data.Viz <- data.in.TPC
-
-# show thermal response of all traits across all systems
-trait_plots <- data.Viz %>%
-  ggplot(aes(x = T, y = trait, color = as.factor(mosquito_species),
-             shape = as.factor(pathogen), group = system_ID)) +
-  geom_point() +
-  scale_shape_manual(name = "Pathogen",
-                     values = 1:length(unique(data.Viz$pathogen))) +
-  scale_color_discrete(name = "Mosquito species") +
-  labs(x = "Temperature",
-       y = "Trait value") +
-  facet_wrap(~ trait.name, scales = "free") +
-  theme_minimal(16)
-
-# show thermal response data for focal systems only
-select_trait_plots <- data.Viz %>% 
-  filter(system_ID %in% c("Aedes aegypti / DENV", "Aedes aegypti / none", 
-                          "Aedes aegypti / ZIKV", "Aedes aegypti / none",
-                          "Aedes albopictus / DENV", "Aedes albopictus / none", 
-                          "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
-                          "Anopheles spp. / Plasmodium spp.",
-                          "Anopheles spp. / none"
-  )) %>%
-  ggplot(aes(x = T, y = trait, color = as.factor(mosquito_species),
-             shape = as.factor(pathogen), group = system_ID)) +
-  geom_point() +
-  scale_shape_manual(name = "Pathogen",
-                     values = 1:length(unique(data.Viz$pathogen))) +
-  scale_color_discrete(name = "Mosquito species") +
-  labs(x = "Temperature",
-       y = "Trait value") +
-  facet_wrap(~ trait.name, scales = "free") +
-  theme_minimal(16)
+  library(cowplot)
+  # Set up data frame for visualization
+  data.Viz <- data.in.TPC
+  
+  # show thermal response of all traits across all systems
+  trait_plots <- data.Viz %>%
+    ggplot(aes(x = T, y = trait, color = as.factor(mosquito_species),
+               shape = as.factor(pathogen), group = system_ID)) +
+    geom_point() +
+    scale_shape_manual(name = "Pathogen",
+                       values = 1:length(unique(data.Viz$pathogen))) +
+    scale_color_discrete(name = "Mosquito species") +
+    labs(x = "Temperature",
+         y = "Trait value") +
+    facet_wrap(~ trait.name, scales = "free") +
+    theme_minimal(16)
+  
+  # show thermal response data for focal systems only
+  select_trait_plots <- data.Viz %>% 
+    filter(system_ID %in% c("Aedes aegypti / DENV", "Aedes aegypti / none", 
+                            "Aedes aegypti / ZIKV", "Aedes aegypti / none"#,
+                            #"Aedes albopictus / DENV", "Aedes albopictus / none", 
+                            #"Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
+                            #"Anopheles spp. / Plasmodium spp.",
+                            #"Anopheles spp. / none"
+    )) %>%
+    ggplot(aes(x = T, y = trait, color = as.factor(mosquito_species),
+               shape = as.factor(pathogen), group = system_ID)) +
+    geom_point() +
+    scale_shape_manual(name = "Pathogen",
+                       values = 1:length(unique(data.Viz$pathogen))) +
+    scale_color_discrete(name = "Mosquito species") +
+    labs(x = "Temperature",
+         y = "Trait value") +
+    facet_wrap(~ trait.name, scales = "free") +
+    theme_minimal(16)
 }

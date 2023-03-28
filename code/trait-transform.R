@@ -66,9 +66,13 @@ get.thermal.response <- function(data_in, Temperature) {
 
 # 2) Create TPCs and deal with missing data ----
 
+# choose a random set of samples from the TPC parameters
+num_samples <- length(unique(data.in.transform$sample_num))
+sample_inds <- sample(1:num_samples, thin_size, replace = FALSE)
+
 # Create data frame of TPCs
 TPC_df <- data.in.transform %>%
-  filter(sample_num %in% seq(1, thin_size)) %>%
+  filter(sample_num %in% sample_inds) %>%
   cross_join(list(Temperature = Temps), copy = TRUE) %>%
   mutate(Trait_val = case_when(
     func == "Briere" ~ Briere(c, T0, Tm)(Temperature),
@@ -89,7 +93,7 @@ TPC_df <- data.in.transform %>%
   mutate(EFD = case_when(
     !(is.na(EFD)) ~ EFD,
     !(is.na(EFOC * a)) ~ EFOC * a,
-    !(is.na(EPR * pO)) ~ EPR * pO
+    !(is.na(EPR * pO)) ~ EV * EPR * pO * a
   )) %>% 
   mutate(bc = ifelse(is.na(bc), b * c, bc)) %>% 
   # throw out traits that are no longer needed
@@ -170,11 +174,9 @@ data.in.params <- combined_df %>%
   mutate(rhoL = MDR) %>% 
   mutate(etaL = rhoL / (deltaL + eps)) %>%
   # Aquatic-stage mosquito mortality rate. This should be ~infinite if deltaL = 0
-  mutate(muL = etaL - rhoL) %>%  
-  # mutate(muL = ifelse(deltaL != 0, rhoL * (1 - deltaL) / (deltaL + eps), Inf)) %>%  
-  # Adult mosquito mortality rate. This should be ~infinite if lf = 0
+  mutate(muL = etaL - rhoL) %>%   
+  # Adult mosquito average lifespan
   mutate(lf = lf) %>% 
-  # mutate(muV = ifelse(lf != 0, 1/(lf + eps), Inf)) %>% 
   # Pathogen development rate.
   mutate(etaV = PDR) %>%
   # Mosquito infection probability.
@@ -185,28 +187,24 @@ data.in.params <- combined_df %>%
 # 4) Save parameter data frame --------------------------------------------
 
 # write_rds(data.in.params, "data/clean/parameter_TPCs.rds", compress = "gz")
-write_rds(data.in.params, "data/clean/parameter_TPCs_thin.rds", compress = "gz")
+# write_rds(data.in.params, "data/clean/parameter_TPCs_thin.rds", compress = "gz")
 
 # remove work sets
-rm("combined_df", "data.in.params", "Infection_df", "noInfection_df", "TPC_df", "missing_traits_df", "data.in.transform")
+rm("combined_df", "Infection_df", "noInfection_df", "TPC_df", "missing_traits_df")#, "data.in.transform")
 
 # *) Diagnostics & visualizations -----------------------------------------
 
-plot_bool = FALSE
+plot_bool = TRUE
+
 if (plot_bool) {
 library(cowplot)
 # For each mosquito species, trait, and sample, get a thermal response curve
 TPC_df <- data.in.params %>% 
   ungroup() %>% 
-  dplyr::select(-c(muL, etaL)) %>% 
-  # mutate(lfL = 1/etaL, .keep = "unused") %>%
-  # select(-c())
+  dplyr::select(-c(muL, etaL)) %>%
   melt(id = c("system_ID", "mosquito_species","pathogen", "Temperature", "sample_num"),
        variable.name = "trait",
-       value.name = "Trait_val") #%>% 
-  # mutate(Trait_val = ifelse(is.infinite(Trait_val), 0, Trait_val)) %>%
-  #remove unreasonably long lifespan values
-  # mutate(Trait_val = ifelse(trait %in% c("lfL", "lf"), ifelse(Trait_val>200, NA, Trait_val), Trait_val))
+       value.name = "Trait_val")
 
 # get mean TPC from samples
 meanTPC_df <- TPC_df %>%

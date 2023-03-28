@@ -81,9 +81,13 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
   
   # set initial values for jags model
   inits_list <- if (TPC_function == "Briere") {
-    list(T0 = 5, Tm = 31, c = 0.00007)
+    if (trait_in == "EFD") { # use revised initial values from Mordecai 2017
+      list(T0 = 15, Tm = 34, c = 0.01)
+    } else {
+      list(T0 = 5, Tm = 31, c = 0.00007)
+    }
   } else if (TPC_function == "Quadratic") {
-    list(c = 0.005, Tm = 33, T0 = 5)
+    list(c = 0.005, Tm = 33, T0 = 5)  
   } else if (TPC_function == "Linear") {
     list(z = 0.2, c = 0.005) # corresponds to Tm = 40
   } 
@@ -214,6 +218,13 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
     dplyr::filter(mosquito_species == mosquito_in) %>%
     arrange(year, lead_author) %>%
     distinct(lead_author, year)
+  
+  # SPECIAL CASE: Alternate data for Aedes aegypti fecundity (from Ae. albopictus)
+  #               is substantially different than original data. Do not use it
+  #               to inform the TPC parameter prior distribution
+  if (trait_in == "EFD" & mosquito_in == "Aedes aegypti") {
+    prev_hypers = c()
+  }
   
   # Select the appropriate bugs model
   jags_choice <- if (prob_bool) {
@@ -449,7 +460,10 @@ distinct_combos <- data_in %>%
   "Culex spp. / WNV",
   "Anopheles spp. / Plasmodium spp.",
   "Anopheles spp. / none"
-)) %>% distinct(trait.name, system_ID)
+)) %>% distinct(trait.name, system_ID) %>% 
+  # Remove unused Culex spp. / WNV data (we only need b, c, and bc)
+  filter(system_ID != "Culex spp. / WNV" | trait.name != "MDR")%>% 
+  filter(system_ID != "Culex spp. / WNV" | trait.name != "PDR")
 
 samples <- tibble(
   trait = as.character(),
@@ -476,7 +490,7 @@ for (system_index in 1:dim(distinct_combos)[1]) {
     as.character()
   
   # Give a progress report
-  print(paste0("System #", system_index, " / ", dim(distinct_combos)[1], ": ", mosquito_in, " / ", pathogen_in, " / ", trait_in, 
+  print(paste0("System # ", system_index, " of ", dim(distinct_combos)[1], ": ", mosquito_in, " / ", pathogen_in, " / ", trait_in, 
                " -------------------------------------------------------------------------------"))
 
   
@@ -496,16 +510,17 @@ for (system_index in 1:dim(distinct_combos)[1]) {
   samples <- rbind(samples, temp_sample)
 }
 
+data.in.transform <- samples
 
 # 3) Save trait TPC parameter posterior distribution samples --------------
 
-write_rds(samples, "data/clean/TPC_param_samples.rds")
+# write_rds(samples, "data/clean/TPC_param_samples.rds")
 # write_rds(samples, "data/clean/TEST_TPC_param_samples.rds")
 
 # *) Diagnostics & visualizations -----------------------------------------
 
 # Do you want to look at diagnostic plots?
-plot_bool <- TRUE
+plot_bool <- FALSE
 
 # Do you just want to look at focal species?
 focal_bool <- FALSE
