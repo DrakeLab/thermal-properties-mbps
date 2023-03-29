@@ -514,8 +514,7 @@ data.in.transform <- samples
 
 # 3) Save trait TPC parameter posterior distribution samples --------------
 
-# write_rds(samples, "data/clean/TPC_param_samples.rds")
-# write_rds(samples, "data/clean/TEST_TPC_param_samples.rds")
+write_rds(samples, "data/clean/TPC_param_samples.rds")
 
 # *) Diagnostics & visualizations -----------------------------------------
 
@@ -526,7 +525,9 @@ plot_bool <- FALSE
 focal_bool <- FALSE
 
 if (plot_bool) {
-  plot_samples <- samples# read_csv("data/clean/TPC_param_samples.csv", show_col_types = FALSE)
+  plot_samples <- samples %>% # read_csv("data/clean/TPC_param_samples.csv", show_col_types = FALSE) %>% 
+  filter(sample_num %in% 1:1000)
+  
   if (focal_bool) {
     plot_samples <- filter(plot_samples, system_ID %in% c(
       "Aedes aegypti / DENV", "Aedes aegypti / none",
