@@ -255,7 +255,21 @@ data.Villena2021 <- read.csv("data/raw/Villena_2021/traits.csv", header = TRUE) 
   # Restrict to relevant columns
   dplyr::select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year) 
 
-  
+# Following Villena 2021, use An. arabiensis and An. Pseudopunctipennis data for Anopheles gambiae biting rate
+data.Villena2021 <- data.Villena2021 %>% 
+  rbind(filter(data.Villena2021, 
+               mosquito_species %in% c("Anopheles arabiensis", "Anopheles pseudopunctipennis"),
+               trait.name == "a") %>% 
+          mutate(mosquito_species = "Anopheles gambiae"))
+
+# Following Villena 2021, use Plasmodium berghei data for Anopheles gambiae / Plasmodium falciparum competence  
+data.Villena2021 <- data.Villena2021 %>% 
+  rbind(filter(data.Villena2021, 
+               pathogen == "Plasmodium berghei",
+               trait.name == "bc") %>% 
+          mutate(mosquito_species = "Anopheles gambiae", 
+                 pathogen = "Plasmodium falciparum"))
+
 # 2) Combine data sets ----------------------------------------------------
 # Combine all data frames
 data.All <- rbind(data.Mordecai2013, data.Mordecai2017, data.Shocket2018, 
@@ -281,8 +295,8 @@ data.Reduced <- data.All %>%
   mutate(species_label = case_when(
     (Genus == "Aedes" & !(Species %in% c("aegypti", "albopictus"))) ~ "spp.",
     (Genus == "Culex" & !(Species %in% "quinquefasciatus")) ~ "spp.",
-    Genus == "Anopheles" ~ "spp.",
-    # (Genus == "Anopheles" & Species != "gambiae") ~ "spp.", # Not enough data for Anopheles gambiae alone to fit model, expand to genus level
+    # Genus == "Anopheles" ~ "spp.",
+    (Genus == "Anopheles" & Species != "gambiae") ~ "spp.", # Not enough data for Anopheles gambiae alone to fit model, expand to genus level
     Genus == "Other" ~ "spp.",
     TRUE ~ Species
   )) %>%
@@ -295,9 +309,9 @@ data.Reduced <- data.All %>%
     pathogen == "DENV" ~ "DENV",
     pathogen == "ZIKV" ~ "ZIKV",
     pathogen %in% c("WNV-NY99", "WNV-SA", "WNV") ~ "WNV",
-    pathogen_1 == "Plasmodium" ~ "Plasmodium spp.",
-    # (pathogen_1 == "Plasmodium"  & pathogen_2 != "falciparum") ~ "Plasmodium spp.", # Not enough data for Plasmodium falciparum alone to fit model.
-    # (pathogen_1 == "Plasmodium"  & pathogen_2 == "falciparum") ~ "Plasmodium falciparum",
+    # pathogen_1 == "Plasmodium" ~ "Plasmodium spp.",
+    (pathogen_1 == "Plasmodium"  & pathogen_2 != "falciparum") ~ "Plasmodium spp.", # Not enough data for Plasmodium falciparum alone to fit model.
+    (pathogen_1 == "Plasmodium"  & pathogen_2 == "falciparum") ~ "Plasmodium falciparum",
     pathogen %in% c("SLEV", "MVE", "YFV") ~ "other flavivirus",
     pathogen %in% c("RVFV", "WEEV", "SINV", "EEEV", "RRV", "CHIKV") ~ "other togavirus", # might want to separate out CHIKV later
     is.na(pathogen) ~ "none",
