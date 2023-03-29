@@ -214,12 +214,53 @@ data.Anga_fecundity <- read.csv("data/raw/Anopheles_fecundity.csv", header = TRU
     host.code == "Ansu" ~ "Anopheles superpictus"
   )) %>%
   mutate(pathogen = NA) %>% 
-  dplyr::select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
+  dplyr::select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year) 
 
+### * Villena 2021 ----
+data.Villena2021 <- read.csv("data/raw/Villena_2021/traits.csv", header = TRUE) %>%
+  # make mosquito names consistent with other data
+  mutate(mosquito_species = case_when(
+    specie %in% c("An. stephensi") ~ "Anopheles stephensi",
+    specie %in% c("An. gambiae") ~ "Anopheles gambiae",
+    specie %in% c("An. culicifacies") ~ "Anopheles culicifacies",
+    specie %in% c("An. maculipennies") ~ "Anopheles maculipennies",
+    specie %in% c("An. quadrimaculatus", "An. Quadrimaculatus") ~ "Anopheles quadrimaculatus",
+    specie %in% c("An. albimanus") ~ "Anopheles albimanus",
+    specie %in% c("An. arabiensis", "An. Arabiensis") ~ "Anopheles arabiensis",
+    specie %in% c("An. funestus") ~ "Anopheles funestus",
+    specie %in% c("An. Pseudopunctipennis") ~ "Anopheles pseudopunctipennis"
+  )) %>% 
+  # make parasite names consistent with other data
+  mutate(pathogen = case_when(
+    parasite %in% c("P. falciparum") ~ "Plasmodium falciparum",
+    parasite %in% c("P. malariae") ~ "Plasmodium malariae",
+    parasite %in% c("P. vivax") ~ "Plasmodium vivax",
+    parasite %in% c("P. yoelii") ~ "Plasmodium yoelii",
+    parasite %in% c("P. berghei") ~ "Plasmodium berghei",
+    TRUE ~ "none"
+  )) %>% 
+  # make trait names consistent with other data
+  mutate(trait.name = case_when(
+    trait.name == "pdr" ~ "PDR",
+    trait.name == "efd" ~ "EFD",
+    trait.name == "bc.succ" ~ "bc",
+    trait.name == "mdr" ~ "MDR",
+    TRUE ~ trait.name
+  )) %>% 
+  # Turn vector competence into a probability
+  mutate(trait = ifelse(trait.name == "bc", trait/100, trait)) %>% 
+  # Add lead author and year of publication
+  mutate(lead_author = "Villena") %>%
+  mutate(year = "2021") %>%
+  # Restrict to relevant columns
+  dplyr::select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year) 
+
+  
 # 2) Combine data sets ----------------------------------------------------
 # Combine all data frames
 data.All <- rbind(data.Mordecai2013, data.Mordecai2017, data.Shocket2018, 
-                  data.Tesla2018, data.Shocket2020, data.Anga_fecundity)
+                  data.Tesla2018, data.Shocket2020, data.Anga_fecundity, 
+                  data.Villena2021)
 
 # 3) Rename non-focal systems and combine synonymous traits -----------------
 
@@ -299,8 +340,7 @@ data.in.TPC <- data.Reduced %>%
     # Others will be transformed after fitting thermal performance curves
   )) %>% 
   mutate(trait.from = trait.name) %>% 
-  mutate(trait.name = trait.to, .keep = "unused") %>% 
-  filter(!is.na(trait))
+  mutate(trait.name = trait.to, .keep = "unused")
 
 # 4) Save and export data set ---------------------------------------------
 
@@ -333,11 +373,11 @@ if (plot_bool) {
   # show thermal response data for focal systems only
   select_trait_plots <- data.Viz %>% 
     filter(system_ID %in% c("Aedes aegypti / DENV", "Aedes aegypti / none", 
-                            "Aedes aegypti / ZIKV", "Aedes aegypti / none"#,
-                            #"Aedes albopictus / DENV", "Aedes albopictus / none", 
-                            #"Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
-                            #"Anopheles spp. / Plasmodium spp.",
-                            #"Anopheles spp. / none"
+                            "Aedes aegypti / ZIKV", "Aedes aegypti / none",
+                            "Aedes albopictus / DENV", "Aedes albopictus / none",
+                            "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
+                            "Anopheles spp. / Plasmodium spp.",
+                            "Anopheles spp. / none"
     )) %>%
     ggplot(aes(x = T, y = trait, color = as.factor(mosquito_species),
                shape = as.factor(pathogen), group = system_ID)) +
