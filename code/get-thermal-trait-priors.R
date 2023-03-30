@@ -514,12 +514,12 @@ data.in.transform <- samples
 
 # 3) Save trait TPC parameter posterior distribution samples --------------
 
-write_rds(samples, "data/clean/TPC_param_samples.rds")
+
 
 # *) Diagnostics & visualizations -----------------------------------------
 
 # Do you want to look at diagnostic plots?
-plot_bool <- FALSE
+plot_bool <- TRUE
 
 # Do you just want to look at focal species?
 focal_bool <- FALSE
@@ -586,6 +586,7 @@ if (plot_bool) {
     geom_histogram(aes(), bins = 100) +
     facet_grid(trait ~ variable, scales = "free") +
     theme_minimal_grid(12)
+  
   # Save figure
   ggsave("figures/parm_hists.svg", device = "svg",
          width = 16, height = 9, units = "in")
@@ -641,6 +642,7 @@ if (plot_bool) {
     ylab("") +
     facet_wrap(~trait, scales = "free", ncol = 2) +
     theme_minimal_grid(12)
+  
   # Save figure
   ggsave("figures/TPC_plot.svg", device = "svg",
          width = 16, height = 9, units = "in")
