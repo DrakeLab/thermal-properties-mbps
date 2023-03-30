@@ -384,7 +384,7 @@ run.jags <- function(jags_data, TPC_function, variable_names,
   if (prob_bool) {
     quad_max_func <- function(c, T0, Tm) {c * ((Tm - T0) / 2)^2}
     briere_max_func <- function(c, T0, Tm) {
-      T_star = (1/3) * (T0 + Tm + sqrt((T0 - Tm)^2 + T0 * Tm))
+      T_star =  (1/10) * ( (4*Tm + 3*T0) + sqrt((4*Tm + 3*T0)^2 - 40 * T0 * Tm))
       maxB = c * T_star * (T_star - T0) * sqrt(Tm -T_star)}
     linear_max_func <- function(c, T0, Tm) {c * Tm}
     # remove samples which lead to maximum values exceeding one
