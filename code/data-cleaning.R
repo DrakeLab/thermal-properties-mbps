@@ -359,7 +359,7 @@ data.in.TPC <- data.Reduced %>%
 # 4) Save and export data set ---------------------------------------------
 
 # Save data.frame to file
-write_rds(data.in.TPC, "data/clean/data_for_TPC_fitting.rds")
+# write_rds(data.in.TPC, "data/clean/data_for_TPC_fitting.rds")
 
 # 5) Data visualizations / diagnostics ------------------------------------
 

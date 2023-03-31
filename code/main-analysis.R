@@ -43,14 +43,14 @@ set.seed(512)
 # 2) Fit trait thermal performance curves to trait data -------------------
 
 # Set parameters for MCMC
-n.chains <- 5#3 # 5
-n.adapt <- 5000#100 # 5000
-n.samps <- 5000#1000 # 5000
+n.chains <- 3 # 5
+n.adapt <- 100 # 5000
+n.samps <- 1000 # 5000
 
 # # Run this to generate samples of trait TPC parameters from informed posterior distributions
 # source("code/get-thermal-trait-priors.R")
 
-write_rds(samples, "data/clean/TPC_param_samples.rds")
+# write_rds(samples, "data/clean/TPC_param_samples.rds")
 
 # # Run this to load pre-processed data set
 # data.in.transform <- read_rds("data/clean/TPC_param_samples.rds")
@@ -65,16 +65,24 @@ thin_size <- 20 # full = 100, thin = 20
 
 # source("code/trait-transform.R")
 
+
+# write_rds(data.in.params, "data/clean/parameter_TPCs.rds", compress = "gz")
+# write_rds(data.in.params, "data/clean/parameter_TPCs_thin.rds", compress = "gz")
+
+# remove work sets
+rm("combined_df", "Infection_df", "noInfection_df", "TPC_df", "missing_traits_df")#, "data.in.transform")
+
 # 4) Build data set incorporating all axes of variation -------------------
 
 ## Set resolution for host trait variation
 # Host density vector: Number of values to include to consider for vertebrate host density
-KH_vec_length <- 100 # full = 100, thin = 20
+KH_vec_length <- 20 # full = 100, thin = 20
 
 # Biting tolerance vector: Number of values to consider for biting tolerance
-sigmaH_vec_length <- 100 # full = 100, thin = 20
+sigmaH_vec_length <- 20 # full = 100, thin = 20
 
 # data.in.params <- read_rds("data/clean/parameter_TPCs.rds")
+# data.in.params <- read_rds("data/clean/parameter_TPCs_thin.rds")
 # 
 source("code/trait-variation.R")
 

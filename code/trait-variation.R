@@ -45,14 +45,19 @@ lambdaH_baseline <- .005
 muH_baseline <- 1 / (365 * 20)
 
 # Host maximum biting tolerance (mosquitoes bites per day)
-sigmaH_vec <- sort(c(10^seq(-0.25,3.25, by = .0625), 20, 50, Inf))
+sigmaH_vec <- 10^seq(-0.25,3.25, length.out = sigmaH_vec_length) %>% 
+  c(1, 20, 50, Inf) %>% 
+  unique() %>% sort()
 sigmaH_baseline <- 100
 
 # Host carrying capacity
-KH_vec <- 10^seq(-2, 5, length.out = KH_vec_length + 6)
-KH_vec <-  KH_vec %>%
-  c(10^(seq(5,5+log10(2), by = diff(log10(KH_vec), lag = 1)[1]))) %>%
-  unique()
+KH_vec <- 10^seq(-2, 5, length.out = KH_vec_length) %>% 
+  c(10^seq(-2,5)) %>% 
+  unique() %>% sort()
+      
+# KH_vec2 <-  KH_vec %>%
+#   c(10^(seq(5,5+log10(2), by = diff(log10(KH_vec), lag = 1)[1]))) %>%
+#   unique()
 
 ## Host-related pathogen parameters
 # Probability of becoming infected after bite from infectious mosquito
@@ -76,7 +81,7 @@ data.Host <- expand_grid(
   # Infection-related parameters
   gammaH = gammaH_baseline,
   betaH = betaH_baseline
-)
+) %>% as.data.frame()
 
 # 3) Set non-TPC *mosquito* parameters ------------------------------------
 
@@ -94,11 +99,31 @@ Vec_dim <- dim(data.Vec)[1]
 Host_dim <- dim(data.Host)[1]
 
 
-data.AeDENV <- filter(data.Vec, system_ID == "Aedes aegypti / DENV")
-data.AeZIKV <- filter(data.Vec, system_ID == "Aedes aegypti / ZIKV")
-data.AlDENV <- filter(data.Vec, system_ID == "Aedes albopictus / DENV")
-data.CxWNV <- filter(data.Vec, system_ID == "Culex quinquefasciatus / WNV")
-data.AnPlas <- filter(data.Vec, system_ID == "Anopheles spp. / Plasmodium")
+data.AeDENV <- filter(data.Vec, system_ID == "Aedes aegypti / DENV") %>% 
+  expand_grid(data.Host)
+write_rds(data.AeDENV, "data/clean/AeDENV_data.rds", compress = "gz")
+rm(data.AeDENV)
+
+data.AeZIKV <- filter(data.Vec, system_ID == "Aedes aegypti / ZIKV") %>% 
+  expand_grid(data.Host)
+write_rds(data.AeZIKV, "data/clean/AeZIKV_data.rds", compress = "gz")
+rm(data.AeZIKV)
+
+data.AlDENV <- filter(data.Vec, system_ID == "Aedes albopictus / DENV") %>% 
+  expand_grid(data.Host)
+write_rds(data.AlDENV, "data/clean/AlDENV_data.rds", compress = "gz")
+rm(data.AlDENV)
+
+data.CxWNV <- filter(data.Vec, system_ID == "Culex quinquefasciatus / WNV") %>% 
+  expand_grid(data.Host)
+write_rds(data.CxWNV, "data/clean/CxWNV_data.rds", compress = "gz")
+rm(data.CxWNV)
+
+data.AnPlas <- filter(data.Vec, system_ID == "Anopheles gambiae / Plasmodium") %>% # "Anopheles gambiae / Plasmodium falciparum") %>% 
+  expand_grid(data.Host) 
+write_rds(data.AnPlas, "data/clean/AnPlas_data.rds", compress = "gz")
+rm(data.AnPlas)
+
 
 # data.in.analysis <- expand_grid(data.Vec, data.Host)
 

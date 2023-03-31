@@ -463,8 +463,7 @@ distinct_combos <- data_in %>%
 )) %>% distinct(trait.name, system_ID) %>% 
   # Remove unused Culex spp. / WNV data (we only need b, c, and bc)
   filter(system_ID != "Culex spp. / WNV" | trait.name != "MDR")%>% 
-  filter(system_ID != "Culex spp. / WNV" | trait.name != "PDR")%>% 
-  filter(system_ID != "Anopheles spp. / Plasmodium spp." | trait.name != "bc")
+  filter(system_ID != "Culex spp. / WNV" | trait.name != "PDR")
 
 samples <- tibble(
   trait = as.character(),
