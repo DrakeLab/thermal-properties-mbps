@@ -100,10 +100,7 @@ TPC_df <- data.in.transform %>%
   dplyr::select(system_ID, sample_num, Temperature,
                 a, bc, PDR, e2a, EFD, lf, MDR) %>% 
   # separate out mosquito species and pathogen names
-  mutate(mosquito_species = stringr::word(system_ID, 1, 2)) %>% 
-  mutate(pathogen = stringr::word(system_ID, 4, 4)) %>% 
-  # "forget" system_ID for now
-  dplyr::select(-system_ID)
+  separate_wider_delim(system_ID, delim = " / ", names = c("mosquito_species","pathogen"))
 
 # Combine parasite relevant traits with mosquito life history traits according to system
 noInfection_df <- TPC_df %>% 
@@ -135,8 +132,8 @@ missing_traits_df <- combined_df %>%
     "Aedes aegypti / ZIKV", "Aedes aegypti / none",
     "Aedes albopictus / DENV", "Aedes albopictus / none",
     "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
-    "Anopheles spp. / Plasmodium",
-    "Anopheles spp. / none"
+    "Anopheles gambiae / Plasmodium falciparum",
+    "Anopheles gambiae / none"
   )) %>% 
   unique()
 # Should just show: Culex quinquefasciatus / WNV / bc
@@ -188,8 +185,6 @@ data.in.params <- combined_df %>%
 
 
 # *) Diagnostics & visualizations -----------------------------------------
-
-plot_bool = TRUE
 
 if (plot_bool) {
 library(cowplot)
