@@ -43,9 +43,12 @@ set.seed(512)
 # 2) Fit trait thermal performance curves to trait data -------------------
 
 # Set parameters for MCMC
-n.chains <- 3 # 5
-n.adapt <- 100 # 5000
-n.samps <- 1000 # 5000
+n.chains <- 5 # 3 # 5
+n.adapt <- 5000 # 100 # 5000
+n.samps <- 5000 # 1000 # 5000
+
+# Do you want to look at diagnostic plots?
+plot_bool <- TRUE
 
 # # Run this to generate samples of trait TPC parameters from informed posterior distributions
 # source("code/get-thermal-trait-priors.R")

@@ -462,7 +462,7 @@ distinct_combos <- data_in %>%
   "Anopheles gambiae / none"
 )) %>% distinct(trait.name, system_ID) %>% 
   # Remove unused Culex spp. / WNV data (we only need b, c, and bc)
-  filter(system_ID != "Culex spp. / WNV" | trait.name != "MDR")%>% 
+  filter(system_ID != "Culex spp. / WNV" | trait.name != "MDR") %>% 
   filter(system_ID != "Culex spp. / WNV" | trait.name != "PDR")
 
 samples <- tibble(
@@ -522,9 +522,6 @@ print(distinct_samples)
 
 
 # *) Diagnostics & visualizations -----------------------------------------
-
-# Do you want to look at diagnostic plots?
-plot_bool <- TRUE
 
 # Do you just want to look at focal species?
 focal_bool <- FALSE
