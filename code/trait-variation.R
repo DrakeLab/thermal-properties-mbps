@@ -27,6 +27,7 @@
 # Load Libraries
 library(tidyverse)
 library(reshape2)
+library(fst)
 
 # 1) Define accessory functions -------------------------------------------
 
@@ -98,31 +99,29 @@ data.Vec <- data.in.params %>%
 Vec_dim <- dim(data.Vec)[1]
 Host_dim <- dim(data.Host)[1]
 
+# These are still >100 MB even after compression.
 
-data.AeDENV <- filter(data.Vec, system_ID == "Aedes aegypti / DENV") %>% 
-  expand_grid(data.Host)
-write_rds(data.AeDENV, "data/clean/AeDENV_data.rds", compress = "gz")
-rm(data.AeDENV)
-
-data.AeZIKV <- filter(data.Vec, system_ID == "Aedes aegypti / ZIKV") %>% 
-  expand_grid(data.Host)
-write_rds(data.AeZIKV, "data/clean/AeZIKV_data.rds", compress = "gz")
-rm(data.AeZIKV)
-
-data.AlDENV <- filter(data.Vec, system_ID == "Aedes albopictus / DENV") %>% 
-  expand_grid(data.Host)
-write_rds(data.AlDENV, "data/clean/AlDENV_data.rds", compress = "gz")
-rm(data.AlDENV)
-
-data.CxWNV <- filter(data.Vec, system_ID == "Culex quinquefasciatus / WNV") %>% 
-  expand_grid(data.Host)
-write_rds(data.CxWNV, "data/clean/CxWNV_data.rds", compress = "gz")
-rm(data.CxWNV)
-
-data.AnPlas <- filter(data.Vec, system_ID == "Anopheles gambiae / Plasmodium") %>% # "Anopheles gambiae / Plasmodium falciparum") %>% 
-  expand_grid(data.Host) 
-write_rds(data.AnPlas, "data/clean/AnPlas_data.rds", compress = "gz")
-rm(data.AnPlas)
+# filter(data.Vec, system_ID == "Aedes aegypti / DENV") %>% 
+#   expand_grid(data.Host) %>% 
+#   write_rds("data/clean/AeDENV_data.rds", compress = "gz")
+#   # write_fst("data/clean/AeDENV_data.fst", compress = 100)
+# 
+# filter(data.Vec, system_ID == "Aedes aegypti / ZIKV") %>% 
+#   expand_grid(data.Host) %>% 
+#   write_rds("data/clean/AeZIKV_data.rds", compress = "gz")
+# 
+# 
+# filter(data.Vec, system_ID == "Aedes albopictus / DENV") %>% 
+#   expand_grid(data.Host) %>% 
+#   write_rds("data/clean/AlDENV_data.rds", compress = "gz")
+# 
+# filter(data.Vec, system_ID == "Culex quinquefasciatus / WNV") %>% 
+#   expand_grid(data.Host) %>% 
+#   write_rds("data/clean/CxWNV_data.rds", compress = "gz")
+# 
+# data.AnPlas <- filter(data.Vec, system_ID == "Anopheles gambiae / Plasmodium") %>% # "Anopheles gambiae / Plasmodium falciparum") %>% 
+#   expand_grid(data.Host) %>% 
+#   write_rds("data/clean/AnPlas_data.rds", compress = "gz")
 
 
 # data.in.analysis <- expand_grid(data.Vec, data.Host)
