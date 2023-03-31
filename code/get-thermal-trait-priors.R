@@ -458,12 +458,13 @@ distinct_combos <- data_in %>%
   "Aedes albopictus / DENV", "Aedes albopictus / none",
   "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
   "Culex spp. / WNV",
-  "Anopheles spp. / Plasmodium spp.",
-  "Anopheles spp. / none"
+  "Anopheles gambiae / Plasmodium falciparum",
+  "Anopheles gambiae / none"
 )) %>% distinct(trait.name, system_ID) %>% 
   # Remove unused Culex spp. / WNV data (we only need b, c, and bc)
   filter(system_ID != "Culex spp. / WNV" | trait.name != "MDR")%>% 
-  filter(system_ID != "Culex spp. / WNV" | trait.name != "PDR")
+  filter(system_ID != "Culex spp. / WNV" | trait.name != "PDR")%>% 
+  filter(system_ID != "Anopheles spp. / Plasmodium spp." | trait.name != "bc")
 
 samples <- tibble(
   trait = as.character(),
@@ -512,6 +513,11 @@ for (system_index in 1:dim(distinct_combos)[1]) {
 
 data.in.transform <- samples
 
+# check that we have all the data we need
+distinct_samples <- data.in.transform %>% 
+  distinct(system_ID, trait)
+
+print(distinct_samples)
 # 3) Save trait TPC parameter posterior distribution samples --------------
 
 
