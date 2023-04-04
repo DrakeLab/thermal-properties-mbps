@@ -89,6 +89,7 @@ compute.CHmin <- function(input) {
   with(input, {
     eps <- .Machine$double.eps
     # intermediate quantities
+    muV <- 1 / (lf + eps)
     chi <- 0.5 * sigmaV * betaV * exp(-muV / etaV) * sigmaH * betaH *
       (1 / (gammaH + muH)) * (1 / (muV + eps))
     prefactor <- sigmaV * V0 / (sigmaH + eps)
@@ -104,6 +105,7 @@ compute.CHmax <- function(input) {
   with(input, {
     eps <- .Machine$double.eps
     # intermediate quantities
+    muV <- 1 / (lf + eps)
     chi <- 0.5 * sigmaV * betaV * exp(-muV / etaV) * sigmaH * betaH *
       (1 / (gammaH + muH)) * (1 / (muV + eps))
     prefactor <- sigmaV * V0 / (sigmaH + eps)

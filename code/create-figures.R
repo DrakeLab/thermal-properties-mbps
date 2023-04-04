@@ -72,61 +72,25 @@ shift_legend <- function(p) {
 # curves  = Chitnis dynamic R0,
 #   - colour = value of KH. place it on a color scale in the bottom right corner
 
-# Create data frame for plotting
-R0_df <- data.in.outputs %>%
-  # To set num. of curves, change "length.out" to be the number of curves you want
-  filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 21)]) %>%
-  # Just consider one finite value of sigmaH and the Ross-Macdonald model
-  filter(sigmaH == 100 | is.infinite(sigmaH)) %>%
-  # Group by curve_ID and system_ID
-  group_by(system_ID, Model, KH, sample_num) %>%
-  # Normalize R0 for each curve_ID x system_ID combination, so that the maximum is always at one
-  mutate(R0 = ifelse(is.nan(R0), 0, R0)) %>%
-  mutate(norm_R0 = R0 / max(R0)) %>%
-  mutate(norm_R0 = ifelse(is.nan(norm_R0), 0, norm_R0)) %>%
-  # Restrict temperatures to where R0 is positive
-  # filter(norm_R0 > 0) %>%
-  ungroup() %>%
-  dplyr::select(system_ID, sample_num, Temperature, Model, sigmaH, KH, norm_R0) %>%
-  arrange(system_ID, sample_num, sigmaH, Temperature)
+R0_df <- read_rds("results/R0_TPC_data.rds")
 
-meanR0TPC_df <- R0_df %>%
-  group_by(system_ID, Temperature, Model, sigmaH, KH) %>%
-  summarise(
-    mean_val = mean(norm_R0),
-    median_val = median(norm_R0),
-    # mode_val = mlv(norm_R0, method = 'mfv'),
-    .groups = "keep"
-  ) %>%
-  arrange(system_ID, sigmaH, KH, Temperature, mean_val, median_val) %>% # , mode_val) %>% 
-  distinct()
-
-quantsR0TPC_df <- R0_df %>%
-  group_by(system_ID, Temperature, Model, sigmaH, KH) %>%
-  mutate(lowHCI_val = quantile(norm_R0, 0.055)) %>%
-  mutate(highHCI_val = quantile(norm_R0, 0.945)) %>%
-  arrange(system_ID, sigmaH, KH, Temperature, lowHCI_val, highHCI_val) %>%
-  dplyr::select(-c("sample_num")) %>% 
-  distinct()
-
-## PLOTTING ##
-R0_plot <- ggplot(mapping = aes(x = Temperature,group = KH)) +
+ggplot(mapping = aes(x = Temperature, group = KH)) +
   # path of mean, normalized R0 as a function of temperature (finite sigmaH):
   geom_path(
-    data = filter(meanR0TPC_df, sigmaH == 100),
-    aes(y = mean_val, colour = KH, linetype = "finite")
+    data = filter(R0_df, sigmaH == 100),
+    aes(y = norm_median_val, colour = KH, linetype = "finite")
   ) +
   # path of mean, normalized R0 as a function of temperature (infinite sigmaH):
   geom_path(
-    data = filter(meanR0TPC_df, sigmaH == Inf),
-    aes(y = mean_val, linetype = "infinite", colour = "black"),
+    data = filter(R0_df, sigmaH == Inf),
+    aes(y = norm_median_val, linetype = "infinite", colour = "black"),
     colour = "black",
     lwd = 1.5
   ) +
   # 89% HCI of R0 TPC curves
   geom_ribbon(
-    data = filter(quantsR0TPC_df, sigmaH == 100),
-    aes(ymin = lowHCI_val, ymax = highHCI_val, fill = KH),
+    data = filter(R0_df, sigmaH == 100),
+    aes(ymin = norm_lowHCI_val, ymax = norm_highHCI_val, fill = KH),
     alpha = 0.1
   ) +
   # x-axis:
@@ -206,36 +170,24 @@ R0_plot <- shift_legend(R0_plot)
 ggsave("figures/R0_TPCs.svg", R0_plot,
        width = 16, height = 9)
 
-# Figure 5) Topt heatmap --------------------------------------------------
+# Figure 5: Topt heatmap --------------------------------------------------
 # Mean value of Topt as a function of KH and sigmaH
-Topt_heat_df <- data.in.thermchars %>% 
-  select(-c(threshold_bool, CHmin, CHmax, CTmin, CTmax)) %>%
-  group_by(system_ID, Model, sigmaH, KH) %>%
-  mutate(
-    mean_Topt = mean(Topt),
-    median_Topt = median(Topt),
-    std_Topt = sd(Topt),
-    mean_R0opt = mean(R0opt),
-    # mode_val = mlv(norm_R0, method = 'mfv'),
-    # .groups = "keep"
-  ) %>% 
-  select(-c(sample_num, Topt, R0opt)) %>% 
-  unique() %>% 
-  arrange(system_ID, sigmaH, KH, mean_Topt, median_Topt)# , mode_val)
+Topt_heat_df <- read_rds("results/Topt_heat_data.rds")
 
 Toptalt_df <- Topt_heat_df %>%
   ungroup() %>%
   distinct() %>%
   # Arrange along the plotting variables
+  rename(mean_Topt = mean_val) %>% 
   arrange(system_ID, sigmaH, KH, mean_Topt) %>% 
   mutate(sigmaH_proxy = sigmaH)
 
 # add many proxy sigmaH points at infinity to make the values easier to see there
 ## Add a "point at infinity" for sigmaH (NB: to be added to get-analysis-dfs.R)
 # Value of sigmaH to replace 'Inf' with for plotting
-infinite_skew <- 10^3 + 2500
+infinite_skew <- 10^2 + 80
 # Used to create a gap dividing finite and infinite sigmaH
-infinite_divide <- 10^mean(c(3, log10(infinite_skew)))
+infinite_divide <- 10^mean(c(2, log10(infinite_skew)))
 
 temp <- filter(Toptalt_df, is.infinite(sigmaH)) %>%
   mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH,
@@ -278,8 +230,8 @@ Toptalt_df <- add_row(Toptalt_df, temp7) %>%
 
 
 # Define sigmaH tick breaks and labels
-sigmaH_breaks <- c(10^c(seq(-1, 3, by = 1)), infinite_divide, infinite_skew)
-sigmaH_labels <- c(paste(c(10^c(seq(-1, 3, by = 1)))), TeX("$\\ldots$"), TeX("$\\infty$"))
+sigmaH_breaks <- c(10^c(seq(-1, 2, by = 1)), infinite_divide, infinite_skew)
+sigmaH_labels <- c(paste(c(10^c(seq(-1, 2, by = 1)))), TeX("$\\ldots$"), TeX("$\\infty$"))
 Topt_breaks <- seq(floor(min(Toptalt_df$mean_Topt)), 
                    ceiling(max(Toptalt_df$mean_Topt)), by = 1)
 
@@ -301,9 +253,9 @@ Toptalt_plots <- Toptalt_df %>%
     size = 1,
     breaks = Topt_breaks
   ) +
-  # R0 = 1 contour:
-  geom_contour(data = Toptalt_df,
-               aes(z = mean_R0opt, colour = "R0=1"), breaks = c(1), size = 1) +
+  # # R0 = 1 contour: # !!! figure this out
+  # geom_contour(data = Toptalt_df,
+  #              aes(z = mean_R0opt, colour = "R0=1"), breaks = c(1), size = 1) +
   
   # x-axis: log10-scale with no buffer space
   scale_x_log10(
@@ -372,7 +324,7 @@ ggsave("figures/Topt_mean.svg", Toptalt_plots,
        width = 16, height = 9)
 
 
-# Figure 6) CTwidth heatmap -----------------------------------------------
+# Figure 6: CTwidth heatmap -----------------------------------------------
 # Shows how the parasite thermal niche (temperatures between CT_min and CT_max) 
 # depends on vertebrate host availability (density and biting tolerance) in each
 # of the focal systems.
@@ -549,6 +501,8 @@ quantsTopt_df <- Topt_df %>%
   arrange(system_ID, sigmaH, KH, lowHCI_val, highHCI_val) %>%
   dplyr::select(-c("sample_num"))
 
+meanTopt_df <- read_rds("results/Topt_data.rds")
+
 # PLOTTING
 Topt_plot <- meanTopt_df %>%
   ## Set up plot ##
@@ -560,20 +514,20 @@ Topt_plot <- meanTopt_df %>%
   geom_path(aes(y = mean_val, colour = as.factor(sigmaH)), lwd = 1) +
   # 89% HCI of R0 TPC curves
   geom_ribbon(
-    data = quantsTopt_df,
-    aes(ymin = lowHCI_val, ymax = highHCI_val, 
+    data = meanTopt_df,
+    aes(ymin = lowHCI_val, ymax = highHCI_val,
         fill = as.factor(sigmaH)),
     alpha = 0.05
   ) +
   # Add dotted lines showing limits of ribbons
   geom_path(
-    data = quantsTopt_df,
+    data = meanTopt_df,
     aes(y = lowHCI_val,
         color = as.factor(sigmaH)),
     linetype = "dashed"
   ) +
   geom_path(
-    data = quantsTopt_df,
+    data = meanTopt_df,
     aes(y = highHCI_val,
         color = as.factor(sigmaH)),
     linetype = "dashed"
@@ -596,14 +550,14 @@ Topt_plot <- meanTopt_df %>%
   # color:
   scale_colour_manual(
     name = "Vertebrate host biting tolerance\n(bites per host per day)",
-    values = c(met.brewer("VanGogh3", 3, direction = 1), "black"),
+    values = c(met.brewer("VanGogh3", 4, direction = 1), "black"),
     # values = c(brewer.pal(9, "YlOrRd")[c(3, 5, 7)], "black"),
     breaks = c(1, 10, 100, Inf),
     labels = unname(c("1 (Chitnis)", "10 (Chitnis)", "100 (Chitnis)", TeX("$\\infty$ (Ross-Macdonald)")))
   ) +
   scale_fill_manual(
     name = "Vertebrate host biting tolerance\n(bites per host per day)",
-    values = c(met.brewer("VanGogh3", 3, direction = 1), "black"),
+    values = c(met.brewer("VanGogh3", 4, direction = 1), "black"),
     # values = c(brewer.pal(9, "YlOrRd")[c(3, 5, 7)], "black"),
     breaks = c(1, 10, 100, Inf),
     labels = unname(c("1 (Chitnis)", "10 (Chitnis)", "100 (Chitnis)", TeX("$\\infty$ (Ross-Macdonald)")))
@@ -612,7 +566,7 @@ Topt_plot <- meanTopt_df %>%
   facet_wrap(~system_ID,
              scales = "free",
              nrow = 2,
-             labeller = labeller()  ) +
+             labeller = labeller()) +
   # theme options:
   theme_minimal_hgrid(11) +
   guides(color = guide_legend(override.aes = list(size = 4))) +

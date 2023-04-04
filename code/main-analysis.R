@@ -61,11 +61,11 @@ plot_bool <- TRUE
 # 3) Translate traits into model parameters -------------------------------
 
 # Define temperature range of study
-Temps <- seq(5, 50, by = 0.2) #0.1) # full: by = 0.2, thin: by = 0.2
+Temps <- seq(10, 40, by = 0.1) # full: by = 0.05, thin: by = 0.2
 
 # Thin samples
-thin_size <- 20 # full = 100, thin = 20
-
+thin_size <- 1200 # full = 500, thin = 100
+plot_bool = FALSE
 # source("code/trait-transform.R")
 
 # write_rds(data.in.params, "data/clean/parameter_TPCs.rds", compress = "gz")
@@ -84,8 +84,8 @@ KH_vec_length <- 100 # full = 100, thin = 20
 sigmaH_vec_length <- 100 # full = 100, thin = 20
 
 # data.in.params <- read_rds("data/clean/parameter_TPCs.rds")
-# data.in.params_thin <- read_rds("data/clean/parameter_TPCs_thin.rds")
-# 
+# data.in.params <- read_rds("data/clean/parameter_TPCs_thin.rds") # !!! thin
+ 
 source("code/trait-variation.R")
 
 
