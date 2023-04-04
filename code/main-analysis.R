@@ -61,10 +61,10 @@ plot_bool <- TRUE
 # 3) Translate traits into model parameters -------------------------------
 
 # Define temperature range of study
-Temps <- seq(10, 40, by = 0.1) # full: by = 0.05, thin: by = 0.2
+Temps <- seq(10, 40, by = 0.1) # full: by = 0.1, thin: by = 0.2
 
 # Thin samples
-thin_size <- 1200 # full = 500, thin = 100
+thin_size <- 1000 # full = 500, thin = 100
 plot_bool = FALSE
 # source("code/trait-transform.R")
 

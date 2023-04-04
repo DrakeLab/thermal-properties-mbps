@@ -27,7 +27,12 @@
 # Load Libraries
 library(tidyverse)
 library(reshape2)
+library(multidplyr)
 
+# Set up parallel
+cluster <- new_cluster(parallel::detectCores() - 1)
+cluster_library(cluster, c("dplyr", "tidyr"))
+cluster_copy(cluster, c("compute.V0", "compute.R0"))
 # 1) Define accessory functions -------------------------------------------
 
 
@@ -194,17 +199,18 @@ summarize.R0 <- function(in_df) {
 summarize.Topt <- function(in_df) {
   out_df <- in_df %>%
     dplyr::select(system_ID, sample_num, Model, sigmaH, KH, Topt) %>%
-    ungroup() %>% # !!!
     # Get mean and CIs of variable across samples
     group_by(system_ID, Model, sigmaH, KH) %>%
-    summarise(
+    # partition(cluster) %>% 
+    dplyr::summarise(
       lowHCI_val = quantile(Topt, 0.055),
       highHCI_val = quantile(Topt, 0.945),
       mean_val = mean(Topt),
       median_val = median(Topt),
       # mode_val = mlv(norm_R0, method = 'mfv'),
       .groups = "keep"
-    ) 
+    ) #%>% 
+  # collect()
 }
 
 
@@ -223,11 +229,11 @@ summarize.Topt <- function(in_df) {
 
 
 # # Mean and quantiles of Topt (across KH and sigmaH) (use for Figures S2 and S3)
-# data.Host %>% 
+# data.Host %>%
 #   # To set num. of curves, change "length.out" to be the number of curves you want
 #   filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 51)]) %>%
 #   filter(sigmaH %in% c(1, 10, 100, Inf)) %>%
-#   expand_grid(data.Vec %>% 
+#   expand_grid(data.Vec %>%
 #                 filter(between(Temperature, 20, 32))) %>% # known range of Topt
 #   # filter(Temperature %in% unique(Temperature)[seq(1,
 #   #                                                 length(unique(Temperature)),
@@ -247,12 +253,97 @@ summarize.Topt <- function(in_df) {
 #   replace_na(list(R0 = 0)) %>%
 #   ## Select only variables used for visualization
 #   dplyr::select(Model, system_ID, sample_num, KH, sigmaH, Topt) %>%
-#   distinct() %>% 
-#   summarize.Topt(.) %>% 
+#   distinct() %>%
+#   summarize.Topt(.) %>%
 #   write_rds("results/Topt_quantile_data.rds")
 
-# Mean of Topt across KH and sigmaH
- 
+# Mean of Topt across KH and sigmaH 
+#  To do this, we have to divide up the systems to avoid running out of memory
+
+Topt_heat_func <- function(in_df, system_name) {
+  
+  out_df <- in_df %>% 
+    expand_grid(data.Vec %>%
+                  filter(system_ID == system_name) %>%
+                  filter(between(Temperature, 20, 29))) %>% # known range of Topt
+    data.table::data.table() %>%
+    # Name the model (just in case this is handier than referring to sigmaH)
+    mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
+    # group_by(system_ID, sample_num, sigmaH, KH) %>%
+    # Vector abundance (needed to compute R0)
+    group_by(sigmaH) %>% 
+    partition(cluster) %>% 
+    mutate(V0 = ifelse( sigmaV_f * deltaL < (1 / lf),
+                        0,
+                        KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL)))) %>%
+    # Basic reproduction number
+    mutate(R0 = ifelse(V0 <= 0, 0,
+                       ifelse(is.infinite(sigmaH),
+                              sigmaV * sigmaV * betaH / (1 / (lf)), # Ross-Macdonald model
+                              sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0)) * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH)) * sigmaH * sigmaV * betaH * KH / ((1 / (lf)) * (sigmaH * KH + sigmaV * V0)))) %>% 
+    # sqrt(compute.RH(.) * compute.RV(.))) %>%
+    group_by(sample_num, sigmaH, KH) %>% 
+    filter(R0 == max(R0)) %>%
+    # Get temperature at which R0 is maximized
+    rename(Topt = Temperature) %>%
+    # If any R0 = NA, replace it with R0 = 0
+    # replace_na(list(R0 = 0)) %>%
+    # (we only get R0=NA when V0<0, i.e. when mosquito recruitment is less than mortality)
+    ## Select only variables used for visualization
+    dplyr::select(Model, system_ID, sample_num, KH, sigmaH, Topt) %>%
+    ungroup() %>% 
+    collect() %>% 
+    distinct() %>% 
+    summarize.Topt(.)
+  
+}
+
+in_df <- data.Host %>%
+  # To set num. of curves, change "length.out" to be the number of curves you want
+  filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 51)]) %>% #51
+  filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 51)])
+
+
+Topt_heat_func(in_df, "Aedes aegypti / DENV") %>% 
+  write_rds("results/Topt_AeDENV.rds")
+Topt_heat_func(in_df, "Aedes aegypti / ZIKV") %>% 
+  write_rds("results/Topt_AeZIKV.rds")
+Topt_heat_func(in_df, "Aedes albopictus / DENV") %>% 
+  write_rds("results/Topt_AlDENV.rds")
+Topt_heat_func(in_df, "Anopheles gambiae / Plasmodium falciparum") %>% 
+  write_rds("results/Topt_AgPlfa.rds")
+Topt_heat_func(in_df, "Culex quinquefasciatus / WNV") %>% 
+  write_rds("results/Topt_CxWNV.rds")
+
+# length(unique(filter(test, system_ID == "Aedes aegypti / DENV")$sigmaH))
+# 
+
+# data.Host %>%
+#   # To set num. of curves, change "length.out" to be the number of curves you want
+#   filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 31)]) %>%
+#   filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 31)]) %>%
+#   expand_grid(data.Vec %>%
+#                 filter(system_ID) %>% 
+#                 filter(between(Temperature, 20, 30))) %>% # known range of Topt
+#   # Name the model (just in case this is handier than referring to sigmaH)
+#   mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
+#   # Vector abundance
+#   mutate(V0 = compute.V0(.)) %>%
+#   # Basic reproduction number
+#   mutate(R0 = sqrt(compute.RH(.) * compute.RV(.))) %>%
+#   group_by(system_ID, sample_num, sigmaH, KH) %>%
+#   filter(R0 == max(R0)) %>%
+#   # Get temperature at which R0 is maximized
+#   rename(Topt = Temperature) %>%
+#   # If any R0 = NA, replace it with R0 = 0
+#   # (we only get R0=NA when V0<0, i.e. when mosquito recruitment is less than mortality)
+#   replace_na(list(R0 = 0)) %>%
+#   ## Select only variables used for visualization
+#   dplyr::select(Model, system_ID, sample_num, KH, sigmaH, Topt) %>%
+#   distinct() %>%
+#   summarize.Topt(.) %>%
+#   write_rds("results/Topt_heat_data.rds") 
+
 
 # 
 # filter(data.Vec, system_ID == "Aedes aegypti / ZIKV") %>% 

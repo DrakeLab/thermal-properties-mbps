@@ -36,7 +36,7 @@ res_reduce <- function(df, new_length) {
 compute.V0 <- function(input) {
   with(input, {
     eps <- .Machine$double.eps
-    if(is.null(lf)) {lf = 1 / (muV + eps)}
+    # if(is.null(lf)) {lf = 1 / (muV + eps)}
     temp <- sigmaV_f * deltaL
     # check if net reproduction rate exceeds mortality rate
     temp_bool <- temp > (1 / lf)
@@ -46,6 +46,19 @@ compute.V0 <- function(input) {
     )
   })
 }
+
+# compute.V0 <- function(input) {
+#     eps <- .Machine$double.eps
+#     # if(is.null(lf)) {lf = 1 / (muV + eps)}
+#     temp <- input$sigmaV_f * input$deltaL
+#     # check if net reproduction rate exceeds mortality rate
+#     temp_bool <- temp > (1 / input$lf)
+#     V0 <- ifelse(temp_bool,
+#            input$KL * input$rhoL * input$lf * (1 - 1 / (input$lf * temp + eps)) ,
+#            0 # if mortality exceeds reproduction, set to zero
+#     )
+#     return(V0)
+# }
 
 ### Host-to-mosquito reproduction number----------------------------------------
 compute.RH <- function(input) {
