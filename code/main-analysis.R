@@ -61,10 +61,10 @@ plot_bool <- TRUE
 # 3) Translate traits into model parameters -------------------------------
 
 # Define temperature range of study
-Temps <- seq(10, 40, by = 0.1) # full: by = 0.1, thin: by = 0.2
+Temps <- seq(10, 40, length.out = 120) # full: length.out = 200, thin: length.out = 120
 
 # Thin samples
-thin_size <- 1000 # full = 500, thin = 100
+thin_size <- 100 # full = 800, thin = 100
 plot_bool = FALSE
 # source("code/trait-transform.R")
 
@@ -78,10 +78,10 @@ rm("combined_df", "Infection_df", "noInfection_df", "TPC_df", "missing_traits_df
 
 ## Set resolution for host trait variation
 # Host density vector: Number of values to include to consider for vertebrate host density
-KH_vec_length <- 100 # full = 100, thin = 20
+KH_vec_length <- 50 # full = 50, thin = 20
 
 # Biting tolerance vector: Number of values to consider for biting tolerance
-sigmaH_vec_length <- 100 # full = 100, thin = 20
+sigmaH_vec_length <- 50 # full = 50, thin = 20
 
 # data.in.params <- read_rds("data/clean/parameter_TPCs.rds")
 # data.in.params <- read_rds("data/clean/parameter_TPCs_thin.rds") # !!! thin

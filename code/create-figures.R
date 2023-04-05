@@ -72,25 +72,27 @@ shift_legend <- function(p) {
 # curves  = Chitnis dynamic R0,
 #   - colour = value of KH. place it on a color scale in the bottom right corner
 
-R0_df <- read_rds("results/R0_TPC_data.rds")
+# R0_df <- read_rds("results/R0_TPC_data.rds")
 
-ggplot(mapping = aes(x = Temperature, group = KH)) +
+R0_df <- test
+
+R0_plot <- ggplot(mapping = aes(x = Temperature, group = KH)) +
   # path of mean, normalized R0 as a function of temperature (finite sigmaH):
   geom_path(
     data = filter(R0_df, sigmaH == 100),
-    aes(y = norm_median_val, colour = KH, linetype = "finite")
+    aes(y = mean, colour = KH, linetype = "finite")
   ) +
   # path of mean, normalized R0 as a function of temperature (infinite sigmaH):
   geom_path(
     data = filter(R0_df, sigmaH == Inf),
-    aes(y = norm_median_val, linetype = "infinite", colour = "black"),
+    aes(y = mean, linetype = "infinite", colour = "black"),
     colour = "black",
     lwd = 1.5
   ) +
   # 89% HCI of R0 TPC curves
   geom_ribbon(
     data = filter(R0_df, sigmaH == 100),
-    aes(ymin = norm_lowHCI_val, ymax = norm_highHCI_val, fill = KH),
+    aes(ymin = lowHCI, ymax = highHCI, fill = KH),
     alpha = 0.1
   ) +
   # x-axis:
