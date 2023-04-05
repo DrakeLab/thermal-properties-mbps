@@ -32,7 +32,6 @@ library(multidplyr)
 # Set up parallel
 cluster <- new_cluster(parallel::detectCores() - 1)
 cluster_library(cluster, c("dplyr", "tidyr"))
-cluster_copy(cluster, c("compute.V0", "compute.R0"))
 # 1) Define accessory functions -------------------------------------------
 
 
@@ -95,9 +94,14 @@ data.Host <- expand_grid(
 # (it could alternately be used to fix the maximum adult mosquito density across species)
 larval_mosquito_carrying_capacity <- 300
 
+thin_size <- 300
+num_samples <- length(unique(data.in.params$sample_num))
+sample_inds <- sample(unique(data.in.params$sample_num), thin_size, replace = FALSE)
+
 data.Vec <- data.in.params %>% 
+  filter(sample_num %in% sample_inds) %>%
   mutate(KL = larval_mosquito_carrying_capacity)
-rm(data.in.params)
+# rm(data.in.params)
 
 # 4) Combine and save data frames -----------------------------------------
 Vec_dim <- dim(data.Vec)[1]
