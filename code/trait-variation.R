@@ -304,8 +304,8 @@ Topt_heat_func <- function(in_df, system_name) {
 
 in_df <- data.Host %>%
   # To set num. of curves, change "length.out" to be the number of curves you want
-  filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 51)]) %>% #51
-  filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 51)])
+  filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 41)]) %>% #51
+  filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 41)])
 
 
 Topt_heat_func(in_df, "Aedes aegypti / DENV") %>% 
