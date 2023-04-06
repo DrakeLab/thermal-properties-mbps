@@ -205,11 +205,17 @@ R0_TPC_func <- function(in_df, system_name) {
     mutate(V0 = ifelse( sigmaV_f * deltaL < (1 / lf),
                         0,
                         KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL)))) %>%
+    mutate(RV = ifelse(is.infinite(sigmaH),
+                       sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
+                       sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>% 
+    mutate(bV = ifelse(is.infinite(sigmaH),
+                       sigmaV, # Ross-Macdonald model
+                       sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>% 
+    mutate(RH = ifelse(V0 == 0, 
+                       0, 
+                       bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>% 
     # Basic reproduction number
-    mutate(R0 = ifelse(V0 <= 0, 0,
-                       ifelse(is.infinite(sigmaH),
-                              sigmaV * sigmaV * betaH / (1 / (lf)), # Ross-Macdonald model
-                              (sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0)) * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH)) * sigmaH * sigmaV * betaH * KH / ((1 / (lf)) * (sigmaH * KH + sigmaV * V0))))) %>% 
+    mutate(R0 = sqrt(RV*RH))%>% 
     dplyr::select(system_ID, sample_num, Temperature, Model, sigmaH, KH, V0, R0) %>%
     # Normalize R0 across temperature
     group_by(system_ID, Model, sigmaH, KH, sample_num) %>%
@@ -242,12 +248,19 @@ Topt_heat_func <- function(in_df, system_name) {
     mutate(V0 = ifelse( sigmaV_f * deltaL < (1 / lf),
                         0,
                         KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL)))) %>%
+    mutate(RV = ifelse(is.infinite(sigmaH),
+                 sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
+                 sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>% 
+    mutate(bV = ifelse(is.infinite(sigmaH),
+                 sigmaV, # Ross-Macdonald model
+                 sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>% 
+    mutate(RH = ifelse(V0 == 0, 
+                 0, 
+                 bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>% 
     # Basic reproduction number
-    mutate(R0 = ifelse(V0 <= 0, 0,
-                       ifelse(is.infinite(sigmaH),
-                              sigmaV * sigmaV * betaH / (1 / (lf)), # Ross-Macdonald model
-                              (sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0)) * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH)) * sigmaH * sigmaV * betaH * KH / ((1 / (lf)) * (sigmaH * KH + sigmaV * V0))))) %>%     group_by(sample_num, KH, sigmaH) %>%
+    mutate(R0 = sqrt(RV*RH)) %>% 
     # Filter to maximum value of R0
+    group_by(system_ID, sample_num, sigmaH, KH) %>%
     filter(R0 == max(R0)) %>%
     # Get temperature at which R0 is maximized
     rename(Topt = Temperature) %>%
@@ -280,11 +293,17 @@ CT_heat_func <- function(in_df, system_name) {
     mutate(V0 = ifelse( sigmaV_f * deltaL < (1 / lf),
                         0,
                         KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL)))) %>%
+    mutate(RV = ifelse(is.infinite(sigmaH),
+                       sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
+                       sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>% 
+    mutate(bV = ifelse(is.infinite(sigmaH),
+                       sigmaV, # Ross-Macdonald model
+                       sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>% 
+    mutate(RH = ifelse(V0 == 0, 
+                       0, 
+                       bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>% 
     # Basic reproduction number
-    mutate(R0 = ifelse(V0 <= 0, 0,
-                       ifelse(is.infinite(sigmaH),
-                              sigmaV * sigmaV * betaH / (1 / (lf)), # Ross-Macdonald model
-                              sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0)) * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH)) * sigmaH * sigmaV * betaH * KH / ((1 / (lf)) * (sigmaH * KH + sigmaV * V0)))) %>% 
+    mutate(R0 = sqrt(RV*RH)) %>%
     # Filter to maximum value of R0
     group_by(system_ID, sample_num, sigmaH, KH) %>%
     filter(R0 > 1) %>%
@@ -360,7 +379,7 @@ write_rds(Topt.df, "results/Topt_sigmaH.rds", compress = "gz")
 # Topt vs. KH -------------------------------------------------------------
 
 data.Topt.KH <- data.Host %>%
-  # filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 50)]) %>%
+  # filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 10)]) %>%
   filter(sigmaH %in% c(1, 10, 100, Inf))
 
 Topt.df <- init.df
@@ -395,183 +414,6 @@ for (system_name in unique(data.Vec$system_ID)) {
   gc()
 }
 write_rds(CT.df, "results/CT_vals.rds", compress = "gz")
-
-
-# # System 1: Aedes aegypti / DENV ------------------------------------------
-# # Code = AeDENV
-# system_name = "Aedes aegypti / DENV"
-# 
-# # Topt TPCs
-# gc()
-# system.time(
-#   data.Host %>%
-#     filter(sigmaH %in% c(100, Inf))  %>%
-#     R0_TPC_func(., system_name) %>%
-#     write_rds("results/AeDENV/R0_TPC_data.rds", compress = "gz")
-# )
-# 
-# # Topt vs. sigmaH and KH
-# gc()
-# system.time(
-#   data.Host %>%
-#     filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 61)]) %>%
-#     filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 61)]) %>%
-#     Topt_heat_func(., system_name) %>%
-#     write_rds("results/AeDENV/Topt_vals.rds", compress = "gz")
-# )
-# gc()
-# 
-# # CTmin, CTmax, CTwidth vs. sigmaH and KH
-# gc()
-# system.time(
-#   data.Host %>%
-#     filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 61)]) %>%
-#     filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 61)]) %>%
-#     CT_heat_func(., system_name) %>%
-#     write_rds("results/AeDENV/CT_vals.rds", compress = "gz")
-# )
-# gc()
-# 
-# # System 2: Aedes aegypti / ZIKV ------------------------------------------
-# # Code = AeZIKV
-# system_name = "Aedes aegypti / ZIKV"
-# 
-# # Topt TPCs
-# gc()
-# system.time(
-#   data.Host %>%
-#     filter(sigmaH %in% c(100, Inf))  %>%
-#     R0_TPC_func(., system_name) %>%
-#     write_rds("results/AeZIKV/R0_TPC_data.rds", compress = "gz")
-# )
-# 
-# # Topt vs. sigmaH and KH
-# gc()
-# system.time(
-#   data.Host %>%
-#     filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 61)]) %>%
-#     filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 61)]) %>%
-#     Topt_heat_func(., system_name) %>%
-#     write_rds("results/AeZIKV/Topt_vals.rds", compress = "gz")
-# )
-# gc()
-# 
-# # CTmin, CTmax, CTwidth vs. sigmaH and KH
-# gc()
-# system.time(
-#   data.Host %>%
-#     filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 61)]) %>%
-#     filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 61)]) %>%
-#     CT_heat_func(., system_name) %>%
-#     write_rds("results/AeZIKV/CT_vals.rds", compress = "gz")
-# )
-# gc()
-# 
-# # System 3: Aedes albopictus / DENV ---------------------------------------
-# # Code = AlDENV
-# system_name = "Aedes albopictus / DENV"
-# 
-# # Topt TPCs
-# gc()
-# system.time(
-#   data.Host %>%
-#     filter(sigmaH %in% c(100, Inf))  %>%
-#     R0_TPC_func(., system_name) %>%
-#     write_rds("results/AlDENV/R0_TPC_data.rds", compress = "gz")
-# )
-# 
-# # Topt vs. sigmaH and KH
-# gc()
-# system.time(
-#   data.Host %>%
-#     filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 61)]) %>%
-#     filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 61)]) %>%
-#     Topt_heat_func(., system_name) %>%
-#     write_rds("results/AlDENV/Topt_vals.rds", compress = "gz")
-# )
-# gc()
-# 
-# # CTmin, CTmax, CTwidth vs. sigmaH and KH
-# gc()
-# system.time(
-#   data.Host %>%
-#     filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 61)]) %>%
-#     filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 61)]) %>%
-#     CT_heat_func(., system_name) %>%
-#     write_rds("results/AlDENV/CT_vals.rds", compress = "gz")
-# )
-# gc()
-
-# System 4: Anopheles gambiae / Plasmodium falciparum -----------------------
-# Code = AgPlfa
-system_name = "Anopheles gambiae / Plasmodium falciparum"
-
-# Topt TPCs
-gc()
-system.time(
-  data.Host %>%
-    filter(sigmaH %in% c(100, Inf))  %>%
-    R0_TPC_func(., system_name) %>%
-    write_rds("results/AgPlfa/R0_TPC_data.rds", compress = "gz")
-)
-
-# Topt vs. sigmaH and KH
-gc()
-system.time(
-  data.Host %>%
-    filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 61)]) %>%
-    filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 61)]) %>%
-    Topt_heat_func(., system_name) %>%
-    write_rds("results/AgPlfa/Topt_vals.rds", compress = "gz")
-)
-gc()
-
-# CTmin, CTmax, CTwidth vs. sigmaH and KH
-gc()
-system.time(
-  data.Host %>%
-    filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 61)]) %>%
-    filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 61)]) %>%
-    CT_heat_func(., system_name) %>%
-    write_rds("results/AgPlfa/CT_vals.rds", compress = "gz")
-)
-gc()
-
-
-# System 5: Culex quinquefasciatus / WNV ----------------------------------
-# Code = CxWNV
-system_name = "Culex quinquefasciatus / WNV"
-
-# Topt TPCs
-gc()
-system.time(
-  data.Host %>%
-    filter(sigmaH %in% c(100, Inf))  %>%
-    R0_TPC_func(., system_name) %>%
-    write_rds("results/CxWNV/R0_TPC_data.rds", compress = "gz")
-)
-
-# Topt vs. sigmaH and KH
-gc()
-system.time(
-  data.Host %>%
-    filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 61)]) %>%
-    filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 61)]) %>%
-    Topt_heat_func(., system_name) %>%
-    write_rds("results/CxWNV/Topt_vals.rds", compress = "gz")
-)
-gc()
-
-# CTmin, CTmax, CTwidth vs. sigmaH and KH
-gc()
-system.time(
-  data.Host %>%
-    filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 11)]) %>%
-    filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 11)]) %>%
-    CT_heat_func(., system_name) %>%
-    write_rds("results/CxWNV/CT_vals.rds", compress = "gz")
-)
-gc()
 
 
 
