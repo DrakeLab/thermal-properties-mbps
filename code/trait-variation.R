@@ -182,7 +182,7 @@ get.summary <- function(in_df, summary_vars, group_vars) {
   out_df <- in_df %>%
     pivot_longer(cols = {{summary_vars}}, names_to = "variable", values_to = "value") %>% 
     group_by(!!!syms(group_vars)) %>%
-    partition(cluster) %>%
+#    partition(cluster) %>%
     summarise(
       lowHCI = quantile(value, 0.055),
       highHCI = quantile(value, 0.945),
@@ -190,24 +190,24 @@ get.summary <- function(in_df, summary_vars, group_vars) {
       median = median(value)
     ) %>%
     arrange(system_ID, sigmaH, KH) %>% 
-    collect() %>%
+#    collect() %>%
     distinct()
 }
-
+eps <- .Machine$double.eps
 # Mean and quantiles of R0 TPCs (across KH and sigmaH) (use for Figures 4, S2, and S3)
-system.time(data.Host %>%
+test <- data.Host %>%
               # To set num. of curves, change "length.out" to be the number of curves you want
-              # filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 21)]) %>%
+              filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 1)]) %>%
               filter(sigmaH %in% c(100, Inf)) %>%
               expand_grid(data.Vec) %>%
               get.outputs(.) %>%
               # Normalize R0 across temperature
               group_by(system_ID, Model, sigmaH, KH, sample_num) %>%
-              mutate(norm_R0 = R0 / max(R0)) %>% 
+              mutate(norm_R0 = R0 / max(R0, eps)) %>% 
               ungroup() %>% 
               dplyr::select(-c(V0, CHmin, CHmax, R0)) %>% 
-              get.summary(., norm_R0, group_vars = c('system_ID', 'Temperature', 'Model', 'sigmaH', 'KH')) %>% 
-              write_rds("results/R0_TPC_data.rds", compress = ".gz"))
+              get.summary(., norm_R0, group_vars = c('system_ID', 'Temperature', 'Model', 'sigmaH', 'KH'))# %>% 
+              #write_rds("results/R0_TPC_data.rds", compress = "gz"))
 
 
 # # Mean and quantiles of Topt (across KH and sigmaH) (use for Figures S2 and S3)

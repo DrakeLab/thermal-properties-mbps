@@ -17,9 +17,6 @@
 ## Inputs:  
 ##          
 ##
-##          
-##          
-##
 ## Outputs: 
 ##
 ## Written and maintained by: Kyle Dahlin, kydahlin@gmail.com
@@ -84,7 +81,7 @@ KH_vec_length <- 50 # full = 50, thin = 20
 sigmaH_vec_length <- 50 # full = 50, thin = 20
 
 # data.in.params <- read_rds("data/clean/parameter_TPCs.rds")
-# data.in.params <- read_rds("data/clean/parameter_TPCs_thin.rds") # !!! thin
+data.in.params <- read_rds("data/clean/parameter_TPCs_thin.rds") # !!! thin
  
 source("code/trait-variation.R")
 
