@@ -14,10 +14,10 @@
 ##           7) Conduct sensitivity analysis
 ##
 ##
-## Inputs:  
-##          
+## Inputs:
 ##
-## Outputs: 
+##
+## Outputs:
 ##
 ## Written and maintained by: Kyle Dahlin, kydahlin@gmail.com
 ## Initialized March 2023
@@ -58,10 +58,10 @@ plot_bool <- TRUE
 # 3) Translate traits into model parameters -------------------------------
 
 # Define temperature range of study
-Temps <- seq(10, 40, length.out = 601) # full: length.out = 200, thin: length.out = 120
+Temps <- seq(10, 40, length.out = 601) # full: length.out = 601, thin: length.out = 301
 
 # Thin samples
-thin_size <- 1000 # full = 800, thin = 100
+thin_size <- 600 # full = 600, thin = 100
 plot_bool = FALSE
 # source("code/trait-transform.R")
 
@@ -82,7 +82,7 @@ sigmaH_vec_length <- 100 # full = 50, thin = 20
 
 data.in.params <- read_rds("data/clean/parameter_TPCs.rds")
 # data.in.params <- read_rds("data/clean/parameter_TPCs_thin.rds") # !!! thin
- 
+
 # source("code/trait-variation.R")
 
 
