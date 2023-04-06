@@ -478,7 +478,7 @@ ggsave("figures/CTwidth_mean.svg", CTWidth_heat_plots,
 
 
 # Figure S2: Topt as a function of KH -------------------------------------
-Topt_df <- read_rds("results/Topt_vals.rds") %>% # read_rds("results/Topt_KH.rds") %>% 
+Topt_df <- read_rds("results/Topt_KH.rds") %>% 
   select(-c(variable)) %>%
   # filter(KH > 0.01) %>%
   # filter(sigmaH %in% 10^seq(0, 2) | is.infinite(sigmaH)) %>%
@@ -529,7 +529,8 @@ Topt_plot <- Topt_df %>%
   # y-axis
   scale_y_continuous(
     name = expression("Thermal optimum "(degree * C)),
-    expand = c(0.05, 0.05)
+    expand = c(0.05, 0.05),
+    limits = c(11,39)
   ) +
   # # color:
   # scale_colour_manual(

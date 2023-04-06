@@ -58,7 +58,7 @@ plot_bool <- TRUE
 # 3) Translate traits into model parameters -------------------------------
 
 # Define temperature range of study
-Temps <- seq(10, 40, length.out = 200) # full: length.out = 200, thin: length.out = 120
+Temps <- seq(10, 40, length.out = 601) # full: length.out = 200, thin: length.out = 120
 
 # Thin samples
 thin_size <- 1000 # full = 800, thin = 100

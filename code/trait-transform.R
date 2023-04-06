@@ -194,7 +194,8 @@ TPC_df <- data.in.params %>%
   dplyr::select(-c(muL, etaL)) %>%
   melt(id = c("system_ID", "mosquito_species","pathogen", "Temperature", "sample_num"),
        variable.name = "trait",
-       value.name = "Trait_val")
+       value.name = "Trait_val") %>% 
+  filter(system_ID %in% c("Aedes aegypti / DENV", "Aedes aegypti / ZIKV"))
 
 # get mean TPC from samples
 meanTPC_df <- TPC_df %>%
