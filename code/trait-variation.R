@@ -38,68 +38,7 @@ if (!exists("cluster")) {
 }
 
 # 1) Define accessory functions -------------------------------------------
-# 
-# get.outputs <- function(in_df) {
-#   out_df <- in_df %>%
-#     # Name the model (just in case this is handier than referring to sigmaH)
-#     mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
-#     # Vector abundance
-#     mutate(V0 = compute.V0(.)) %>%
-#     # Basic reproduction number
-#     mutate(R0 = sqrt(compute.RH(.) * compute.RV(.))) %>%
-#     # If any R0 = NA, replace it with R0 = 0
-#     # (we only get R0=NA when V0<0, i.e. when mosquito recruitment is less than mortality)
-#     replace_na(list(R0 = 0)) %>%
-#     # Lower host density limit
-#     mutate(CHmin = compute.CHmin(.)) %>%
-#     # Upper host density limit
-#     mutate(CHmax = compute.CHmax(.)) %>%
-#     distinct() %>% 
-#     ## Select only variables used for visualization
-#     dplyr::select(
-#       # Characteristics
-#       Model, system_ID, Temperature,
-#       # Uncertainty (sample number)
-#       sample_num,
-#       # Host traits
-#       KH, sigmaH,
-#       # Vector abundance
-#       sigmaV, V0,
-#       # Basic reproduction number
-#       R0,
-#       # Critical minimum host density (only applicable when sigmaH is finite)
-#       CHmin,
-#       # Critical maximum host density
-#       CHmax
-#     ) %>%
-#     distinct()
-# }
-# 
-# summarize.R0 <- function(in_df) {
-#   out_df <- in_df %>%
-#     dplyr::select(system_ID, sample_num, Temperature, Model, sigmaH, KH, R0) %>%
-#     ungroup() %>% # !!!
-#     # Get mean and CIs of R0 across samples
-#     group_by(system_ID, Temperature, Model, sigmaH, KH) %>%
-#     summarise(
-#       lowHCI_val = quantile(R0, 0.055),
-#       highHCI_val = quantile(R0, 0.945),
-#       mean_val = mean(R0),
-#       median_val = median(R0),
-#       # mode_val = mlv(norm_R0, method = 'mfv'),
-#       .groups = "keep"
-#     ) %>%
-#     # Normalize R0 means across temperature
-#     group_by(system_ID, Model, sigmaH, KH) %>%
-#     mutate(norm_mean_val = mean_val / max(mean_val, na.rm = TRUE),
-#            norm_median_val = median_val / max(median_val, na.rm = TRUE),
-#            norm_lowHCI_val = lowHCI_val / max(lowHCI_val, na.rm = TRUE),
-#            norm_highHCI_val = highHCI_val / max(highHCI_val, na.rm = TRUE)) %>%
-#     # in the case that ALL lower HCI values are zero (resulting in NaN from above), replace with
-#     mutate(norm_lowHCI_val = ifelse(is.nan(norm_lowHCI_val), 0, norm_lowHCI_val)) %>%
-#     arrange(system_ID, sigmaH, KH, Temperature, mean_val, median_val) %>% # , mode_val) %>%
-#     distinct()
-# }
+
 
 # 2) Set *host* parameters --------------------------------
 
@@ -179,7 +118,6 @@ Host_dim <- dim(data.Host)[1]
 # Each of these proceeds by by producing a data frame of outputs, restricting
 # to the appropriate case for the output of interest, then summarizing the
 # outputs by calculating the mean, median, and the endpoints of the 89% HPIs
-
 
 get.summary <- function(in_df, summary_vars, group_vars) {
   out_df <- in_df %>%
@@ -352,7 +290,7 @@ for (system_name in unique(data.Vec$system_ID)) {
   gc()
 }
 
-# write_rds(R0_TPC.df, "results/R0_TPC_data.rds", compress = "gz")
+write_rds(R0_TPC.df, "results/R0_TPC_data.rds", compress = "gz")
 
 # Topt vs. sigmaH ---------------------------------------------------------
 
