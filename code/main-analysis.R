@@ -14,10 +14,10 @@
 ##           7) Conduct sensitivity analysis
 ##
 ##
-## Inputs:  
-##          
+## Inputs:
 ##
-## Outputs: 
+##
+## Outputs:
 ##
 ## Written and maintained by: Kyle Dahlin, kydahlin@gmail.com
 ## Initialized March 2023
@@ -82,7 +82,7 @@ sigmaH_vec_length <- 100 # full = 50, thin = 20
 
 data.in.params <- read_rds("data/clean/parameter_TPCs.rds")
 # data.in.params <- read_rds("data/clean/parameter_TPCs_thin.rds") # !!! thin
- 
+
 # source("code/trait-variation.R")
 
 
