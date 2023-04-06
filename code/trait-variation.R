@@ -34,69 +34,70 @@ source("code/output-functions.R") # needed for compute.variable functions
 # Set up parallel
 cluster <- new_cluster(parallel::detectCores() - 1)
 cluster_library(cluster, c("dplyr", "tidyr"))
+
 # 1) Define accessory functions -------------------------------------------
-
-get.outputs <- function(in_df) {
-  out_df <- in_df %>%
-    # Name the model (just in case this is handier than referring to sigmaH)
-    mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
-    # Vector abundance
-    mutate(V0 = compute.V0(.)) %>%
-    # Basic reproduction number
-    mutate(R0 = sqrt(compute.RH(.) * compute.RV(.))) %>%
-    # If any R0 = NA, replace it with R0 = 0
-    # (we only get R0=NA when V0<0, i.e. when mosquito recruitment is less than mortality)
-    replace_na(list(R0 = 0)) %>%
-    # Lower host density limit
-    mutate(CHmin = compute.CHmin(.)) %>%
-    # Upper host density limit
-    mutate(CHmax = compute.CHmax(.)) %>%
-    distinct() %>% 
-    ## Select only variables used for visualization
-    dplyr::select(
-      # Characteristics
-      Model, system_ID, Temperature,
-      # Uncertainty (sample number)
-      sample_num,
-      # Host traits
-      KH, sigmaH,
-      # Vector abundance
-      sigmaV, V0,
-      # Basic reproduction number
-      R0,
-      # Critical minimum host density (only applicable when sigmaH is finite)
-      CHmin,
-      # Critical maximum host density
-      CHmax
-    ) %>%
-    distinct()
-}
-
-summarize.R0 <- function(in_df) {
-  out_df <- in_df %>%
-    dplyr::select(system_ID, sample_num, Temperature, Model, sigmaH, KH, R0) %>%
-    ungroup() %>% # !!!
-    # Get mean and CIs of R0 across samples
-    group_by(system_ID, Temperature, Model, sigmaH, KH) %>%
-    summarise(
-      lowHCI_val = quantile(R0, 0.055),
-      highHCI_val = quantile(R0, 0.945),
-      mean_val = mean(R0),
-      median_val = median(R0),
-      # mode_val = mlv(norm_R0, method = 'mfv'),
-      .groups = "keep"
-    ) %>%
-    # Normalize R0 means across temperature
-    group_by(system_ID, Model, sigmaH, KH) %>%
-    mutate(norm_mean_val = mean_val / max(mean_val, na.rm = TRUE),
-           norm_median_val = median_val / max(median_val, na.rm = TRUE),
-           norm_lowHCI_val = lowHCI_val / max(lowHCI_val, na.rm = TRUE),
-           norm_highHCI_val = highHCI_val / max(highHCI_val, na.rm = TRUE)) %>%
-    # in the case that ALL lower HCI values are zero (resulting in NaN from above), replace with
-    mutate(norm_lowHCI_val = ifelse(is.nan(norm_lowHCI_val), 0, norm_lowHCI_val)) %>%
-    arrange(system_ID, sigmaH, KH, Temperature, mean_val, median_val) %>% # , mode_val) %>%
-    distinct()
-}
+# 
+# get.outputs <- function(in_df) {
+#   out_df <- in_df %>%
+#     # Name the model (just in case this is handier than referring to sigmaH)
+#     mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
+#     # Vector abundance
+#     mutate(V0 = compute.V0(.)) %>%
+#     # Basic reproduction number
+#     mutate(R0 = sqrt(compute.RH(.) * compute.RV(.))) %>%
+#     # If any R0 = NA, replace it with R0 = 0
+#     # (we only get R0=NA when V0<0, i.e. when mosquito recruitment is less than mortality)
+#     replace_na(list(R0 = 0)) %>%
+#     # Lower host density limit
+#     mutate(CHmin = compute.CHmin(.)) %>%
+#     # Upper host density limit
+#     mutate(CHmax = compute.CHmax(.)) %>%
+#     distinct() %>% 
+#     ## Select only variables used for visualization
+#     dplyr::select(
+#       # Characteristics
+#       Model, system_ID, Temperature,
+#       # Uncertainty (sample number)
+#       sample_num,
+#       # Host traits
+#       KH, sigmaH,
+#       # Vector abundance
+#       sigmaV, V0,
+#       # Basic reproduction number
+#       R0,
+#       # Critical minimum host density (only applicable when sigmaH is finite)
+#       CHmin,
+#       # Critical maximum host density
+#       CHmax
+#     ) %>%
+#     distinct()
+# }
+# 
+# summarize.R0 <- function(in_df) {
+#   out_df <- in_df %>%
+#     dplyr::select(system_ID, sample_num, Temperature, Model, sigmaH, KH, R0) %>%
+#     ungroup() %>% # !!!
+#     # Get mean and CIs of R0 across samples
+#     group_by(system_ID, Temperature, Model, sigmaH, KH) %>%
+#     summarise(
+#       lowHCI_val = quantile(R0, 0.055),
+#       highHCI_val = quantile(R0, 0.945),
+#       mean_val = mean(R0),
+#       median_val = median(R0),
+#       # mode_val = mlv(norm_R0, method = 'mfv'),
+#       .groups = "keep"
+#     ) %>%
+#     # Normalize R0 means across temperature
+#     group_by(system_ID, Model, sigmaH, KH) %>%
+#     mutate(norm_mean_val = mean_val / max(mean_val, na.rm = TRUE),
+#            norm_median_val = median_val / max(median_val, na.rm = TRUE),
+#            norm_lowHCI_val = lowHCI_val / max(lowHCI_val, na.rm = TRUE),
+#            norm_highHCI_val = highHCI_val / max(highHCI_val, na.rm = TRUE)) %>%
+#     # in the case that ALL lower HCI values are zero (resulting in NaN from above), replace with
+#     mutate(norm_lowHCI_val = ifelse(is.nan(norm_lowHCI_val), 0, norm_lowHCI_val)) %>%
+#     arrange(system_ID, sigmaH, KH, Temperature, mean_val, median_val) %>% # , mode_val) %>%
+#     distinct()
+# }
 
 # 2) Set *host* parameters --------------------------------
 
@@ -181,7 +182,89 @@ Host_dim <- dim(data.Host)[1]
 get.summary <- function(in_df, summary_vars, group_vars) {
   out_df <- in_df %>%
     pivot_longer(cols = {{summary_vars}}, names_to = "variable", values_to = "value") %>% 
-    group_by(!!!syms(group_vars)) %>%
+    group_by(c(!!!syms(group_vars), variable)) %>%
+    partition(cluster) %>%
+    summarise(
+      lowHCI = quantile(value, 0.055),
+      highHCI = quantile(value, 0.945),
+      mean = mean(value),
+      median = median(value)
+    ) %>%
+    arrange(system_ID, sigmaH, KH) %>% 
+    collect() %>%
+    distinct()
+}
+eps <- .Machine$double.eps
+
+# # Mean and quantiles of R0 TPCs (across KH and sigmaH) (use for Figure 4)
+# system.time(data.Host %>%
+#               # To set num. of curves, change "length.out" to be the number of curves you want
+#               #filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 1)]) %>%
+#               filter(sigmaH %in% c(100, Inf)) %>%
+#               expand_grid(data.Vec) %>%
+#               get.outputs(.) %>%
+#               # Normalize R0 across temperature
+#               group_by(system_ID, Model, sigmaH, KH, sample_num) %>%
+#               mutate(norm_R0 = R0 / max(R0, eps)) %>% 
+#               ungroup() %>% 
+#               dplyr::select(-c(V0, CHmin, CHmax, R0)) %>% 
+#               get.summary(., norm_R0, group_vars = c('system_ID', 'Temperature', 'Model', 'sigmaH', 'KH')) %>% 
+#               write_rds("results/R0_TPC_data.rds", compress = "gz"))
+
+
+# # Mean and quantiles of Topt (across KH and sigmaH) (use for Figures S2 and S3)
+# system.time(test <- data.Host %>%
+#               #filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 1)]) %>%
+#               filter(sigmaH %in% c(1, 10, 100, Inf)) %>%
+#               expand_grid(data.Vec %>%
+#                             filter(between(Temperature, 20, 32))) %>% # known range of Topt
+#               get.outputs(.) %>%
+#               # Filter to maximum value of R0
+#               group_by(system_ID, sample_num, sigmaH, KH) %>%
+#               filter(R0 == max(R0)) %>%
+#               # Get temperature at which R0 is maximized
+#               rename(Topt = Temperature) %>%
+#               # If any R0 = NA, replace it with R0 = 0
+#               # (we only get R0=NA when V0<0, i.e. when mosquito recruitment is less than mortality)
+#               replace_na(list(R0 = 0)) %>%
+#               ungroup() %>%
+#               dplyr::select(-c(V0, CHmin, CHmax, R0)) %>%
+#               get.summary(., Topt, group_vars = c('system_ID', 'Model', 'sigmaH', 'KH')) %>%
+#               write_rds("results/Topt_quantile_data.rds", compress = "gz"))
+
+# Mean of Topt across KH and sigmaH 
+
+Topt_heat_func <- function(in_df, system_name) {
+  
+  out_df <- in_df %>%
+    expand_grid(data.Vec %>%
+                  filter(system_ID == system_name) %>%
+                  filter(between(Temperature, 20, 29))) %>% # known range of Topt
+    data.table::data.table() %>%
+    # Name the model (just in case this is handier than referring to sigmaH)
+    mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
+    group_by(sigmaH) %>%
+    # partition(cluster) %>%
+    mutate(V0 = ifelse( sigmaV_f * deltaL < (1 / lf),
+                        0,
+                        KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL)))) %>%
+    # Basic reproduction number
+    mutate(R0 = ifelse(V0 <= 0, 0,
+                       ifelse(is.infinite(sigmaH),
+                              sigmaV * sigmaV * betaH / (1 / (lf)), # Ross-Macdonald model
+                              sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0)) * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH)) * sigmaH * sigmaV * betaH * KH / ((1 / (lf)) * (sigmaH * KH + sigmaV * V0)))) %>%
+    group_by(sample_num, sigmaH, KH) %>%
+    # Filter to maximum value of R0
+    filter(R0 == max(R0)) %>%
+    # Get temperature at which R0 is maximized
+    rename(Topt = Temperature) %>%
+    # If any R0 = NA, replace it with R0 = 0
+    # (we only get R0=NA when V0<0, i.e. when mosquito recruitment is less than mortality)
+    replace_na(list(R0 = 0)) %>%
+    ungroup() %>%
+    dplyr::select(-c(V0, R0)) %>%
+    pivot_longer(cols = Topt, names_to = "variable", values_to = "value") %>% 
+    group_by(system_ID, Model, sigmaH, KH, variable) %>%
     partition(cluster) %>%
     summarise(
       lowHCI = quantile(value, 0.055),
@@ -194,64 +277,14 @@ get.summary <- function(in_df, summary_vars, group_vars) {
     distinct()
 }
 
-# Mean and quantiles of R0 TPCs (across KH and sigmaH) (use for Figures 4, S2, and S3)
-system.time(data.Host %>%
-              # To set num. of curves, change "length.out" to be the number of curves you want
-              # filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 21)]) %>%
-              filter(sigmaH %in% c(100, Inf)) %>%
-              expand_grid(data.Vec) %>%
-              get.outputs(.) %>%
-              # Normalize R0 across temperature
-              group_by(system_ID, Model, sigmaH, KH, sample_num) %>%
-              mutate(norm_R0 = R0 / max(R0)) %>% 
-              ungroup() %>% 
-              dplyr::select(-c(V0, CHmin, CHmax, R0)) %>% 
-              get.summary(., norm_R0, group_vars = c('system_ID', 'Temperature', 'Model', 'sigmaH', 'KH')) %>% 
-              write_rds("results/R0_TPC_data.rds", compress = ".gz"))
-
-
-# # Mean and quantiles of Topt (across KH and sigmaH) (use for Figures S2 and S3)
-# data.Host %>%
-#   # To set num. of curves, change "length.out" to be the number of curves you want
-#   filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 51)]) %>%
-#   filter(sigmaH %in% c(1, 10, 100, Inf)) %>%
-#   expand_grid(data.Vec %>%
-#                 filter(between(Temperature, 20, 32))) %>% # known range of Topt
-#   # Name the model (just in case this is handier than referring to sigmaH)
-#   mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
-#   # Vector abundance
-#   mutate(V0 = compute.V0(.)) %>%
-#   # Basic reproduction number
-#   mutate(R0 = sqrt(compute.RH(.) * compute.RV(.))) %>%
-#   group_by(system_ID, sample_num, sigmaH, KH) %>%
-#   filter(R0 == max(R0)) %>%
-#   # Get temperature at which R0 is maximized
-#   rename(Topt = Temperature) %>%
-#   # If any R0 = NA, replace it with R0 = 0
-#   # (we only get R0=NA when V0<0, i.e. when mosquito recruitment is less than mortality)
-#   replace_na(list(R0 = 0)) %>%
-#   ## Select only variables used for visualization
-#   dplyr::select(Model, system_ID, sample_num, KH, sigmaH, Topt) %>%
-#   distinct() %>%
-#   get.summary(., Topt)
-#   write_rds("results/Topt_quantile_data.rds")
-
-# Mean of Topt across KH and sigmaH 
-#  To do this, we have to divide up the systems to avoid running out of memory
-
-Topt_heat_func <- function(in_df, system_name) {
+CT_heat_func <- function(in_df, system_name) {
   
-  out_df <- in_df %>% 
+  out_df <- in_df %>%
     expand_grid(data.Vec %>%
-                  filter(system_ID == system_name) %>%
-                  filter(between(Temperature, 20, 29))) %>% # known range of Topt
-    data.table::data.table() %>%
+                  filter(between(Temperature, 13, 34)) %>% # known range of CT
+                  filter(system_ID == system_name)) %>%
     # Name the model (just in case this is handier than referring to sigmaH)
     mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
-    # group_by(system_ID, sample_num, sigmaH, KH) %>%
-    # Vector abundance (needed to compute R0)
-    group_by(sigmaH) %>% 
-    partition(cluster) %>% 
     mutate(V0 = ifelse( sigmaV_f * deltaL < (1 / lf),
                         0,
                         KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL)))) %>%
@@ -260,95 +293,205 @@ Topt_heat_func <- function(in_df, system_name) {
                        ifelse(is.infinite(sigmaH),
                               sigmaV * sigmaV * betaH / (1 / (lf)), # Ross-Macdonald model
                               sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0)) * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH)) * sigmaH * sigmaV * betaH * KH / ((1 / (lf)) * (sigmaH * KH + sigmaV * V0)))) %>% 
-    # sqrt(compute.RH(.) * compute.RV(.))) %>%
-    group_by(sample_num, sigmaH, KH) %>% 
-    filter(R0 == max(R0)) %>%
-    # Get temperature at which R0 is maximized
-    rename(Topt = Temperature) %>%
-    # If any R0 = NA, replace it with R0 = 0
-    # replace_na(list(R0 = 0)) %>%
-    # (we only get R0=NA when V0<0, i.e. when mosquito recruitment is less than mortality)
-    ## Select only variables used for visualization
-    dplyr::select(Model, system_ID, sample_num, KH, sigmaH, Topt) %>%
-    ungroup() %>% 
-    collect() %>% 
-    distinct() %>% 
-    summarize.Topt(.)
-  
+    # Filter to maximum value of R0
+    group_by(system_ID, sample_num, sigmaH, KH) %>%
+    filter(R0 > 1) %>%
+    # Get lowest temperature at which R0 exceeds one
+    mutate(CTmin = min(Temperature)) %>%
+    # Get highest temperature at which R0 exceeds one
+    mutate(CTmax = max(Temperature)) %>%
+    # Get width of critical thermal interval
+    mutate(CTwidth = CTmax - CTmin) %>% 
+    ungroup() %>%
+    dplyr::select(system_ID, Model, sigmaH, KH, CTmin, CTmax, CTwidth) %>%
+    pivot_longer(cols = c(CTwidth, CTmin, CTmax), names_to = "variable", values_to = "value") %>%
+    group_by(system_ID, Model, sigmaH, KH, variable) %>%
+    partition(cluster) %>%
+    summarise(
+      lowHCI = quantile(value, 0.055),
+      highHCI = quantile(value, 0.945),
+      mean = mean(value),
+      median = median(value)
+    ) %>%
+    arrange(system_ID, sigmaH, KH) %>%
+    collect() %>%
+    distinct()
 }
 
-# in_df <- data.Host %>%
-#   # To set num. of curves, change "length.out" to be the number of curves you want
-#   filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 41)]) %>% #51
-#   filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 41)])
+# gc()
+# system.time(data.Host %>%
+#               filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 81)]) %>%
+#               filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 81)]) %>%
+#               Topt_heat_func(., system_name = "Anopheles gambiae / Plasmodium falciparum") %>% 
+#               write_rds("results/Topt_AgPlfa.rds"))
+# gc()
 # 
 # 
-# Topt_heat_func(in_df, "Aedes aegypti / DENV") %>% 
-#   write_rds("results/Topt_AeDENV.rds")
-# Topt_heat_func(in_df, "Aedes aegypti / ZIKV") %>% 
-#   write_rds("results/Topt_AeZIKV.rds")
-# Topt_heat_func(in_df, "Aedes albopictus / DENV") %>% 
-#   write_rds("results/Topt_AlDENV.rds")
-# Topt_heat_func(in_df, "Anopheles gambiae / Plasmodium falciparum") %>% 
-#   write_rds("results/Topt_AgPlfa.rds")
-# Topt_heat_func(in_df, "Culex quinquefasciatus / WNV") %>% 
-#   write_rds("results/Topt_CxWNV.rds")
-
-# length(unique(filter(test, system_ID == "Aedes aegypti / DENV")$sigmaH))
 # 
-
-# data.Host %>%
-#   # To set num. of curves, change "length.out" to be the number of curves you want
-#   filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 31)]) %>%
-#   filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 31)]) %>%
-#   expand_grid(data.Vec %>%
-#                 filter(system_ID) %>% 
-#                 filter(between(Temperature, 20, 30))) %>% # known range of Topt
-#   # Name the model (just in case this is handier than referring to sigmaH)
-#   mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
-#   # Vector abundance
-#   mutate(V0 = compute.V0(.)) %>%
-#   # Basic reproduction number
-#   mutate(R0 = sqrt(compute.RH(.) * compute.RV(.))) %>%
-#   group_by(system_ID, sample_num, sigmaH, KH) %>%
-#   filter(R0 == max(R0)) %>%
-#   # Get temperature at which R0 is maximized
-#   rename(Topt = Temperature) %>%
-#   # If any R0 = NA, replace it with R0 = 0
-#   # (we only get R0=NA when V0<0, i.e. when mosquito recruitment is less than mortality)
-#   replace_na(list(R0 = 0)) %>%
-#   ## Select only variables used for visualization
-#   dplyr::select(Model, system_ID, sample_num, KH, sigmaH, Topt) %>%
-#   distinct() %>%
-#   summarize.Topt(.) %>%
-#   write_rds("results/Topt_heat_data.rds") 
-
-
+# system.time(data.Host %>%
+#               filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 81)]) %>%
+#               filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 81)]) %>%
+#               Topt_heat_func(., system_name = "Aedes aegypti / DENV") %>% 
+#               write_rds("results/Topt_AeDENV.rds"))
+# gc()
+# 
+# system.time(data.Host %>%
+#               filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 81)]) %>%
+#               filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 81)]) %>%
+#               Topt_heat_func(., system_name = "Aedes aegypti / ZIKV") %>% 
+#               write_rds("results/Topt_AeZIKV.rds"))
+# gc()
+# 
+# system.time(data.Host %>%
+#               filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 81)]) %>%
+#               filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 81)]) %>%
+#               Topt_heat_func(., system_name = "Aedes albopictus / DENV") %>% 
+#               write_rds("results/Topt_AlDENV.rds"))
+# gc()
+# 
+# system.time(data.Host %>%
+#               filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 81)]) %>%
+#               filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 81)]) %>%
+#               Topt_heat_func(., system_name = "Culex quinquefasciatus / WNV") %>% 
+#               write_rds("results/Topt_CxWNV.rds"))
+# gc()
 
 # Critical thermal interval data ------------------------------------------
 
-in_df <- data.Host %>%
-  # To set num. of curves, change "length.out" to be the number of curves you want
-  # filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 91)]) %>% #51
-  # filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 91)]) %>%
-  expand_grid(data.Vec)
 
-out_df <- in_df %>%
-  get.outputs(.) %>% 
-  # Restrict to rows where R0 exceeds one
-  filter(R0 > 1) %>%
-  group_by(system_ID, sample_num, sigmaH, KH) %>%
-  # Get lowest temperature at which R0 exceeds one
-  mutate(CTmin = min(Temperature)) %>%
-  # Get highest temperature at which R0 exceeds one
-  mutate(CTmax = max(Temperature)) %>%
-  # Get width of critical thermal interval
-  mutate(CTwidth = CTmax - CTmin) %>% 
-  dplyr::select(Model, system_ID, sample_num, sigmaH, KH, CTmin, CTmax, CTwidth) %>%
-  # remove duplicate rows
-  distinct() %>%
-  arrange(system_ID, sample_num, sigmaH) %>%
-  get.summary(., c(CTmin, CTmax, CTwidth))
+rm(data.in.params)
+
+gc()
+system.time(test <- data.Host %>%
+              filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 50)]) %>%
+              filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 50)]) %>%
+              expand_grid(data.Vec %>%
+                            filter(between(Temperature, 13, 34)) %>% # known range of CT
+                            filter(sample_num %in% unique(sample_num)[seq(1, length(unique(sample_num)), length.out = 300)])) %>% 
+              # Name the model (just in case this is handier than referring to sigmaH)
+              mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
+              mutate(V0 = ifelse( sigmaV_f * deltaL < (1 / lf),
+                                  0,
+                                  KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL)))) %>%
+              # Basic reproduction number
+              mutate(R0 = ifelse(V0 <= 0, 0,
+                                 ifelse(is.infinite(sigmaH),
+                                        sigmaV * sigmaV * betaH / (1 / (lf)), # Ross-Macdonald model
+                                        sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0)) * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH)) * sigmaH * sigmaV * betaH * KH / ((1 / (lf)) * (sigmaH * KH + sigmaV * V0)))) %>% 
+              # Filter to maximum value of R0
+              group_by(system_ID, sample_num, sigmaH, KH) %>%
+              filter(R0 > 1) %>%
+              # Get lowest temperature at which R0 exceeds one
+              mutate(CTmin = min(Temperature)) %>%
+              # Get highest temperature at which R0 exceeds one
+              mutate(CTmax = max(Temperature)) %>%
+              # Get width of critical thermal interval
+              mutate(CTwidth = CTmax - CTmin) %>% 
+              ungroup() %>%
+              dplyr::select(system_ID, Model, sigmaH, KH, CTmin, CTmax, CTwidth) %>%
+              pivot_longer(cols = c(CTwidth, CTmin, CTmax), names_to = "variable", values_to = "value") %>%
+              group_by(system_ID, Model, sigmaH, KH, variable) %>%
+              partition(cluster) %>%
+              summarise(
+                lowHCI = quantile(value, 0.055),
+                highHCI = quantile(value, 0.945),
+                mean = mean(value),
+                median = median(value)
+              ) %>%
+              arrange(system_ID, sigmaH, KH) %>%
+              collect() %>%
+              distinct() %>%
+              write_rds("results/CT_quantile_data.rds", compress = "gz")
+)
+
+gc()
+
+
+
+# System 1: Aedes aegypti / DENV ------------------------------------------
+# Code = AeDENV
+system_name = "Aedes aegypti / DENV"
+
+# Topt TPCs
+system.time(
+  test1 <- data.Host %>%
+    filter(sigmaH %in% c(100, Inf)) %>%
+    expand_grid(data.Vec) %>%    # Name the model (just in case this is handier than referring to sigmaH)
+    mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
+    mutate(V0 = ifelse( sigmaV_f * deltaL < (1 / lf),
+                        0,
+                        KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL)))) %>%
+    # Basic reproduction number
+    mutate(R0 = ifelse(V0 <= 0, 0,
+                       ifelse(is.infinite(sigmaH),
+                              sigmaV * sigmaV * betaH / (1 / (lf)), # Ross-Macdonald model
+                              sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0)) * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH)) * sigmaH * sigmaV * betaH * KH / ((1 / (lf)) * (sigmaH * KH + sigmaV * V0)))) %>% 
+    # Normalize R0 across temperature
+    group_by(system_ID, Model, sigmaH, KH, sample_num) %>%
+    mutate(norm_R0 = R0 / max(R0, eps)) %>%
+    ungroup() %>%
+    dplyr::select(-c(V0, CHmin, CHmax, R0)) %>%
+    get.summary(., norm_R0, group_vars = c('system_ID', 'Temperature', 'Model', 'sigmaH', 'KH')) %>%
+    write_rds("results/AeDENV/R0_TPC_data.rds", compress = "gz")
+)
+
+# Topt vs. sigmaH and KH
+gc()
+system.time(
+  test2 <- data.Host %>%
+    filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 81)]) %>%
+    filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 81)]) %>%
+    Topt_heat_func(., system_name) %>%
+    write_rds("results/AeDENV/Topt_vals.rds")
+)
+gc()
+
+# CTmin, CTmax, CTwidth vs. sigmaH and KH
+gc()
+system.time(
+  test3 <- data.Host %>%
+    filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 81)]) %>%
+    filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 81)]) %>%
+    CT_heat_func (., system_name) %>%
+    write_rds("results/AeDENV/CT_vals.rds", compress = "gz")
+)
+gc()
+
+# System 2: Aedes aegypti / ZIKV ------------------------------------------
+
+
+# System 3: Aedes albopictus / DENV ---------------------------------------
+
+
+# System 4: Anopheles gambiae / Plasmodium relictum -----------------------
+
+
+# System 5: Culex quinquefasciatus / WNV ----------------------------------
+
+
+
+# in_df <- data.Host %>%
+#   # To set num. of curves, change "length.out" to be the number of curves you want
+#   # filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 91)]) %>% #51
+#   # filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 91)]) %>%
+#   expand_grid(data.Vec)
+# 
+# out_df <- in_df %>%
+#   get.outputs(.) %>% 
+#   # Restrict to rows where R0 exceeds one
+#   filter(R0 > 1) %>%
+#   group_by(system_ID, sample_num, sigmaH, KH) %>%
+#   # Get lowest temperature at which R0 exceeds one
+#   mutate(CTmin = min(Temperature)) %>%
+#   # Get highest temperature at which R0 exceeds one
+#   mutate(CTmax = max(Temperature)) %>%
+#   # Get width of critical thermal interval
+#   mutate(CTwidth = CTmax - CTmin) %>% 
+#   dplyr::select(Model, system_ID, sample_num, sigmaH, KH, CTmin, CTmax, CTwidth) %>%
+#   # remove duplicate rows
+#   distinct() %>%
+#   arrange(system_ID, sample_num, sigmaH) %>%
+#   get.summary(., c(CTmin, CTmax, CTwidth))
 
 
 
