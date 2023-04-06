@@ -196,44 +196,6 @@ get.summary <- function(in_df, summary_vars, group_vars) {
 }
 eps <- .Machine$double.eps
 
-# # Mean and quantiles of R0 TPCs (across KH and sigmaH) (use for Figure 4)
-# system.time(data.Host %>%
-#               # To set num. of curves, change "length.out" to be the number of curves you want
-#               #filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 1)]) %>%
-#               filter(sigmaH %in% c(100, Inf)) %>%
-#               expand_grid(data.Vec) %>%
-#               get.outputs(.) %>%
-#               # Normalize R0 across temperature
-#               group_by(system_ID, Model, sigmaH, KH, sample_num) %>%
-#               mutate(norm_R0 = R0 / max(R0, eps)) %>% 
-#               ungroup() %>% 
-#               dplyr::select(-c(V0, CHmin, CHmax, R0)) %>% 
-#               get.summary(., norm_R0, group_vars = c('system_ID', 'Temperature', 'Model', 'sigmaH', 'KH')) %>% 
-#               write_rds("results/R0_TPC_data.rds", compress = "gz"))
-
-
-# # Mean and quantiles of Topt (across KH and sigmaH) (use for Figures S2 and S3)
-# system.time(test <- data.Host %>%
-#               #filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 1)]) %>%
-#               filter(sigmaH %in% c(1, 10, 100, Inf)) %>%
-#               expand_grid(data.Vec %>%
-#                             filter(between(Temperature, 20, 32))) %>% # known range of Topt
-#               get.outputs(.) %>%
-#               # Filter to maximum value of R0
-#               group_by(system_ID, sample_num, sigmaH, KH) %>%
-#               filter(R0 == max(R0)) %>%
-#               # Get temperature at which R0 is maximized
-#               rename(Topt = Temperature) %>%
-#               # If any R0 = NA, replace it with R0 = 0
-#               # (we only get R0=NA when V0<0, i.e. when mosquito recruitment is less than mortality)
-#               replace_na(list(R0 = 0)) %>%
-#               ungroup() %>%
-#               dplyr::select(-c(V0, CHmin, CHmax, R0)) %>%
-#               get.summary(., Topt, group_vars = c('system_ID', 'Model', 'sigmaH', 'KH')) %>%
-#               write_rds("results/Topt_quantile_data.rds", compress = "gz"))
-
-# Mean of Topt across KH and sigmaH 
-
 Topt_heat_func <- function(in_df, system_name) {
   
   out_df <- in_df %>%
@@ -263,8 +225,9 @@ Topt_heat_func <- function(in_df, system_name) {
     replace_na(list(R0 = 0)) %>%
     ungroup() %>%
     dplyr::select(-c(V0, R0)) %>%
-    pivot_longer(cols = Topt, names_to = "variable", values_to = "value") %>% 
     group_by(system_ID, Model, sigmaH, KH, variable) %>%
+    pivot_longer(cols = Topt, names_to = "variable", values_to = "value") %>% 
+    partition(cluster) %>%
     partition(cluster) %>%
     summarise(
       lowHCI = quantile(value, 0.055),
@@ -278,7 +241,6 @@ Topt_heat_func <- function(in_df, system_name) {
 }
 
 CT_heat_func <- function(in_df, system_name) {
-  
   out_df <- in_df %>%
     expand_grid(data.Vec %>%
                   filter(between(Temperature, 13, 34)) %>% # known range of CT
@@ -317,6 +279,69 @@ CT_heat_func <- function(in_df, system_name) {
     collect() %>%
     distinct()
 }
+
+# # Mean and quantiles of R0 TPCs (across KH and sigmaH) (use for Figure 4)
+# system.time(data.Host %>%
+#               # To set num. of curves, change "length.out" to be the number of curves you want
+#               #filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 1)]) %>%
+#               filter(sigmaH %in% c(100, Inf)) %>%
+#               expand_grid(data.Vec) %>%
+#               get.outputs(.) %>%
+#               # Normalize R0 across temperature
+#               group_by(system_ID, Model, sigmaH, KH, sample_num) %>%
+#               mutate(norm_R0 = R0 / max(R0, eps)) %>% 
+#               ungroup() %>% 
+#               dplyr::select(-c(V0, CHmin, CHmax, R0)) %>% 
+#               get.summary(., norm_R0, group_vars = c('system_ID', 'Temperature', 'Model', 'sigmaH', 'KH')) %>% 
+#               write_rds("results/R0_TPC_data.rds", compress = "gz"))
+
+
+# # Mean and quantiles of Topt (across KH and sigmaH) (use for Figures S2 and S3)
+# system.time(test <- data.Host %>%
+#               #filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 1)]) %>%
+#               filter(sigmaH %in% c(1, 10, 100, Inf)) %>%
+#               expand_grid(data.Vec %>%
+#                             filter(between(Temperature, 20, 32))) %>% # known range of Topt
+#               get.outputs(.) %>%
+#               # Filter to maximum value of R0
+#               group_by(system_ID, sample_num, sigmaH, KH) %>%
+#               filter(R0 == max(R0)) %>%
+#               # Get temperature at which R0 is maximized
+#               rename(Topt = Temperature) %>%
+#               # If any R0 = NA, replace it with R0 = 0
+#               # (we only get R0=NA when V0<0, i.e. when mosquito recruitment is less than mortality)
+#               replace_na(list(R0 = 0)) %>%
+#               ungroup() %>%
+#               dplyr::select(-c(V0, CHmin, CHmax, R0)) %>%
+#               get.summary(., Topt, group_vars = c('system_ID', 'Model', 'sigmaH', 'KH')) %>%
+#               write_rds("results/Topt_quantile_data.rds", compress = "gz"))
+
+# Mean of Topt across KH and sigmaH 
+
+
+eps <- .Machine$double.eps
+# Mean and quantiles of R0 TPCs (across KH and sigmaH) (use for Figures 4, S2, and S3)
+test <- data.Host %>%
+              # To set num. of curves, change "length.out" to be the number of curves you want
+              filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 1)]) %>%
+              filter(sigmaH %in% c(100, Inf)) %>%
+              expand_grid(data.Vec) %>%
+              get.outputs(.) %>%
+              # Normalize R0 across temperature
+              group_by(system_ID, Model, sigmaH, KH, sample_num) %>%
+              mutate(norm_R0 = R0 / max(R0, eps)) %>% 
+              ungroup() %>% 
+              dplyr::select(-c(V0, CHmin, CHmax, R0)) %>% 
+              get.summary(., norm_R0, group_vars = c('system_ID', 'Temperature', 'Model', 'sigmaH', 'KH'))# %>% 
+              #write_rds("results/R0_TPC_data.rds", compress = "gz"))
+
+
+
+# Mean of Topt across KH and sigmaH 
+#  To do this, we have to divide up the systems to avoid running out of memory
+
+
+
 
 # gc()
 # system.time(data.Host %>%
