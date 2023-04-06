@@ -72,9 +72,10 @@ shift_legend <- function(p) {
 # curves  = Chitnis dynamic R0,
 #   - colour = value of KH. place it on a color scale in the bottom right corner
 
-# R0_df <- read_rds("results/R0_TPC_data.rds")
 
-R0_df <- test
+R0_df <- read_rds("results/R0_TPC_data.rds") %>% 
+  filter(KH %in% 10^seq(-2,5)) %>% 
+  arrange(system_ID, KH, sigmaH, Temperature)
 
 R0_plot <- ggplot(mapping = aes(x = Temperature, group = KH)) +
   # path of mean, normalized R0 as a function of temperature (finite sigmaH):
@@ -169,6 +170,7 @@ R0_plot <- ggplot(mapping = aes(x = Temperature, group = KH)) +
 
 # Plot
 R0_plot <- shift_legend(R0_plot)
+
 ggsave("figures/R0_TPCs.svg", R0_plot,
        width = 16, height = 9)
 
@@ -476,61 +478,41 @@ ggsave("figures/CTwidth_mean.svg", CTWidth_heat_plots,
 
 
 # Figure S2: Topt as a function of KH -------------------------------------
-Topt_df <- data.in.thermchars %>% 
-  select(-c(R0opt, threshold_bool, CHmin, CHmax, CTmin, CTmax)) %>%
+Topt_df <- read_rds("results/Topt_vals.rds") %>% # read_rds("results/Topt_KH.rds") %>% 
+  select(-c(variable)) %>%
   # filter(KH > 0.01) %>%
-  filter(sigmaH %in% 10^seq(0, 2) | is.infinite(sigmaH)) %>%
+  # filter(sigmaH %in% 10^seq(0, 2) | is.infinite(sigmaH)) %>%
   group_by(KH) %>%
   # Arrange along the plotting variables
-  arrange(system_ID, KH, Topt) %>%
+  arrange(system_ID, KH, mean) %>%
   arrange(sigmaH) %>%
   ungroup()
 
-meanTopt_df <- Topt_df %>%
-  group_by(system_ID, Model, sigmaH, KH) %>%
-  summarise(
-    mean_val = mean(Topt),
-    median_val = median(Topt),
-    # mode_val = mlv(norm_R0, method = 'mfv'),
-    .groups = "keep"
-  ) %>%
-  arrange(system_ID, sigmaH, KH, mean_val, median_val)# , mode_val)
-
-quantsTopt_df <- Topt_df %>%
-  group_by(system_ID, Model, sigmaH, KH) %>%
-  mutate(lowHCI_val = quantile(Topt, 0.055)) %>%
-  mutate(highHCI_val = quantile(Topt, 0.945)) %>%
-  arrange(system_ID, sigmaH, KH, lowHCI_val, highHCI_val) %>%
-  dplyr::select(-c("sample_num"))
-
-meanTopt_df <- read_rds("results/Topt_data.rds")
-
 # PLOTTING
-Topt_plot <- meanTopt_df %>%
+Topt_plot <- Topt_df %>%
   ## Set up plot ##
   # color = sigmaH
   ggplot(aes(
     x = KH
   )) +
   # Topt curves:
-  geom_path(aes(y = mean_val, colour = as.factor(sigmaH)), lwd = 1) +
-  # 89% HCI of R0 TPC curves
-  geom_ribbon(
-    data = meanTopt_df,
-    aes(ymin = lowHCI_val, ymax = highHCI_val,
-        fill = as.factor(sigmaH)),
-    alpha = 0.05
-  ) +
+  geom_path(aes(y = mean, colour = as.factor(sigmaH)), lwd = 1) +
+  # # 89% HCI of R0 TPC curves
+  # geom_ribbon(
+  #   
+  #   aes(ymin = lowHCI, ymax = highHCI,
+  #       fill = as.factor(sigmaH)),
+  #   alpha = 0.05
+  # ) +
   # Add dotted lines showing limits of ribbons
   geom_path(
-    data = meanTopt_df,
-    aes(y = lowHCI_val,
+    aes(y = lowHCI,
         color = as.factor(sigmaH)),
     linetype = "dashed"
   ) +
   geom_path(
-    data = meanTopt_df,
-    aes(y = highHCI_val,
+    
+    aes(y = highHCI,
         color = as.factor(sigmaH)),
     linetype = "dashed"
   ) +
@@ -549,21 +531,21 @@ Topt_plot <- meanTopt_df %>%
     name = expression("Thermal optimum "(degree * C)),
     expand = c(0.05, 0.05)
   ) +
-  # color:
-  scale_colour_manual(
-    name = "Vertebrate host biting tolerance\n(bites per host per day)",
-    values = c(met.brewer("VanGogh3", 4, direction = 1), "black"),
-    # values = c(brewer.pal(9, "YlOrRd")[c(3, 5, 7)], "black"),
-    breaks = c(1, 10, 100, Inf),
-    labels = unname(c("1 (Chitnis)", "10 (Chitnis)", "100 (Chitnis)", TeX("$\\infty$ (Ross-Macdonald)")))
-  ) +
-  scale_fill_manual(
-    name = "Vertebrate host biting tolerance\n(bites per host per day)",
-    values = c(met.brewer("VanGogh3", 4, direction = 1), "black"),
-    # values = c(brewer.pal(9, "YlOrRd")[c(3, 5, 7)], "black"),
-    breaks = c(1, 10, 100, Inf),
-    labels = unname(c("1 (Chitnis)", "10 (Chitnis)", "100 (Chitnis)", TeX("$\\infty$ (Ross-Macdonald)")))
-  ) +
+  # # color:
+  # scale_colour_manual(
+  #   name = "Vertebrate host biting tolerance\n(bites per host per day)",
+  #   values = c(met.brewer("VanGogh3", 4, direction = 1), "black"),
+  #   # values = c(brewer.pal(9, "YlOrRd")[c(3, 5, 7)], "black"),
+  #   breaks = c(1, 10, 100, Inf),
+  #   labels = unname(c("1 (Chitnis)", "10 (Chitnis)", "100 (Chitnis)", TeX("$\\infty$ (Ross-Macdonald)")))
+  # ) +
+  # scale_fill_manual(
+  #   name = "Vertebrate host biting tolerance\n(bites per host per day)",
+  #   values = c(met.brewer("VanGogh3", 4, direction = 1), "black"),
+  #   # values = c(brewer.pal(9, "YlOrRd")[c(3, 5, 7)], "black"),
+  #   breaks = c(1, 10, 100, Inf),
+  #   labels = unname(c("1 (Chitnis)", "10 (Chitnis)", "100 (Chitnis)", TeX("$\\infty$ (Ross-Macdonald)")))
+  # ) +
   # faceting:
   facet_wrap(~system_ID,
              scales = "free",
@@ -601,7 +583,7 @@ ggsave("figures/ToptKH_plot.svg", Topt_plot,
 # Figure S3: Topt as a function of sigmaH ---------------------------------
 # Mean Topt as a function of sigmaH, across discrete values of KH
 
-Topt_plot <- Toptalt_df %>%
+Topt_plot <- read_rds("results/Topt_KH.rds") %>% 
   # Choose appropriate pop. dens. values and group
   # filter(KH %in% 10^seq(0, 4)) %>%
   group_by(KH) %>%
@@ -615,24 +597,24 @@ Topt_plot <- Toptalt_df %>%
     x = sigmaH
   )) +
   # Topt curves:
-  geom_path(aes(y = mean_Topt, colour = as.factor(KH)), lwd = 1) +
+  geom_path(aes(y = mean, colour = as.factor(KH)), lwd = 1) +
   # 89% HCI of R0 TPC curves
   geom_ribbon(
-    data = quantsTopt_df,
-    aes(ymin = lowHCI_val, ymax = highHCI_val, 
+    
+    aes(ymin = lowHCI, ymax = highHCI, 
         fill = as.factor(KH)),
     alpha = 0.05
   ) +
   # Add dotted lines showing limits of ribbons
   geom_path(
-    data = quantsTopt_df,
-    aes(y = lowHCI_val,
+    
+    aes(y = lowHCI,
         color = as.factor(KH)),
     linetype = "dashed"
   ) +
   geom_path(
-    data = quantsTopt_df,
-    aes(y = highHCI_val,
+    
+    aes(y = highHCI,
         color = as.factor(KH)),
     linetype = "dashed"
   ) +
