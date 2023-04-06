@@ -32,8 +32,10 @@ library(multidplyr)
 source("code/output-functions.R") # needed for compute.variable functions
 
 # Set up parallel
-cluster <- new_cluster(parallel::detectCores() - 1)
-cluster_library(cluster, c("dplyr", "tidyr"))
+if (!exists("cluster")) {
+  cluster <- new_cluster(parallel::detectCores() - 1)
+  cluster_library(cluster, c("dplyr", "tidyr"))
+}
 
 # 1) Define accessory functions -------------------------------------------
 # 
@@ -231,13 +233,12 @@ R0_TPC_func <- function(in_df, system_name) {
 Topt_heat_func <- function(in_df, system_name) {
   out_df <- in_df %>%
     expand_grid(data.Vec %>%
-                  filter(system_ID == system_name) %>%
-                  filter(between(Temperature, 20, 29))) %>% # known range of Topt
+                  filter(system_ID == system_name) #%>%
+                  # filter(between(Temperature, 20, 29)) # w/ host trait resolution at 40, HCImin of 20.1, HCImax of 28.99497
+                ) %>% # known range of Topt
     data.table::data.table() %>%
     # Name the model (just in case this is handier than referring to sigmaH)
     mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
-    group_by(sigmaH) %>%
-    # partition(cluster) %>%
     mutate(V0 = ifelse( sigmaV_f * deltaL < (1 / lf),
                         0,
                         KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL)))) %>%
@@ -245,8 +246,7 @@ Topt_heat_func <- function(in_df, system_name) {
     mutate(R0 = ifelse(V0 <= 0, 0,
                        ifelse(is.infinite(sigmaH),
                               sigmaV * sigmaV * betaH / (1 / (lf)), # Ross-Macdonald model
-                              sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0)) * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH)) * sigmaH * sigmaV * betaH * KH / ((1 / (lf)) * (sigmaH * KH + sigmaV * V0)))) %>%
-    group_by(sample_num, sigmaH, KH) %>%
+                              (sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0)) * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH)) * sigmaH * sigmaV * betaH * KH / ((1 / (lf)) * (sigmaH * KH + sigmaV * V0))))) %>%     group_by(sample_num, KH, sigmaH) %>%
     # Filter to maximum value of R0
     filter(R0 == max(R0)) %>%
     # Get temperature at which R0 is maximized
@@ -258,14 +258,14 @@ Topt_heat_func <- function(in_df, system_name) {
     ungroup() %>%
     pivot_longer(cols = Topt, names_to = "variable", values_to = "value") %>% 
     group_by(system_ID, Model, sigmaH, KH, variable) %>%
-    partition(cluster) %>%
+    # partition(cluster) %>%
     summarise(
       lowHCI = quantile(value, 0.055),
       highHCI = quantile(value, 0.945),
       mean = mean(value),
       median = median(value)
     ) %>%
-    collect() %>%
+    # collect() %>%
     arrange(system_ID, sigmaH, KH) %>% 
     distinct()
 }
@@ -273,7 +273,7 @@ Topt_heat_func <- function(in_df, system_name) {
 CT_heat_func <- function(in_df, system_name) {
   out_df <- in_df %>%
     expand_grid(data.Vec %>%
-                  filter(between(Temperature, 13, 34)) %>% # known range of CT
+                  # filter(between(Temperature, 13, 34)) %>% # known range of CT
                   filter(system_ID == system_name)) %>%
     # Name the model (just in case this is handier than referring to sigmaH)
     mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
@@ -305,10 +305,73 @@ CT_heat_func <- function(in_df, system_name) {
       mean = mean(value),
       median = median(value)
     ) %>%
-    arrange(system_ID, sigmaH, KH) %>%
     collect() %>%
+    arrange(system_ID, sigmaH, KH) %>%
     distinct()
 }
+
+# Initialize a data frame to save our analyses
+init.df <- tibble(system_ID = c(), Temperature = c(), Model = c(),
+                  sigmaH = c(), KH = c(), variable = c(), 
+                  lowHCI = c(), highHCI = c(), mean = c(), median = c())
+
+# Remove the parameter data frame to free up memory
+rm(data.in.params)
+
+# R0 TPC data -------------------------------------------------------------
+
+data.Host.R0_TPC <- data.Host %>%
+  # filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 11)]) %>% 
+  filter(sigmaH %in% c(100, Inf))
+
+R0_TPC.df <- init.df
+for (system_name in unique(data.Vec$system_ID)) {
+  print(paste0("R0 TPCs: ", system_name))
+  R0_TPC.df <- data.Host.R0_TPC %>%
+    R0_TPC_func(., system_name) %>%
+    rbind(R0_TPC.df)
+  gc()
+}
+
+# write_rds(R0_TPC.df, "results/R0_TPC_data.rds", compress = "gz")
+
+
+# Topt vs. sigma and KH ---------------------------------------------------
+
+data.Host.Topt <- data.Host %>%
+  filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 40)]) %>%
+  filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 40)])
+
+Topt.df <- init.df
+for (system_name in unique(data.Vec$system_ID)) {
+  print(paste0("Topt vals: ", system_name))
+  system.time(
+  Topt.df <- data.Host.Topt %>%
+    Topt_heat_func(., system_name) %>%
+    rbind(Topt.df)
+  )
+  gc()
+}
+
+# write_rds(Topt.df, "results/Topt_vals.rds", compress = "gz")
+
+
+# CTmin, max, and width vs. sigma and KH ----------------------------------
+
+data.Host.CT <- data.Host %>%
+  filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 80)]) %>%
+  filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 80)])
+
+CT.df <- init.df
+for (system_name in unique(data.Vec$system_ID)) {
+  print(paste0("CT vals: ", system_name))
+  CT.df <- data.Host.CT %>%
+    CT_heat_func(., system_name) %>% 
+    # !!! might want to add back on missing values of sigmaH and KH later. these are created by filtering on R0 > 1
+    rbind(CT.df)
+  gc()
+}
+write_rds(CT.df, "results/CT_vals.rds", compress = "gz")
 
 
 # # System 1: Aedes aegypti / DENV ------------------------------------------
@@ -416,9 +479,9 @@ CT_heat_func <- function(in_df, system_name) {
 # )
 # gc()
 
-# System 4: Anopheles gambiae / Plasmodium relictum -----------------------
+# System 4: Anopheles gambiae / Plasmodium falciparum -----------------------
 # Code = AgPlfa
-system_name = "Anopheles gambiae / Plasmodium relictum"
+system_name = "Anopheles gambiae / Plasmodium falciparum"
 
 # Topt TPCs
 gc()
@@ -480,8 +543,8 @@ gc()
 gc()
 system.time(
   data.Host %>%
-    filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 61)]) %>%
-    filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 61)]) %>%
+    filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 11)]) %>%
+    filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 11)]) %>%
     CT_heat_func(., system_name) %>%
     write_rds("results/CxWNV/CT_vals.rds", compress = "gz")
 )
