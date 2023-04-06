@@ -284,15 +284,18 @@ data.Host.R0_TPC <- data.Host %>%
 R0_TPC.df <- init.df
 for (system_name in unique(data.Vec$system_ID)) {
   print(paste0("R0 TPCs: ", system_name))
+  system.time(
   R0_TPC.df <- data.Host.R0_TPC %>%
     R0_TPC_func(., system_name) %>%
     rbind(R0_TPC.df)
+  )
   gc()
 }
 
 write_rds(R0_TPC.df, "results/R0_TPC_data.rds", compress = "gz")
 
-# Topt vs. sigmaH ---------------------------------------------------------
+
+# Topt vs. sigmaH data ----------------------------------------------------
 
 data.Topt.sigmaH <- data.Host %>%
   filter(KH %in% c(1, 10, 100, 1000, 10000)) # %>%
