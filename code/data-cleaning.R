@@ -50,6 +50,7 @@ data.Mordecai2013 <- read.csv("data/raw/Mordecai_2013/Mordecai_2013_supp_data.cs
 ### * Mordecai 2017 ----
 # -- aegyptiDENVmodelTempData_2016-03-30.csv
 # -- albopictusCHIKVmodelTempData_2016-03-26.csv
+
 data.Mordecai2017.Aegypti <- read.csv("data/raw/Mordecai_2017/aegyptiDENVmodelTempData_2016-03-30.csv", header = TRUE) %>%
   # Exclude the Focks & Barrera 2006 data because they're from a model
   filter(ref != "Focks_Barrera_2006_Research&TrainingTropicalDis_Geneva_Paper") %>%

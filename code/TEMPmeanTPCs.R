@@ -72,7 +72,22 @@ sample_inds <- sample(1:num_samples, thin_size, replace = FALSE)
 
 # Create data frame of TPCs
 TPC_df <- data.in.transform %>%
-  filter(sample_num %in% sample_inds) %>%
+  filter(system_ID %in% c("Aedes aegypti / none"), trait == "EFD") %>% 
+  # filter(sample_num %in% sample_inds) %>%
+  melt(id = c("system_ID", "trait", "func", "sample_num")) %>% 
+  group_by(system_ID, trait, func, variable) %>%
+  summarise(mean = mean(value),
+            median = median(value),
+            variance = sd(value),
+            lowHCI = quantile(value, 0.05, na.rm = TRUE),
+            highHCI = quantile(value, 0.95, na.rm = TRUE),
+            .groups = "keep") %>% 
+  mutate(highHCI_fake = mean + 1.96 * variance) %>% 
+  mutate(lowHCI_fake = mean - 1.96 * variance) %>% 
+  distinct() %>% 
+  pivot_wider(id_cols = c(system_ID, trait, func), names_from = variable, values_from = c(mean, lowHCI, highHCI, median)) %>% 
+  pivot_longer(cols = mean_T0:median_c, names_sep = "_", names_to = c("type", "parameter")) %>% 
+  pivot_wider(id_cols = c(system_ID, trait, func, type), names_from = parameter, values_from = value) %>% 
   cross_join(list(Temperature = Temps), copy = TRUE) %>%
   mutate(Trait_val = case_when(
     func == "Briere" ~ Briere(c, T0, Tm)(Temperature),
@@ -80,7 +95,7 @@ TPC_df <- data.in.transform %>%
     func == "Linear" ~ Linear(c, Tm)(Temperature)
   )) %>%
   dplyr::select(-c("c", "T0", "Tm")) %>% 
-  pivot_wider(id_cols = c("system_ID", "sample_num", "Temperature"), 
+  pivot_wider(id_cols = c("system_ID", "Temperature"), 
               names_from = "trait",
               values_from = "Trait_val")  %>% 
   # Combine traits into intermediate parameters as necessary
@@ -188,44 +203,36 @@ data.in.params <- combined_df %>%
 
 if (plot_bool) {
   
-library(cowplot)
+  library(cowplot)
   
-# For each mosquito species, trait, and sample, get a thermal response curve
-TPC_df <- data.in.params %>%  
-  ungroup() %>% 
-  # dplyr::select(-c(muL, etaL, mosquito_species, pathogen)) %>%
-  melt(id = c("system_ID", "Temperature", "sample_num"),
-       variable.name = "trait",
-       value.name = "Trait_val") %>% 
-  group_by(system_ID, trait, Temperature) %>%
-  summarise(mean = mean(Trait_val),
-            median = median(Trait_val),
-            lowHCI = quantile(Trait_val, 0.05, na.rm = TRUE),
-            highHCI = quantile(Trait_val, 0.95, na.rm = TRUE),
-            .groups = "keep") %>%
-  unique() %>% ungroup()
-
-TPC_plot <- TPC_df %>%
-  # group_by(sample_num) %>%
-  arrange(Temperature) %>%
-  # group_by()
-  ggplot() +
-  # means of TPC curves
-  geom_path(aes(x = Temperature, y = mean, color = system_ID)) +
-  # 89% HCI of TPC curves
-  geom_path(aes(x = Temperature, y = lowHCI, color = system_ID), lty = 2) +
-  geom_path(aes(x = Temperature, y = highHCI, color = system_ID), lty = 2) +
-  # geom_ribbon(
-  #   aes(x = Temperature, ymin = lowHCI, ymax = highHCI, fill = system_ID),
-  #   alpha = 0.1
-  # ) +
-  ylab("") +
-  facet_wrap(~trait, scales = "free", ncol = 2) +
-  theme_minimal_grid(12)
-
-# Save figure
-ggsave("figures/param_TPC_plot.svg",
-       plot = TPC_plot,
-       device = "svg",
-       width = 16, height = 9, units = "in")
+  # For each mosquito species, trait, and sample, get a thermal response curve
+  plot_df <- TPC_df 
+  
+  TPC_plot <- plot_df %>%
+    # group_by(sample_num) %>%
+    arrange(Temperature) %>%
+    # group_by()
+    ggplot() +
+    # means of TPC curves
+    geom_path(data = filter(plot_df, type == "mean"),
+      aes(x = Temperature, y = EFD, color = system_ID)) +
+    # 89% HCI of TPC curves
+    geom_path(data = filter(plot_df, type == "lowHCI"),
+      aes(x = Temperature, y = EFD, color = system_ID), lty = 2) +
+    geom_path(data = filter(plot_df, type == "highHCI"),
+              aes(x = Temperature, y = EFD, color = system_ID), lty = 2) +
+    # geom_ribbon(
+    #   aes(x = Temperature, ymin = lowHCI, ymax = highHCI, fill = system_ID),
+    #   alpha = 0.1
+    # ) +
+    ylab("") +
+    ylim(0,14) +
+    facet_wrap(~trait, scales = "free", ncol = 2) +
+    theme_minimal_grid(12)
+  
+  # Save figure
+  ggsave("figures/param_TPC_plot.svg",
+         plot = TPC_plot,
+         device = "svg",
+         width = 16, height = 9, units = "in")
 }
