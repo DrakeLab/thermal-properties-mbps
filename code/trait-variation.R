@@ -234,7 +234,7 @@ Topt_heat_func <- function(in_df, system_name) {
   out_df <- in_df %>%
     expand_grid(data.Vec %>%
                   filter(system_ID == system_name) #%>%
-                  # filter(between(Temperature, 20, 29)) # w/ host trait resolution at 40, HCImin of 20.1, HCImax of 28.99497
+                  # filter(between(Temperature, 20, 29)) # w/ host trait resolution at 40, HCImin of 11, HCImax of 39
                 ) %>% # known range of Topt
     data.table::data.table() %>%
     # Name the model (just in case this is handier than referring to sigmaH)
@@ -258,14 +258,14 @@ Topt_heat_func <- function(in_df, system_name) {
     ungroup() %>%
     pivot_longer(cols = Topt, names_to = "variable", values_to = "value") %>% 
     group_by(system_ID, Model, sigmaH, KH, variable) %>%
-    # partition(cluster) %>%
+    partition(cluster) %>%
     summarise(
       lowHCI = quantile(value, 0.055),
       highHCI = quantile(value, 0.945),
       mean = mean(value),
       median = median(value)
     ) %>%
-    # collect() %>%
+    collect() %>%
     arrange(system_ID, sigmaH, KH) %>% 
     distinct()
 }
@@ -321,7 +321,7 @@ rm(data.in.params)
 # R0 TPC data -------------------------------------------------------------
 
 data.Host.R0_TPC <- data.Host %>%
-  # filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 11)]) %>% 
+  filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 21)]) %>%
   filter(sigmaH %in% c(100, Inf))
 
 R0_TPC.df <- init.df
@@ -335,25 +335,48 @@ for (system_name in unique(data.Vec$system_ID)) {
 
 # write_rds(R0_TPC.df, "results/R0_TPC_data.rds", compress = "gz")
 
+# Topt vs. sigmaH ---------------------------------------------------------
 
-# Topt vs. sigma and KH ---------------------------------------------------
-
-data.Host.Topt <- data.Host %>%
-  filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 40)]) %>%
-  filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 40)])
+data.Topt.sigmaH <- data.Host %>%
+  filter(KH %in% c(1, 10, 100, 1000, 10000)) # %>%
+  # filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 50)])
 
 Topt.df <- init.df
+
+gc()
 for (system_name in unique(data.Vec$system_ID)) {
-  print(paste0("Topt vals: ", system_name))
+  print(paste0("Topt vs. sigmaH: ", system_name))
   system.time(
-  Topt.df <- data.Host.Topt %>%
+  Topt.df <- data.Topt.sigmaH %>%
     Topt_heat_func(., system_name) %>%
     rbind(Topt.df)
   )
   gc()
 }
 
-# write_rds(Topt.df, "results/Topt_vals.rds", compress = "gz")
+write_rds(Topt.df, "results/Topt_sigmaH.rds", compress = "gz")
+
+
+# Topt vs. KH -------------------------------------------------------------
+
+data.Topt.KH <- data.Host %>%
+  # filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 50)]) %>%
+  filter(sigmaH %in% c(1, 10, 100, Inf))
+
+Topt.df <- init.df
+
+gc()
+for (system_name in unique(data.Vec$system_ID)) {
+  print(paste0("Topt vs. KH: ", system_name))
+  system.time(
+    Topt.df <- data.Topt.KH %>%
+      Topt_heat_func(., system_name) %>%
+      rbind(Topt.df)
+  )
+  gc()
+}
+
+write_rds(Topt.df, "results/Topt_KH.rds", compress = "gz")
 
 
 # CTmin, max, and width vs. sigma and KH ----------------------------------
