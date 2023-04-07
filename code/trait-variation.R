@@ -33,12 +33,6 @@ library(foreach)
 source("code/output-functions.R") # needed for compute.variable functions
 
 # Set up parallel
-my.cluster <- parallel::makeCluster(
-  parallel::detectCores() - 1, 
-  type = "PSOCK"
-)
-
-
 if (!exists("cluster")) {
   cluster <- new_cluster(parallel::detectCores() - 1)
   cluster_library(cluster, c("dplyr", "tidyr"))
@@ -262,20 +256,7 @@ CT_heat_func <- function(in_df, system_name) {
     mutate(CTwidth = CTmax - CTmin)%>% 
     ungroup() %>%
     dplyr::select(system_ID, Model, sigmaH, KH, CTmin, CTmax, CTwidth) %>%
-    pivot_longer(cols = c(CTwidth, CTmin, CTmax), names_to = "variable", values_to = "value") %>%
-    group_by(system_ID, Model, sigmaH, KH, variable) %>%
-    # partition(cluster) %>%
-    summarise(
-      lowHCI = quantile(value, 0.055),
-      highHCI = quantile(value, 0.945),
-      mean = mean(value),
-      median = median(value),
-      .groups = "keep"
-    ) %>%
-    # collect() %>%
-    arrange(system_ID, sigmaH, KH) %>%
-    distinct()
-  
+    pivot_longer(cols = c(CTwidth, CTmin, CTmax), names_to = "variable", values_to = "value")
   # If R0 < 1 across all temperatures, report the following:
   #  critical thermal minimum = Inf
   #  critical thermal maximum = -Inf
@@ -292,6 +273,20 @@ CT_heat_func <- function(in_df, system_name) {
       mutate(median = mean) %>% 
       mutate(highHCI = mean) %>% 
       mutate(lowHCI = mean)
+  } else {
+    out_df <- out_df %>% 
+      group_by(system_ID, Model, sigmaH, KH, variable) %>%
+      # partition(cluster) %>%
+      summarise(
+        lowHCI = quantile(value, 0.055),
+        highHCI = quantile(value, 0.945),
+        mean = mean(value),
+        median = median(value),
+        .groups = "keep"
+      ) %>%
+      # collect() %>%
+      arrange(system_ID, sigmaH, KH) %>%
+      distinct()
   }
   return(out_df)
 }
@@ -326,20 +321,25 @@ write_rds(R0_TPC.df, "results/R0_TPC_data.rds", compress = "gz")
 
 # Topt vs. sigmaH data ----------------------------------------------------
 
-data.Topt.sigmaH <- data.Host %>%
-  filter(KH %in% c(1, 10, 100, 1000, 10000)) # %>%
+data.Host.Topt <- data.Host #%>%
+# filter(KH %in% c(1, 10, 100, 1000, 10000)) # %>%
 # filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 50)])
 
 Topt.df <- init.df
 
 gc()
 for (system_name in unique(data.Vec$system_ID)) {
-  print(paste0("Topt vs. sigmaH: ", system_name))
-  system.time(
-    Topt.df <- data.Topt.sigmaH %>%
-      Topt_heat_func(., system_name) %>%
-      rbind(Topt.df)
-  )
+  print(paste0("Topt vals: ", system_name))
+  # parallel compute Topt values over host trait values
+  temp_df <- foreach(
+    index_sigmaH = data.Host.CT$sigmaH,
+    index_KH = data.Host.CT$KH,
+    .combine = "rbind") %dopar% {
+      data.Host.Topt %>% 
+        filter(sigmaH == index_sigmaH, KH == index_KH) %>% 
+        Topt_heat_func(., system_name) 
+    }
+  Topt.df <- rbind(Topt.df, temp_df)
   gc()
 }
 
@@ -370,27 +370,29 @@ write_rds(Topt.df, "results/Topt_KH.rds", compress = "gz")
 
 # CTmin, max, and width vs. sigma and KH ----------------------------------
 
-data.Host.CT <- data.Host %>%
-  filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 4)]) %>%
-  filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 4)])
+data.Host.CT <- data.Host #%>%
+# filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 4)]) %>%
+# filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 4)])
 
 CT.df <- init.df
 
 gc()
-for (system_name in unique(data.Vec$system_ID)) {
-  print(paste0("CT vals: ", system_name))
-  # parallel compute CT values over host trait values
-  temp_df <- foreach(
-    index_sigmaH = data.Host.CT$sigmaH,
-    index_KH = data.Host.CT$KH,
-    .combine = "rbind") %dopar% {
-      data.Host.CT %>% 
-        filter(sigmaH == index_sigmaH, KH == index_KH) %>% 
-        CT_heat_func(., system_name) 
+system.time(
+  for (system_name in unique(data.Vec$system_ID)) {
+    print(paste0("CT vals: ", system_name))
+    for (index_sigmaH in unique(data.Host.CT$sigmaH)) {
+      print(paste0(which(unique(data.Host.CT$sigmaH)== index_sigmaH)/length(unique(data.Host.CT$sigmaH))*100, "% complete"))
+      # parallel compute CT values over host trait values
+      # for (index_KH in unique(data.Host.CT$KH)) {
+      CT.df <- data.Host.CT %>% 
+          filter(sigmaH == index_sigmaH) %>% 
+          CT_heat_func(., system_name) %>% 
+          rbind(CT.df)
+      # }
     }
-  CT.df <- rbind(CT.df, temp_df)
-  gc()
-}
+    gc()
+  }
+)
 
 # smallest CTmin ~13.85
 # largest CTmax ~34.45

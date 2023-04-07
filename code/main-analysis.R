@@ -51,6 +51,7 @@ plot_bool <- TRUE
 # source("code/get-thermal-trait-priors.R")
 
 # write_rds(samples, "data/clean/TPC_param_samples.rds")
+# write_rds(samples, "data/clean/NEW_TPC_param_samples.rds")
 
 # # Run this to load pre-processed data set
 # data.in.transform <- read_rds("data/clean/TPC_param_samples.rds")
@@ -90,7 +91,7 @@ data.in.params <- read_rds("data/clean/parameter_TPCs.rds")
 
 # data.in.analysis <- read_rds("data/clean/full_traitset.rds")
 
-source("code/get-outputs.R")
+# source("code/get-outputs.R")
 
 # 6) Illustrate model outputs (might be done separately) ------------------
 
