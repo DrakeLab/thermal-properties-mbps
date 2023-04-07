@@ -2,7 +2,7 @@
 ##
 ## Project: Global zoonoses - spillover of mosquito-borne pathogens
 ##
-## Purpose: Transform trait values, which we have fit TPCs to from data, in 
+## Purpose: Transform trait values, which we have fit TPCs to from data, in
 ##          order to use in model analyses
 ##
 ## Contents: 0) Set-up, load in necessary packages and data-sets
@@ -33,11 +33,6 @@ library(foreach)
 source("code/output-functions.R") # needed for compute.variable functions
 
 # Set up parallel
-# my.cluster <- parallel::makeCluster(
-#   parallel::detectCores() - 1, 
-#   type = "PSOCK"
-# )
-
 if (!exists("cluster")) {
   cluster <- new_cluster(parallel::detectCores() - 1)
   cluster_library(cluster, c("dplyr", "tidyr"))
@@ -62,14 +57,14 @@ lambdaH_baseline <- .005
 muH_baseline <- 1 / (365 * 20)
 
 # Host maximum biting tolerance (mosquitoes bites per day)
-sigmaH_vec <- 10^seq(-0.25,2.25, length.out = sigmaH_vec_length - 6) %>% 
-  c(1, 10, 20, 50, 100, Inf) %>% 
+sigmaH_vec <- 10^seq(-0.25,2.25, length.out = sigmaH_vec_length - 6) %>%
+  c(1, 10, 20, 50, 100, Inf) %>%
   unique() %>% sort()
 sigmaH_baseline <- 100
 
 # Host carrying capacity
-KH_vec <- 10^seq(-2, 5, length.out = KH_vec_length) %>% 
-  c(10^seq(-2,5)) %>% 
+KH_vec <- 10^seq(-2, 5, length.out = KH_vec_length) %>%
+  c(10^seq(-2,5)) %>%
   unique() %>% sort()
 
 # KH_vec2 <-  KH_vec %>%
@@ -98,13 +93,13 @@ data.Host <- expand_grid(
   # Infection-related parameters
   gammaH = gammaH_baseline,
   betaH = betaH_baseline
-) %>% as.data.frame() %>% 
+) %>% as.data.frame() %>%
   mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model"))
 
 # 3) Set non-TPC *mosquito* parameters ------------------------------------
 
 ## Carrying capacity for larval mosquitoes
-# NB: In the absence of good estimates for each species or temperature-dependence of this trait, we assume that this parameter is constant. It can be used as a  scaling parameter for overall mosquito abundance 
+# NB: In the absence of good estimates for each species or temperature-dependence of this trait, we assume that this parameter is constant. It can be used as a  scaling parameter for overall mosquito abundance
 # (it could alternately be used to fix the maximum adult mosquito density across species)
 larval_mosquito_carrying_capacity <- 300
 
@@ -112,9 +107,9 @@ larval_mosquito_carrying_capacity <- 300
 # num_samples <- length(unique(data.in.params$sample_num))
 # sample_inds <- sample(unique(data.in.params$sample_num), thin_size, replace = FALSE)
 
-data.Vec <- data.in.params %>% 
+data.Vec <- data.in.params %>%
   # filter(sample_num %in% sample_inds) %>%
-  mutate(KL = larval_mosquito_carrying_capacity) %>% 
+  mutate(KL = larval_mosquito_carrying_capacity) %>%
   mutate(V0 = ifelse( sigmaV_f * deltaL < (1 / lf),
                       0,
                       KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL))))
@@ -134,7 +129,7 @@ Host_dim <- dim(data.Host)[1]
 
 get.summary <- function(in_df, summary_vars, group_vars) {
   out_df <- in_df %>%
-    pivot_longer(cols = {{summary_vars}}, names_to = "variable", values_to = "value") %>% 
+    pivot_longer(cols = {{summary_vars}}, names_to = "variable", values_to = "value") %>%
     group_by(c(!!!syms(group_vars), variable)) %>%
     partition(cluster) %>%
     summarise(
@@ -143,7 +138,7 @@ get.summary <- function(in_df, summary_vars, group_vars) {
       mean = mean(value),
       median = median(value)
     ) %>%
-    arrange(system_ID, sigmaH, KH) %>% 
+    arrange(system_ID, sigmaH, KH) %>%
     collect() %>%
     distinct()
 }
@@ -154,22 +149,22 @@ R0_TPC_func <- function(in_df, system_name) {
     expand_grid(data.Vec %>% filter(system_ID == system_name)) %>%
     mutate(RV = ifelse(is.infinite(sigmaH),
                        sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
-                       sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>% 
+                       sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>%
     mutate(bV = ifelse(is.infinite(sigmaH),
                        sigmaV, # Ross-Macdonald model
-                       sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>% 
-    mutate(RH = ifelse(V0 == 0, 
-                       0, 
-                       bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>% 
+                       sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>%
+    mutate(RH = ifelse(V0 == 0,
+                       0,
+                       bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>%
     # Basic reproduction number
-    mutate(R0 = sqrt(RV*RH))%>% 
+    mutate(R0 = sqrt(RV*RH))%>%
     dplyr::select(system_ID, sample_num, Temperature, Model, sigmaH, KH, V0, R0) %>%
     # Normalize R0 across temperature
     group_by(system_ID, Model, sigmaH, KH, sample_num) %>%
     mutate(norm_R0 = R0 / max(R0, eps)) %>%
     ungroup() %>%
     dplyr::select(system_ID, Temperature, Model, sigmaH, KH, norm_R0) %>%
-    pivot_longer(cols = norm_R0, names_to = "variable", values_to = "value") %>% 
+    pivot_longer(cols = norm_R0, names_to = "variable", values_to = "value") %>%
     group_by(system_ID, Temperature, Model, sigmaH, KH, variable) %>%
     partition(cluster) %>%
     summarise(
@@ -179,7 +174,7 @@ R0_TPC_func <- function(in_df, system_name) {
       median = median(value)
     ) %>%
     collect() %>%
-    arrange(system_ID, sigmaH, KH) %>% 
+    arrange(system_ID, sigmaH, KH) %>%
     distinct()
 }
 
@@ -193,15 +188,15 @@ Topt_heat_func <- function(in_df, system_name) {
     # Name the model (just in case this is handier than referring to sigmaH)
     mutate(RV = ifelse(is.infinite(sigmaH),
                        sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
-                       sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>% 
+                       sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>%
     mutate(bV = ifelse(is.infinite(sigmaH),
                        sigmaV, # Ross-Macdonald model
-                       sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>% 
-    mutate(RH = ifelse(V0 == 0, 
-                       0, 
-                       bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>% 
+                       sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>%
+    mutate(RH = ifelse(V0 == 0,
+                       0,
+                       bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>%
     # Basic reproduction number
-    mutate(R0 = sqrt(RV*RH)) %>% 
+    mutate(R0 = sqrt(RV*RH)) %>%
     # Filter to maximum value of R0
     group_by(system_ID, sample_num, sigmaH, KH) %>%
     filter(R0 == max(R0)) %>%
@@ -212,7 +207,7 @@ Topt_heat_func <- function(in_df, system_name) {
     # (we only get R0=NA when V0<0, i.e. when mosquito recruitment is less than mortality)
     replace_na(list(R0 = 0)) %>%
     ungroup() %>%
-    pivot_longer(cols = Topt, names_to = "variable", values_to = "value") %>% 
+    pivot_longer(cols = Topt, names_to = "variable", values_to = "value") %>%
     group_by(system_ID, Model, sigmaH, KH, variable) %>%
     partition(cluster) %>%
     summarise(
@@ -223,7 +218,7 @@ Topt_heat_func <- function(in_df, system_name) {
       # .groups = "keep"
     ) %>%
     collect() %>%
-    arrange(system_ID, sigmaH, KH) %>% 
+    arrange(system_ID, sigmaH, KH) %>%
     distinct()
 }
 
@@ -235,13 +230,13 @@ CT_heat_func <- function(in_df, system_name) {
                   filter(system_ID == system_name)) %>%
     mutate(RV = ifelse(is.infinite(sigmaH),
                        sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
-                       sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>% 
+                       sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>%
     mutate(bV = ifelse(is.infinite(sigmaH),
                        sigmaV, # Ross-Macdonald model
-                       sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>% 
-    mutate(RH = ifelse(V0 == 0, 
-                       0, 
-                       bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>% 
+                       sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>%
+    mutate(RH = ifelse(V0 == 0,
+                       0,
+                       bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>%
     # Basic reproduction number
     mutate(R0 = sqrt(RV*RH)) %>%
     # Filter to maximum value of R0
@@ -252,30 +247,30 @@ CT_heat_func <- function(in_df, system_name) {
     # Get highest temperature at which R0 exceeds one
     mutate(CTmax = max(Temperature)) %>%
     # Get width of critical thermal interval
-    mutate(CTwidth = CTmax - CTmin)%>% 
+    mutate(CTwidth = CTmax - CTmin)%>%
     ungroup() %>%
     dplyr::select(system_ID, Model, sigmaH, KH, CTmin, CTmax, CTwidth) %>%
     pivot_longer(cols = c(CTwidth, CTmin, CTmax), names_to = "variable", values_to = "value")
-  
+
   # If R0 < 1 across all temperatures, report the following:
   #  critical thermal minimum = Inf
   #  critical thermal maximum = -Inf
   #  critical thermal width = 0
   if (dim(out_df)[1] == 0) {
     out_df <- expand_grid(system_ID = system_name, sigmaH = in_df$sigmaH, KH = in_df$KH,
-                          variable = c("CTmax", "CTmin", "CTwidth")) %>% 
-      distinct() %>% 
+                          variable = c("CTmax", "CTmin", "CTwidth")) %>%
+      distinct() %>%
       mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
       mutate(mean = case_when(
         variable == "CTmax" ~ -Inf,
         variable == "CTmin" ~ Inf,
         variable == "CTwidth" ~ 0
-      )) %>% 
-      mutate(median = mean) %>% 
-      mutate(highHCI = mean) %>% 
+      )) %>%
+      mutate(median = mean) %>%
+      mutate(highHCI = mean) %>%
       mutate(lowHCI = mean)
   } else {
-    out_df <- out_df %>% 
+    out_df <- out_df %>%
       group_by(system_ID, Model, sigmaH, KH, variable) %>%
       # partition(cluster) %>%
       summarise(
@@ -294,7 +289,7 @@ CT_heat_func <- function(in_df, system_name) {
 
 # Initialize a data frame to save our analyses
 init.df <- tibble(system_ID = c(), Temperature = c(), Model = c(),
-                  sigmaH = c(), KH = c(), variable = c(), 
+                  sigmaH = c(), KH = c(), variable = c(),
                   lowHCI = c(), highHCI = c(), mean = c(), median = c())
 
 # Remove the parameter data frame to free up memory
@@ -340,10 +335,10 @@ for (system_name in unique(data.Vec$system_ID)) {
       print(paste0(which(unique(data.Topt$sigmaH)== index_sigmaH)/length(unique(data.Topt$sigmaH))*100, "% complete"))
       # parallel compute CT values over host trait values
       # for (index_KH in unique(data.Host.CT$KH)) {
-      system.time(Topt.df <- data.Topt %>% 
+      system.time(Topt.df <- data.Topt %>%
                     filter(sigmaH == index_sigmaH,
-                           KH %in% index_KH) %>% 
-                    Topt_heat_func(., system_name) %>% 
+                           KH %in% index_KH) %>%
+                    Topt_heat_func(., system_name) %>%
                     rbind(Topt.df))
       # }
     }
@@ -393,9 +388,9 @@ system.time(
       print(paste0(which(unique(data.Host.CT$sigmaH)== index_sigmaH)/length(unique(data.Host.CT$sigmaH))*100, "% complete"))
       # parallel compute CT values over host trait values
       # for (index_KH in unique(data.Host.CT$KH)) {
-      CT.df <- data.Host.CT %>% 
-        filter(sigmaH == index_sigmaH) %>% 
-        CT_heat_func(., system_name) %>% 
+      CT.df <- data.Host.CT %>%
+        filter(sigmaH == index_sigmaH) %>%
+        CT_heat_func(., system_name) %>%
         rbind(CT.df)
       # }
     }
