@@ -122,21 +122,21 @@ combined_df <- left_join(Infection_df, noInfection_df)%>%
   relocate(system_ID, mosquito_species, pathogen, Temperature, sample_num)
 
 
-# Check what data we're missing (we'll go back and use substitutes for these)
-missing_traits_df <- combined_df %>% 
-  pivot_longer(cols = bc:MDR) %>% 
-  dplyr::filter(is.na(value)) %>% 
-  dplyr::select(-c(sample_num, Temperature)) %>% 
-  filter(system_ID %in% c(
-    "Aedes aegypti / DENV", "Aedes aegypti / none",
-    "Aedes aegypti / ZIKV", "Aedes aegypti / none",
-    "Aedes albopictus / DENV", "Aedes albopictus / none",
-    "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
-    "Anopheles gambiae / Plasmodium falciparum",
-    "Anopheles gambiae / none"
-  )) %>% 
-  unique()
-# Should just show: Culex quinquefasciatus / WNV / bc
+# # Check what data we're missing (we'll go back and use substitutes for these)
+# missing_traits_df <- combined_df %>% 
+#   pivot_longer(cols = bc:MDR) %>% 
+#   dplyr::filter(is.na(value)) %>% 
+#   dplyr::select(-c(sample_num, Temperature)) %>% 
+#   filter(system_ID %in% c(
+#     "Aedes aegypti / DENV", "Aedes aegypti / none",
+#     "Aedes aegypti / ZIKV", "Aedes aegypti / none",
+#     "Aedes albopictus / DENV", "Aedes albopictus / none",
+#     "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
+#     "Anopheles gambiae / Plasmodium falciparum",
+#     "Anopheles gambiae / none"
+#   )) %>% 
+#   unique()
+# # Should just show: Culex quinquefasciatus / WNV / bc
 
 # Similar to Shocket 2020: use Culex spp. / WNV / bc data for Culex quinquefasciatus / WNV / bc
 # This combines data for Culex univittatus, tarsalis, and pipiens
@@ -193,7 +193,7 @@ library(cowplot)
 # For each mosquito species, trait, and sample, get a thermal response curve
 TPC_df <- data.in.params %>%  
   ungroup() %>% 
-  # dplyr::select(-c(muL, etaL, mosquito_species, pathogen)) %>%
+  dplyr::select(-c(muL, etaL, mosquito_species, pathogen)) %>%
   melt(id = c("system_ID", "Temperature", "sample_num"),
        variable.name = "trait",
        value.name = "Trait_val") %>% 

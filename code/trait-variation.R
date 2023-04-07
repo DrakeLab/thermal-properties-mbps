@@ -33,11 +33,10 @@ library(foreach)
 source("code/output-functions.R") # needed for compute.variable functions
 
 # Set up parallel
-my.cluster <- parallel::makeCluster(
-  parallel::detectCores() - 1, 
-  type = "PSOCK"
-)
-
+# my.cluster <- parallel::makeCluster(
+#   parallel::detectCores() - 1, 
+#   type = "PSOCK"
+# )
 
 if (!exists("cluster")) {
   cluster <- new_cluster(parallel::detectCores() - 1)
@@ -45,7 +44,10 @@ if (!exists("cluster")) {
 }
 
 # 1) Define accessory functions -------------------------------------------
-
+slice<-function(x,n) {
+  N<-length(x);
+  lapply(seq(1,N,n),function(i) x[i:min(i+n-1,N)])
+}
 
 # 2) Set *host* parameters --------------------------------
 
@@ -96,7 +98,8 @@ data.Host <- expand_grid(
   # Infection-related parameters
   gammaH = gammaH_baseline,
   betaH = betaH_baseline
-) %>% as.data.frame()
+) %>% as.data.frame() %>% 
+  mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model"))
 
 # 3) Set non-TPC *mosquito* parameters ------------------------------------
 
@@ -111,7 +114,10 @@ larval_mosquito_carrying_capacity <- 300
 
 data.Vec <- data.in.params %>% 
   # filter(sample_num %in% sample_inds) %>%
-  mutate(KL = larval_mosquito_carrying_capacity)
+  mutate(KL = larval_mosquito_carrying_capacity) %>% 
+  mutate(V0 = ifelse( sigmaV_f * deltaL < (1 / lf),
+                      0,
+                      KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL))))
 
 # rm(data.in.params)
 
@@ -146,10 +152,6 @@ eps <- .Machine$double.eps
 R0_TPC_func <- function(in_df, system_name) {
   out_df <- in_df %>%
     expand_grid(data.Vec %>% filter(system_ID == system_name)) %>%
-    mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
-    mutate(V0 = ifelse( sigmaV_f * deltaL < (1 / lf),
-                        0,
-                        KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL)))) %>%
     mutate(RV = ifelse(is.infinite(sigmaH),
                        sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
                        sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>% 
@@ -189,10 +191,6 @@ Topt_heat_func <- function(in_df, system_name) {
     ) %>% # known range of Topt
     data.table::data.table() %>%
     # Name the model (just in case this is handier than referring to sigmaH)
-    mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
-    mutate(V0 = ifelse( sigmaV_f * deltaL < (1 / lf),
-                        0,
-                        KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL)))) %>%
     mutate(RV = ifelse(is.infinite(sigmaH),
                        sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
                        sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>% 
@@ -221,7 +219,8 @@ Topt_heat_func <- function(in_df, system_name) {
       lowHCI = quantile(value, 0.055),
       highHCI = quantile(value, 0.945),
       mean = mean(value),
-      median = median(value)
+      median = median(value)#,
+      # .groups = "keep"
     ) %>%
     collect() %>%
     arrange(system_ID, sigmaH, KH) %>% 
@@ -232,14 +231,8 @@ CT_heat_func <- function(in_df, system_name) {
   out_df <- in_df %>%
     expand_grid(data.Vec %>%
                   # need to reduce sample size for memory purposes
-                  # filter(sample_num %in% unique(sample_num)[seq(1, length(unique(sample_num)), length.out = 400)]) %>%
                   # filter(between(Temperature, 13, 34)) %>% # known range of CT
                   filter(system_ID == system_name)) %>%
-    # Name the model (just in case this is handier than referring to sigmaH)
-    mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
-    mutate(V0 = ifelse( sigmaV_f * deltaL < (1 / lf),
-                        0,
-                        KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL)))) %>%
     mutate(RV = ifelse(is.infinite(sigmaH),
                        sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
                        sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>% 
@@ -262,27 +255,16 @@ CT_heat_func <- function(in_df, system_name) {
     mutate(CTwidth = CTmax - CTmin)%>% 
     ungroup() %>%
     dplyr::select(system_ID, Model, sigmaH, KH, CTmin, CTmax, CTwidth) %>%
-    pivot_longer(cols = c(CTwidth, CTmin, CTmax), names_to = "variable", values_to = "value") %>%
-    group_by(system_ID, Model, sigmaH, KH, variable) %>%
-    # partition(cluster) %>%
-    summarise(
-      lowHCI = quantile(value, 0.055),
-      highHCI = quantile(value, 0.945),
-      mean = mean(value),
-      median = median(value),
-      .groups = "keep"
-    ) %>%
-    # collect() %>%
-    arrange(system_ID, sigmaH, KH) %>%
-    distinct()
+    pivot_longer(cols = c(CTwidth, CTmin, CTmax), names_to = "variable", values_to = "value")
   
   # If R0 < 1 across all temperatures, report the following:
   #  critical thermal minimum = Inf
   #  critical thermal maximum = -Inf
   #  critical thermal width = 0
   if (dim(out_df)[1] == 0) {
-    out_df <- tibble(system_ID = system_name,sigmaH = in_df$sigmaH, KH = in_df$KH,
-                     variable = c("CTmax", "CTmin", "CTwidth")) %>% 
+    out_df <- expand_grid(system_ID = system_name, sigmaH = in_df$sigmaH, KH = in_df$KH,
+                          variable = c("CTmax", "CTmin", "CTwidth")) %>% 
+      distinct() %>% 
       mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model")) %>%
       mutate(mean = case_when(
         variable == "CTmax" ~ -Inf,
@@ -292,6 +274,20 @@ CT_heat_func <- function(in_df, system_name) {
       mutate(median = mean) %>% 
       mutate(highHCI = mean) %>% 
       mutate(lowHCI = mean)
+  } else {
+    out_df <- out_df %>% 
+      group_by(system_ID, Model, sigmaH, KH, variable) %>%
+      # partition(cluster) %>%
+      summarise(
+        lowHCI = quantile(value, 0.055),
+        highHCI = quantile(value, 0.945),
+        mean = mean(value),
+        median = median(value),
+        .groups = "keep"
+      ) %>%
+      # collect() %>%
+      arrange(system_ID, sigmaH, KH) %>%
+      distinct()
   }
   return(out_df)
 }
@@ -326,24 +322,37 @@ write_rds(R0_TPC.df, "results/R0_TPC_data.rds", compress = "gz")
 
 # Topt vs. sigmaH data ----------------------------------------------------
 
-data.Topt.sigmaH <- data.Host %>%
-  filter(KH %in% c(1, 10, 100, 1000, 10000)) # %>%
+data.Topt <- data.Host #%>%
+# filter(KH %in% c(1, 10, 100, 1000, 10000)) # %>%
 # filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 50)])
+
+KH_slices <- slice(unique(data.Topt$KH), 11)
 
 Topt.df <- init.df
 
 gc()
 for (system_name in unique(data.Vec$system_ID)) {
-  print(paste0("Topt vs. sigmaH: ", system_name))
-  system.time(
-    Topt.df <- data.Topt.sigmaH %>%
-      Topt_heat_func(., system_name) %>%
-      rbind(Topt.df)
-  )
-  gc()
+  print(paste0("CT vals: ", system_name))
+  slice_num <- 1
+  for(index_KH in KH_slices) {
+    print(paste0("Slice number ", slice_num, " out of ", length(KH_slices)))
+    for (index_sigmaH in unique(data.Topt$sigmaH)) {
+      print(paste0(which(unique(data.Topt$sigmaH)== index_sigmaH)/length(unique(data.Topt$sigmaH))*100, "% complete"))
+      # parallel compute CT values over host trait values
+      # for (index_KH in unique(data.Host.CT$KH)) {
+      system.time(Topt.df <- data.Topt %>% 
+                    filter(sigmaH == index_sigmaH,
+                           KH %in% index_KH) %>% 
+                    Topt_heat_func(., system_name) %>% 
+                    rbind(Topt.df))
+      # }
+    }
+    slice_num <- slice_num +1
+    gc()
+  }
 }
 
-write_rds(Topt.df, "results/Topt_sigmaH.rds", compress = "gz")
+write_rds(Topt.df, "results/Topt_vals.rds", compress = "gz")
 
 
 # Topt vs. KH -------------------------------------------------------------
@@ -370,27 +379,29 @@ write_rds(Topt.df, "results/Topt_KH.rds", compress = "gz")
 
 # CTmin, max, and width vs. sigma and KH ----------------------------------
 
-data.Host.CT <- data.Host %>%
-  filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 4)]) %>%
-  filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 4)])
+data.Host.CT <- data.Host #%>%
+# filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 4)]) %>%
+# filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 4)])
 
 CT.df <- init.df
 
 gc()
-for (system_name in unique(data.Vec$system_ID)) {
-  print(paste0("CT vals: ", system_name))
-  # parallel compute CT values over host trait values
-  temp_df <- foreach(
-    index_sigmaH = data.Host.CT$sigmaH,
-    index_KH = data.Host.CT$KH,
-    .combine = "rbind") %dopar% {
-      data.Host.CT %>% 
-        filter(sigmaH == index_sigmaH, KH == index_KH) %>% 
-        CT_heat_func(., system_name) 
+system.time(
+  for (system_name in unique(data.Vec$system_ID)) {
+    print(paste0("CT vals: ", system_name))
+    for (index_sigmaH in unique(data.Host.CT$sigmaH)) {
+      print(paste0(which(unique(data.Host.CT$sigmaH)== index_sigmaH)/length(unique(data.Host.CT$sigmaH))*100, "% complete"))
+      # parallel compute CT values over host trait values
+      # for (index_KH in unique(data.Host.CT$KH)) {
+      CT.df <- data.Host.CT %>% 
+        filter(sigmaH == index_sigmaH) %>% 
+        CT_heat_func(., system_name) %>% 
+        rbind(CT.df)
+      # }
     }
-  CT.df <- rbind(CT.df, temp_df)
-  gc()
-}
+    gc()
+  }
+)
 
 # smallest CTmin ~13.85
 # largest CTmax ~34.45
