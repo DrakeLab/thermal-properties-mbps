@@ -34,7 +34,8 @@ source("code/output-functions.R") # needed for compute.variable functions
 
 # Set up parallel
 if (!exists("cluster")) {
-  cluster <- new_cluster(parallel::detectCores() - 1)
+  cluster_size <- parallel::detectCores() - 1
+  cluster <- new_cluster(cluster_size)
   cluster_library(cluster, c("dplyr", "tidyr"))
 }
 
@@ -251,7 +252,7 @@ CT_heat_func <- function(in_df, system_name) {
     ungroup() %>%
     dplyr::select(system_ID, Model, sigmaH, KH, CTmin, CTmax, CTwidth) %>%
     pivot_longer(cols = c(CTwidth, CTmin, CTmax), names_to = "variable", values_to = "value")
-
+  
   # If R0 < 1 across all temperatures, report the following:
   #  critical thermal minimum = Inf
   #  critical thermal maximum = -Inf
@@ -297,42 +298,62 @@ rm(data.in.params)
 
 # R0 TPC data -------------------------------------------------------------
 
-data.Host.R0_TPC <- data.Host %>%
-  filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 21)]) %>%
-  filter(sigmaH %in% c(100, Inf))
+data.R0 <- data.Host %>%
+  filter(sigmaH %in% c(100, Inf)) %>% 
+  filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 21)])
 
-R0_TPC.df <- init.df
+
+sigmaH_slices <- slice(unique(data.R0$sigmaH), 10)
+KH_slices <- slice(unique(data.R0$KH), cluster_size)
+
+R0.df <- init.df
+
+gc()
 for (system_name in unique(data.Vec$system_ID)) {
-  print(paste0("R0 TPCs: ", system_name))
-  system.time(
-    R0_TPC.df <- data.Host.R0_TPC %>%
-      R0_TPC_func(., system_name) %>%
-      rbind(R0_TPC.df)
-  )
-  gc()
+  print(paste0("Topt vals: ", system_name))
+  KHslice_num <- 1
+  for(index_KH in KH_slices) {
+    print(paste0("KH slice number ", KHslice_num, " out of ", length(KH_slices)))
+    sigmaHslice_num <- 1
+    for (index_sigmaH in sigmaH_slices) {
+      print(paste0("sigmaH slice number ", sigmaHslice_num, " out of ", length(sigmaH_slices)))
+      # parallel compute CT values over host trait values
+      # for (index_KH in unique(data.Host.CT$KH)) {
+      system.time(R0.df <- data.R0 %>%
+                    filter(sigmaH %in% index_sigmaH,
+                           KH %in% index_KH) %>%
+                    R0_TPC_func(., system_name) %>%
+                    rbind(R0.df))
+      # }
+      sigmaHslice_num <- sigmaHslice_num  + 1
+    }
+    KHslice_num <- KHslice_num +1
+    gc()
+  }
 }
 
-write_rds(R0_TPC.df, "results/R0_TPC_data.rds", compress = "gz")
+write_rds(R0.df, "results/R0_vals.rds", compress = "gz")
 
-
-# Topt vs. sigmaH data ----------------------------------------------------
+# Topt data ---------------------------------------------------------------
 
 data.Topt <- data.Host #%>%
 # filter(KH %in% c(1, 10, 100, 1000, 10000)) # %>%
 # filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 50)])
 
-KH_slices <- slice(unique(data.Topt$KH), 11)
+sigmaH_slices <- slice(unique(data.Topt$sigmaH), 10)
+KH_slices <- slice(unique(data.Topt$KH), cluster_size)
 
 Topt.df <- init.df
 
 gc()
 for (system_name in unique(data.Vec$system_ID)) {
-  print(paste0("CT vals: ", system_name))
-  slice_num <- 1
+  print(paste0("Topt vals: ", system_name))
+  KHslice_num <- 1
   for(index_KH in KH_slices) {
-    print(paste0("Slice number ", slice_num, " out of ", length(KH_slices)))
-    for (index_sigmaH in unique(data.Topt$sigmaH)) {
-      print(paste0(which(unique(data.Topt$sigmaH)== index_sigmaH)/length(unique(data.Topt$sigmaH))*100, "% complete"))
+    print(paste0("KH slice number ", KHslice_num, " out of ", length(KH_slices)))
+    sigmaHslice_num <- 1
+    for (index_sigmaH in sigmaH_slices) {
+      print(paste0("sigmaH slice number ", sigmaHslice_num, " out of ", length(sigmaH_slices)))
       # parallel compute CT values over host trait values
       # for (index_KH in unique(data.Host.CT$KH)) {
       system.time(Topt.df <- data.Topt %>%
@@ -341,36 +362,14 @@ for (system_name in unique(data.Vec$system_ID)) {
                     Topt_heat_func(., system_name) %>%
                     rbind(Topt.df))
       # }
+      sigmaHslice_num <- sigmaHslice_num  + 1
     }
-    slice_num <- slice_num +1
+    KHslice_num <- KHslice_num +1
     gc()
   }
 }
 
 write_rds(Topt.df, "results/Topt_vals.rds", compress = "gz")
-
-
-# Topt vs. KH -------------------------------------------------------------
-
-data.Topt.KH <- data.Host %>%
-  # filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 10)]) %>%
-  filter(sigmaH %in% c(1, 10, 100, Inf))
-
-Topt.df <- init.df
-
-gc()
-for (system_name in unique(data.Vec$system_ID)) {
-  print(paste0("Topt vs. KH: ", system_name))
-  system.time(
-    Topt.df <- data.Topt.KH %>%
-      Topt_heat_func(., system_name) %>%
-      rbind(Topt.df)
-  )
-  gc()
-}
-
-write_rds(Topt.df, "results/Topt_KH.rds", compress = "gz")
-
 
 # CTmin, max, and width vs. sigma and KH ----------------------------------
 
