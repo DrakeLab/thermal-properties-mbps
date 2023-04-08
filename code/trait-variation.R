@@ -161,11 +161,11 @@ R0_TPC_func <- function(in_df, system_name) {
     mutate(R0 = sqrt(RV*RH))%>%
     dplyr::select(system_ID, sample_num, Temperature, Model, sigmaH, KH, V0, R0) %>%
     # Normalize R0 across temperature
-    group_by(system_ID, Model, sigmaH, KH, sample_num) %>%
-    mutate(norm_R0 = R0 / max(R0, eps)) %>%
+    group_by(system_ID, Model, sigmaH, KH) %>%
+    mutate(norm_R0 = R0 / max(R0)) %>%
     ungroup() %>%
     dplyr::select(system_ID, Temperature, Model, sigmaH, KH, norm_R0) %>%
-    pivot_longer(cols = norm_R0, names_to = "variable", values_to = "value") %>%
+    pivot_longer(cols = c(R0, norm_R0), names_to = "variable", values_to = "value") %>%
     group_by(system_ID, Temperature, Model, sigmaH, KH, variable) %>%
     partition(cluster) %>%
     summarise(

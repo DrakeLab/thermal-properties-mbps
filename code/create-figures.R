@@ -36,11 +36,11 @@ library(svglite) #nec
 
 # Load in data sets
 data.in.thermchars <- read_rds("results/AllThermChar_thin.rds") #%>% 
-  # Focus on two systems for now
-  # filter(system_ID %in% c("Aedes albopictus / DENV", "Anopheles spp. / Plasmodium"))
+# Focus on two systems for now
+# filter(system_ID %in% c("Aedes albopictus / DENV", "Anopheles spp. / Plasmodium"))
 data.in.outputs <- read_rds("data/clean/AllOutputs_thin.rds") #%>% 
-  # Focus on two systems for now
-  # filter(system_ID %in% c("Aedes albopictus / DENV", "Anopheles spp. / Plasmodium"))
+# Focus on two systems for now
+# filter(system_ID %in% c("Aedes albopictus / DENV", "Anopheles spp. / Plasmodium"))
 
 # Helper function to place legends in empty facets of plot grids
 # Code by: Artem Sokolov, found here: https://stackoverflow.com/questions/54438495/shift-legend-into-empty-facets-of-a-faceted-plot-in-ggplot2
@@ -73,8 +73,8 @@ shift_legend <- function(p) {
 #   - colour = value of KH. place it on a color scale in the bottom right corner
 
 
-R0_df <- read_rds("results/R0_TPC_data.rds") %>% 
-  filter(KH %in% 10^seq(-2,5)) %>% 
+R0_df <- read_rds("results/R0_vals.rds") %>% 
+  # filter(KH %in% 10^seq(-2,5)) %>% 
   arrange(system_ID, KH, sigmaH, Temperature)
 
 R0_plot <- ggplot(mapping = aes(x = Temperature, group = KH)) +
@@ -176,14 +176,13 @@ ggsave("figures/R0_TPCs.svg", R0_plot,
 
 # Figure 5: Topt heatmap --------------------------------------------------
 # Mean value of Topt as a function of KH and sigmaH
-Topt_heat_df <- read_rds("results/Topt_heat_data.rds")
+Topt_heat_df <- read_rds("results/Topt_vals.rds")
 
 Toptalt_df <- Topt_heat_df %>%
   ungroup() %>%
   distinct() %>%
   # Arrange along the plotting variables
-  rename(mean_Topt = mean_val) %>% 
-  arrange(system_ID, sigmaH, KH, mean_Topt) %>% 
+  arrange(system_ID, sigmaH, KH, mean) %>% 
   mutate(sigmaH_proxy = sigmaH)
 
 # add many proxy sigmaH points at infinity to make the values easier to see there
@@ -236,8 +235,8 @@ Toptalt_df <- add_row(Toptalt_df, temp7) %>%
 # Define sigmaH tick breaks and labels
 sigmaH_breaks <- c(10^c(seq(-1, 2, by = 1)), infinite_divide, infinite_skew)
 sigmaH_labels <- c(paste(c(10^c(seq(-1, 2, by = 1)))), TeX("$\\ldots$"), TeX("$\\infty$"))
-Topt_breaks <- seq(floor(min(Toptalt_df$mean_Topt)), 
-                   ceiling(max(Toptalt_df$mean_Topt)), by = 1)
+Topt_breaks <- seq(floor(min(Toptalt_df$mean)), 
+                   ceiling(max(Toptalt_df$mean)), by = 1)
 
 # Plot mean of Topt heat map
 Toptalt_plots <- Toptalt_df %>%
@@ -245,7 +244,7 @@ Toptalt_plots <- Toptalt_df %>%
   # x = biting tolerance (with a point at infinity),
   # y = vertebrate host population density,
   # color = transmission thermal optimum
-  ggplot(aes(x = KH, y = sigmaH_proxy, z = mean_Topt)) +
+  ggplot(aes(x = KH, y = sigmaH_proxy, z = mean)) +
   # Topt for FINITE sigmaH:
   geom_contour_filled(
     data = filter(Toptalt_df, sigmaH_proxy < infinite_divide**0.98),
@@ -257,17 +256,17 @@ Toptalt_plots <- Toptalt_df %>%
     size = 1,
     breaks = Topt_breaks
   ) +
-  # # R0 = 1 contour: # !!! figure this out
-  # geom_contour(data = Toptalt_df,
-  #              aes(z = mean_R0opt, colour = "R0=1"), breaks = c(1), size = 1) +
+  # # R0 = 1 contour: # !!! figure this out. current R0 data only keeps track of the norm!
+  geom_contour(data = R0_df,
+               aes(y = sigmaH, z = mean, colour = "R0=1"), breaks = c(1), size = 1) +
   
   # x-axis: log10-scale with no buffer space
   scale_x_log10(
     name = TeX("Vertebrate host population density (ind/ha)"),
     expand = c(0, 0),
-    # limits = c(0.05, 1E4),
-    # breaks = 10^seq(-1, 4, 1),
-    # labels = TeX(c("$0.1$", "$1$", "$10", "$100$", "$10^3$", "$10^4$"))
+    limits = c(0.05, 1E4),
+    breaks = 10^seq(-1, 4, 1),
+    labels = TeX(c("$0.1$", "$1$", "$10", "$100$", "$10^3$", "$10^4$"))
   ) +
   # y-axis: log10-scale y axis, with no buffer space
   scale_y_log10(
@@ -324,6 +323,7 @@ Toptalt_plots <- Toptalt_df %>%
 
 # Plot
 Toptalt_plots <- shift_legend(Toptalt_plots)
+
 ggsave("figures/Topt_mean.svg", Toptalt_plots,
        width = 16, height = 9)
 
@@ -338,29 +338,11 @@ ggsave("figures/Topt_mean.svg", Toptalt_plots,
 # colour = width of parasite thermal niche (CTmax - CTmin)
 # Facets = systems
 
-CTwidth_df <- data.in.thermchars %>%
-  # remove irrelevant columns
-  select(-c(threshold_bool, CHmin, CHmax, R0opt, Topt)) %>%
-  ungroup() %>%
-  # Calculate thermal niche width
-  mutate(CTwidth = CTmax - CTmin, .keep = "unused") %>% 
-  # Replace NAs with zeroes for CTwidth 
-  # NAs correspond to settings where R0 is always less than one, so CTmin/max are undefined
-  mutate(CTwidth = replace(CTwidth, is.na(CTwidth), 0)) %>%
-  group_by(system_ID, Model, sigmaH, KH) %>%
-  mutate(
-    mean_CTwidth = mean(CTwidth),
-    median_CTwidth = median(CTwidth),
-    std_CTwidth = sd(CTwidth),
-    # mode_val = mlv(norm_R0, method = 'mfv'),
-    # .groups = "keep"
-  ) %>% 
-  # collapse groups
-  select(-c(sample_num, CTwidth)) %>% 
-  unique() %>% 
+CTwidth_df <- read_rds("results/CT_vals.rds") %>%
+  filter(variable == "CTwidth") %>% 
   mutate(sigmaH_proxy = sigmaH) %>% 
   # Arrange along the plotting variables
-  arrange(system_ID, KH, sigmaH_proxy, mean_CTwidth) %>% 
+  arrange(system_ID, KH, sigmaH_proxy, mean) %>% 
   ungroup()
 
 # add many third proxy sigmaH points at infinity to make the values easier to see there
@@ -408,7 +390,7 @@ CTWidth_heat_plots <- CTwidth_df %>%
   # x = biting tolerance (with a point at infinity),
   # y = vertebrate host population density,
   # color = width of parasite thermal mean_CTwidth
-  ggplot(aes(x = KH, y = sigmaH_proxy, z = mean_CTwidth)) +
+  ggplot(aes(x = KH, y = sigmaH_proxy, z = mean)) +
   
   # CTwidth for FINITE sigmaH:
   geom_contour_filled(
@@ -468,6 +450,7 @@ CTWidth_heat_plots <- CTwidth_df %>%
 
 # Plot
 CTWidth_heat_plots <- shift_legend(CTWidth_heat_plots)
+
 ggsave("figures/CTwidth_mean.svg", CTWidth_heat_plots,
        width = 16, height = 9)
 
@@ -478,7 +461,8 @@ ggsave("figures/CTwidth_mean.svg", CTWidth_heat_plots,
 
 
 # Figure S2: Topt as a function of KH -------------------------------------
-Topt_df <- read_rds("results/Topt_KH.rds") %>% 
+Topt_df <- read_rds("results/Topt_vals.rds") %>% 
+  filter(sigmaH %in% c(1, 10, 100, Inf)) %>% 
   select(-c(variable)) %>%
   # filter(KH > 0.01) %>%
   # filter(sigmaH %in% 10^seq(0, 2) | is.infinite(sigmaH)) %>%
@@ -497,14 +481,7 @@ Topt_plot <- Topt_df %>%
   )) +
   # Topt curves:
   geom_path(aes(y = mean, colour = as.factor(sigmaH)), lwd = 1) +
-  # # 89% HCI of R0 TPC curves
-  # geom_ribbon(
-  #   
-  #   aes(ymin = lowHCI, ymax = highHCI,
-  #       fill = as.factor(sigmaH)),
-  #   alpha = 0.05
-  # ) +
-  # Add dotted lines showing limits of ribbons
+  # Add dotted lines showing 89% HCI limits
   geom_path(
     aes(y = lowHCI,
         color = as.factor(sigmaH)),
@@ -532,21 +509,21 @@ Topt_plot <- Topt_df %>%
     expand = c(0.05, 0.05),
     limits = c(11,39)
   ) +
-  # # color:
-  # scale_colour_manual(
-  #   name = "Vertebrate host biting tolerance\n(bites per host per day)",
-  #   values = c(met.brewer("VanGogh3", 4, direction = 1), "black"),
-  #   # values = c(brewer.pal(9, "YlOrRd")[c(3, 5, 7)], "black"),
-  #   breaks = c(1, 10, 100, Inf),
-  #   labels = unname(c("1 (Chitnis)", "10 (Chitnis)", "100 (Chitnis)", TeX("$\\infty$ (Ross-Macdonald)")))
-  # ) +
-  # scale_fill_manual(
-  #   name = "Vertebrate host biting tolerance\n(bites per host per day)",
-  #   values = c(met.brewer("VanGogh3", 4, direction = 1), "black"),
-  #   # values = c(brewer.pal(9, "YlOrRd")[c(3, 5, 7)], "black"),
-  #   breaks = c(1, 10, 100, Inf),
-  #   labels = unname(c("1 (Chitnis)", "10 (Chitnis)", "100 (Chitnis)", TeX("$\\infty$ (Ross-Macdonald)")))
-  # ) +
+  # color:
+  scale_colour_manual(
+    name = "Vertebrate host biting tolerance\n(bites per host per day)",
+    values = c(met.brewer("VanGogh3", 4, direction = 1), "black"),
+    # values = c(brewer.pal(9, "YlOrRd")[c(3, 5, 7)], "black"),
+    breaks = c(1, 10, 100, Inf),
+    labels = unname(c("1 (Chitnis)", "10 (Chitnis)", "100 (Chitnis)", TeX("$\\infty$ (Ross-Macdonald)")))
+  ) +
+  scale_fill_manual(
+    name = "Vertebrate host biting tolerance\n(bites per host per day)",
+    values = c(met.brewer("VanGogh3", 4, direction = 1), "black"),
+    # values = c(brewer.pal(9, "YlOrRd")[c(3, 5, 7)], "black"),
+    breaks = c(1, 10, 100, Inf),
+    labels = unname(c("1 (Chitnis)", "10 (Chitnis)", "100 (Chitnis)", TeX("$\\infty$ (Ross-Macdonald)")))
+  ) +
   # faceting:
   facet_wrap(~system_ID,
              scales = "free",
@@ -584,14 +561,11 @@ ggsave("figures/ToptKH_plot.svg", Topt_plot,
 # Figure S3: Topt as a function of sigmaH ---------------------------------
 # Mean Topt as a function of sigmaH, across discrete values of KH
 
-Topt_plot <- read_rds("results/Topt_KH.rds") %>% 
+Topt_plot <- read_rds("results/Topt_vals.rds") %>% 
+  # filter(sigmaH %in% c(1, 10, 100, Inf)) %>% 
   # Choose appropriate pop. dens. values and group
-  # filter(KH %in% 10^seq(0, 4)) %>%
-  group_by(KH) %>%
-  # Arrange along the plotting variables
-  arrange(system_ID, sigmaH, mean_Topt) %>%
-  arrange(KH) %>%
-  ungroup()%>%
+  filter(KH %in% 10^seq(0, 3)) %>%
+  arrange(system_ID, KH, sigmaH, mean) %>% 
   ## Set up plot ##
   # color = sigmaH
   ggplot(aes(
@@ -599,26 +573,9 @@ Topt_plot <- read_rds("results/Topt_KH.rds") %>%
   )) +
   # Topt curves:
   geom_path(aes(y = mean, colour = as.factor(KH)), lwd = 1) +
-  # 89% HCI of R0 TPC curves
-  geom_ribbon(
-    
-    aes(ymin = lowHCI, ymax = highHCI, 
-        fill = as.factor(KH)),
-    alpha = 0.05
-  ) +
-  # Add dotted lines showing limits of ribbons
-  geom_path(
-    
-    aes(y = lowHCI,
-        color = as.factor(KH)),
-    linetype = "dashed"
-  ) +
-  geom_path(
-    
-    aes(y = highHCI,
-        color = as.factor(KH)),
-    linetype = "dashed"
-  ) +
+  # Dotted lines showing limits of 89% HCI
+  geom_path(aes(y = lowHCI,color = as.factor(KH)),linetype = "dashed") +
+  geom_path(aes(y = highHCI,color = as.factor(KH)),linetype = "dashed") +
   # white lines breaking up finite/infinite sigmaH values:
   geom_vline(
     aes(xintercept = 0.95 * infinite_divide),
@@ -642,7 +599,7 @@ Topt_plot <- read_rds("results/Topt_KH.rds") %>%
   scale_x_log10(
     name = TeX("Vertebrate host biting tolerance (bites per host per day)"),
     expand = c(0, 0),
-    limits = c(5, 3500),
+    limits = c(0.5, 150),
     breaks = sigmaH_breaks,
     labels = sigmaH_labels
   ) +
@@ -655,12 +612,12 @@ Topt_plot <- read_rds("results/Topt_KH.rds") %>%
   # color:
   scale_colour_manual(
     name = "Vertebrate host population\ndensity (ind/ha)",
-    values = met.brewer("Hokusai3", 11,
+    values = met.brewer("Hokusai3", 4,
                         # option = "plasma"
     )) +
   scale_fill_manual(
     name = "Vertebrate host population\ndensity (ind/ha)",
-    values = met.brewer("Hokusai3", 11,
+    values = met.brewer("Hokusai3", 4,
                         # option = "plasma"
     )) +
   # faceting:
@@ -698,10 +655,249 @@ ggsave("figures/ToptsigmaH_plot.svg", Topt_plot,
        width = 16, height = 9)
 
 # Figure S4: CTmin heatmap ------------------------------------------------
+# Shows how the parasite thermal niche (temperatures between CT_min and CT_max) 
+# depends on vertebrate host availability (density and biting tolerance) in each
+# of the focal systems.
 
+#   x    = biting tolerance (with a point at infinity)
+#   y    = vertebrate host population density
+# colour = width of parasite thermal niche (CTmax - CTmin)
+# Facets = systems
+
+CTmin_df <- read_rds("results/CT_vals.rds") %>%
+  filter(variable == "CTmin") %>% 
+  filter(is.finite(mean)) %>%
+  mutate(sigmaH_proxy = sigmaH) %>% 
+  # Arrange along the plotting variables
+  arrange(system_ID, KH, sigmaH_proxy, mean) %>% 
+  ungroup()
+
+# add many third proxy sigmaH points at infinity to make the values easier to see there
+temp <- filter(CTmin_df, is.infinite(sigmaH)) %>%
+  mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH,
+                               mean(c(1.25 * infinite_divide, infinite_skew))
+  ))
+temp2 <- filter(CTmin_df, is.infinite(sigmaH)) %>%
+  mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH,
+                               mean(c(1.15 * infinite_divide, infinite_skew))
+  ))
+temp3 <- filter(CTmin_df, is.infinite(sigmaH)) %>%
+  mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH,
+                               mean(c(1.05 * infinite_divide, infinite_skew))
+  ))
+temp4 <- filter(CTmin_df, is.infinite(sigmaH)) %>%
+  mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH,
+                               mean(c(1.3 * infinite_divide, infinite_skew))
+  ))
+temp5 <- filter(CTmin_df, is.infinite(sigmaH)) %>%
+  mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH,
+                               mean(c(1.2 * infinite_divide, infinite_skew))
+  ))
+temp6 <- filter(CTmin_df, is.infinite(sigmaH)) %>%
+  mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH,
+                               mean(c(1.1 * infinite_divide, infinite_skew))
+  ))
+temp7 <- filter(CTmin_df, is.infinite(sigmaH)) %>%
+  mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH,
+                               mean(c(infinite_divide, infinite_skew))
+  ))
+
+CTmin_df <- add_row(CTmin_df, temp)
+CTmin_df <- add_row(CTmin_df, temp2)
+CTmin_df <- add_row(CTmin_df, temp3)
+CTmin_df <- add_row(CTmin_df, temp4)
+CTmin_df <- add_row(CTmin_df, temp5)
+CTmin_df <- add_row(CTmin_df, temp6)
+CTmin_df <- add_row(CTmin_df, temp7) %>%
+  arrange(sigmaH_proxy) %>%
+  distinct()
+
+CTmin_heat_plots <- CTmin_df %>%
+  ## Set up plot ##
+  # x = biting tolerance (with a point at infinity),
+  # y = vertebrate host population density,
+  # color = width of parasite thermal mean_CTwidth
+  ggplot(aes(x = KH, y = sigmaH_proxy, z = mean)) +
+  
+  # CTwidth for FINITE sigmaH:
+  geom_contour_filled(
+    data = filter(CTmin_df, sigmaH_proxy < infinite_divide**0.98)
+  ) +
+  
+  # CTwidth for INFINITE sigmaH:
+  geom_contour_filled(
+    data = filter(CTmin_df, sigmaH_proxy > infinite_divide**1.02)
+  ) +
+  
+  # x-axis: log10-scale with no buffer space
+  scale_x_log10(
+    name = TeX("Vertebrate host population density (ind/ha)"),
+    expand = c(0, 0),
+    limits = c(0.05, 1E4),
+    breaks = 10^seq(-1, 4, 1),
+    labels = TeX(c("$0.1$", "$1$", "$10", "$100$", "$10^3$", "$10^4$"))
+  ) +
+  # y-axis: log10-scale y axis, with no buffer space
+  scale_y_log10(
+    name = TeX("Biting tolerance (bites per host per day)"),
+    expand = c(0, 0),
+    breaks = sigmaH_breaks,
+    labels = sigmaH_labels
+  ) +
+  # color:
+  scale_fill_viridis_d(
+    name = "Mean critical thermal minimum (°C)",
+    option = "plasma"
+  ) +
+  # faceting:
+  facet_wrap(~system_ID, scales = "free", nrow = 2, labeller = labeller()) +
+  # legend:
+  guides(fill = guide_coloursteps(
+    title.position = "top", title.hjust = 0.5,
+    barwidth = unit(10, "cm"),
+    show.limits = TRUE
+  )) +
+  # theme options:
+  theme_minimal(11) +
+  theme(
+    legend.box = "horizontal",
+    legend.position = "bottom",
+    legend.margin = margin(0, 0, 0, 0),
+    legend.title = element_text(size = 10),
+    legend.direction = "horizontal",
+    legend.justification = "left",
+    axis.title.x = element_text(hjust = 0.5),
+    strip.text = ggtext::element_markdown(
+      size = 11,
+      hjust = 0,
+      padding = margin(0, 0, 0, 0),
+      margin = margin(1, 1, 1, 1)
+    )
+  )
+
+# Plot
+CTmin_heat_plots <- shift_legend(CTmin_heat_plots)
+
+ggsave("figures/CTmin_mean.svg", CTmin_heat_plots,
+       width = 16, height = 9)
 
 # Figure S5: CTmax heatmap ------------------------------------------------
+CTmax_df <- read_rds("results/CT_vals.rds") %>%
+  filter(variable == "CTmax") %>% 
+  filter(is.finite(mean)) %>%
+  mutate(sigmaH_proxy = sigmaH) %>% 
+  # Arrange along the plotting variables
+  arrange(system_ID, KH, sigmaH_proxy, mean) %>% 
+  ungroup()
 
+# add many third proxy sigmaH points at infinity to make the values easier to see there
+temp <- filter(CTmax_df, is.infinite(sigmaH)) %>%
+  mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH,
+                               mean(c(1.25 * infinite_divide, infinite_skew))
+  ))
+temp2 <- filter(CTmax_df, is.infinite(sigmaH)) %>%
+  mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH,
+                               mean(c(1.15 * infinite_divide, infinite_skew))
+  ))
+temp3 <- filter(CTmax_df, is.infinite(sigmaH)) %>%
+  mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH,
+                               mean(c(1.05 * infinite_divide, infinite_skew))
+  ))
+temp4 <- filter(CTmax_df, is.infinite(sigmaH)) %>%
+  mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH,
+                               mean(c(1.3 * infinite_divide, infinite_skew))
+  ))
+temp5 <- filter(CTmax_df, is.infinite(sigmaH)) %>%
+  mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH,
+                               mean(c(1.2 * infinite_divide, infinite_skew))
+  ))
+temp6 <- filter(CTmax_df, is.infinite(sigmaH)) %>%
+  mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH,
+                               mean(c(1.1 * infinite_divide, infinite_skew))
+  ))
+temp7 <- filter(CTmax_df, is.infinite(sigmaH)) %>%
+  mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH,
+                               mean(c(infinite_divide, infinite_skew))
+  ))
+
+CTmax_df <- add_row(CTmax_df, temp)
+CTmax_df <- add_row(CTmax_df, temp2)
+CTmax_df <- add_row(CTmax_df, temp3)
+CTmax_df <- add_row(CTmax_df, temp4)
+CTmax_df <- add_row(CTmax_df, temp5)
+CTmax_df <- add_row(CTmax_df, temp6)
+CTmax_df <- add_row(CTmax_df, temp7) %>%
+  arrange(sigmaH_proxy) %>%
+  distinct()
+
+CTmax_heat_plots <- CTmax_df %>%
+  ## Set up plot ##
+  # x = biting tolerance (with a point at infinity),
+  # y = vertebrate host population density,
+  # color = width of parasite thermal mean_CTwidth
+  ggplot(aes(x = KH, y = sigmaH_proxy, z = mean)) +
+  
+  # CTwidth for FINITE sigmaH:
+  geom_contour_filled(
+    data = filter(CTmax_df, sigmaH_proxy < infinite_divide**0.98)
+  ) +
+  
+  # CTwidth for INFINITE sigmaH:
+  geom_contour_filled(
+    data = filter(CTmax_df, sigmaH_proxy > infinite_divide**1.02)
+  ) +
+  
+  # x-axis: log10-scale with no buffer space
+  scale_x_log10(
+    name = TeX("Vertebrate host population density (ind/ha)"),
+    expand = c(0, 0),
+    limits = c(0.05, 1E4),
+    breaks = 10^seq(-1, 4, 1),
+    labels = TeX(c("$0.1$", "$1$", "$10", "$100$", "$10^3$", "$10^4$"))
+  ) +
+  # y-axis: log10-scale y axis, with no buffer space
+  scale_y_log10(
+    name = TeX("Biting tolerance (bites per host per day)"),
+    expand = c(0, 0),
+    breaks = sigmaH_breaks,
+    labels = sigmaH_labels
+  ) +
+  # color:
+  scale_fill_viridis_d(
+    name = "Mean critical thermal minimum (°C)",
+    option = "plasma"
+  ) +
+  # faceting:
+  facet_wrap(~system_ID, scales = "free", nrow = 2, labeller = labeller()) +
+  # legend:
+  guides(fill = guide_coloursteps(
+    title.position = "top", title.hjust = 0.5,
+    barwidth = unit(10, "cm"),
+    show.limits = TRUE
+  )) +
+  # theme options:
+  theme_minimal(11) +
+  theme(
+    legend.box = "horizontal",
+    legend.position = "bottom",
+    legend.margin = margin(0, 0, 0, 0),
+    legend.title = element_text(size = 10),
+    legend.direction = "horizontal",
+    legend.justification = "left",
+    axis.title.x = element_text(hjust = 0.5),
+    strip.text = ggtext::element_markdown(
+      size = 11,
+      hjust = 0,
+      padding = margin(0, 0, 0, 0),
+      margin = margin(1, 1, 1, 1)
+    )
+  )
+
+# Plot
+CTmax_heat_plots <- shift_legend(CTmax_heat_plots)
+
+ggsave("figures/CTmax_mean.svg", CTmax_heat_plots,
+       width = 16, height = 9)
 
 # Figure S6: CTmin/max as functions of KH ---------------------------------
 
