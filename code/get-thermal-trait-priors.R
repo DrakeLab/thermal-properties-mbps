@@ -108,11 +108,12 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
   # 1) use default priors
   # 2) update these using any related species
   # 3) sequentially update with more recent datasets
-  if (old_informative != TRUE) { # U
+  if (old_informative != TRUE) {
     # Gather data from other species of the same genus
     other_species <- working_data %>%
       dplyr::filter(stringr::word(mosquito_species, 1, 1) == stringr::word(mosquito_in, 1, 1)) %>%
-      dplyr::filter(mosquito_species != mosquito_in)
+      dplyr::filter(mosquito_species != mosquito_in) %>% 
+      distinct(T,trait, .keep_all = TRUE)
 
     # If data was recorded for infections, use infections in other species to inform priors
     if (pathogen_in != "none") {
@@ -145,7 +146,8 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         )
       } else {
         case_when(
-          TPC_function == "Briere" ~ "code/jags-models/jags-briere.bug",
+          TPC_function == "Briere" & trait_in != "EFD" ~ "code/jags-models/jags-briere.bug",
+          TPC_function == "Briere" & trait_in == "EFD" ~ "code/jags-models/jags-briere-EFD.bug",
           TPC_function == "Quadratic" ~ "code/jags-models/jags-quad-neg.bug",
           TPC_function == "Linear" ~ "code/jags-models/jags-linear.bug"
         )
@@ -197,7 +199,8 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
       )
     } else {
       case_when(
-        TPC_function == "Briere" ~ "code/jags-models/jags-briere-informative.bug",
+        TPC_function == "Briere" & trait_in != "EFD" ~ "code/jags-models/jags-briere-informative.bug",
+        TPC_function == "Briere" & trait_in == "EFD" ~ "code/jags-models/jags-briere-EFD-informative.bug",
         TPC_function == "Quadratic" ~ "code/jags-models/jags-quad-neg-informative.bug",
         TPC_function == "Linear" ~ "code/jags-models/jags-linear-informative.bug"
       )
@@ -226,9 +229,9 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
   # SPECIAL CASE: Alternate data for Aedes aegypti fecundity (from Ae. albopictus)
   #               is substantially different than original data. Do not use it
   #               to inform the TPC parameter prior distribution
-  if (trait_in == "EFD" & mosquito_in == "Aedes aegypti") {
-    prev_hypers <- c()
-  }
+  # if (trait_in == "EFD" & mosquito_in == "Aedes aegypti") {
+  #   prev_hypers <- c()
+  # }
 
   # Select the appropriate bugs model
   jags_choice <- if (prob_bool) {
@@ -243,8 +246,10 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
     )
   } else {
     case_when(
-      TPC_function == "Briere" & is.null(prev_hypers) ~ "code/jags-models/jags-briere.bug",
-      TPC_function == "Briere" & !is.null(prev_hypers) ~ "code/jags-models/jags-briere-informative.bug",
+      TPC_function == "Briere" & is.null(prev_hypers) & trait_in != "EFFD" ~ "code/jags-models/jags-briere.bug",
+      TPC_function == "Briere" & is.null(prev_hypers) & trait_in == "EFFD" ~ "code/jags-models/jags-briere-EFD.bug",
+      TPC_function == "Briere" & !is.null(prev_hypers) & trait_in != "EFFD" ~ "code/jags-models/jags-briere-informative.bug",
+      TPC_function == "Briere" & !is.null(prev_hypers) & trait_in == "EFFD" ~ "code/jags-models/jags-briere-EFD-informative.bug",
       TPC_function == "Quadratic" & is.null(prev_hypers) ~ "code/jags-models/jags-quad-neg.bug",
       TPC_function == "Quadratic" & !is.null(prev_hypers) ~ "code/jags-models/jags-quad-neg-informative.bug",
       TPC_function == "Linear" & is.null(prev_hypers) ~ "code/jags-models/jags-linear.bug",
@@ -477,6 +482,7 @@ distinct_combos <- data_in %>%
   # Remove unused Culex spp. / WNV data (we only need b, c, and bc)
   filter(system_ID != "Culex spp. / WNV" | trait.name != "MDR") %>%
   filter(system_ID != "Culex spp. / WNV" | trait.name != "PDR")
+  
 
 samples <- tibble(
   trait = as.character(),
@@ -489,7 +495,7 @@ samples <- tibble(
 )
 
 # Go through all trait/system combinations to generate TPC parameter posterior samples
-system.time(
+# system.time(
   for (system_index in 1:dim(distinct_combos)[1]) {
     # Pull system information
     system_sample <- distinct_combos$system_ID[system_index]
@@ -525,7 +531,7 @@ system.time(
     # add samples to running list
     samples <- rbind(samples, temp_sample)
   }
-)
+# )
 
 data.in.transform <- samples
 
@@ -541,11 +547,11 @@ print(distinct_samples)
 # *) Diagnostics & visualizations -----------------------------------------
 
 # Do you just want to look at focal species?
-focal_bool <- FALSE
+focal_bool <- TRUE
 
 if (plot_bool) {
   
-  plot_samples <- data.in.transform %>%  # read_csv("data/clean/TPC_param_samples.csv", show_col_types = FALSE) %>%
+  plot_samples <- data.in.transform %>%  #read_rds("data/clean/TPC_param_samples.rds") %>% 
     filter(sample_num %in% 1:1000)
 
   if (focal_bool) {

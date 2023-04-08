@@ -85,11 +85,18 @@ data.Mordecai2017.Albopictus <- read.csv("data/raw/Mordecai_2017/albopictusCHIKV
   # mutate(pathogen = ifelse(trait.name %in% c("b", "c", "PDR"), "CHIKV", NA)) %>%
   dplyr::select(-c("trait2", "trait2.name"))
 
+data.Mordecai2017.AedesSpp <- read.csv("data/raw/Mordecai_2017/Aedes_prior_data.csv", header = TRUE) %>%
+  mutate(mosquito_species = "Aedes spp.") %>%
+  dplyr::select(-mosquito.species) %>% 
+  mutate(pathogen = ifelse(trait.name %in% c("b", "c", "PDR", "EIP"), "other", NA)) 
+  
+
 data.Mordecai2017.PDRaddl <- read.csv("data/raw/Mordecai_2017/EIP_priors_2015-12-04.csv", header = TRUE) %>%
   rename(pathogen = virus, mosquito_species = mosquito)
 
 data.Mordecai2017 <- rbind(data.Mordecai2017.Aegypti, 
                            data.Mordecai2017.Albopictus,
+                           data.Mordecai2017.AedesSpp, 
                            data.Mordecai2017.PDRaddl) %>%
   mutate(lead_author = "Mordecai") %>%
   mutate(year = "2017") %>%
@@ -360,7 +367,7 @@ data.in.TPC <- data.Reduced %>%
 # 4) Save and export data set ---------------------------------------------
 
 # Save data.frame to file
-# write_rds(data.in.TPC, "data/clean/data_for_TPC_fitting.rds")
+write_rds(data.in.TPC, "data/clean/data_for_TPC_fitting.rds")
 
 # 5) Data visualizations / diagnostics ------------------------------------
 
