@@ -1,5 +1,6 @@
 # Fit DENV models with informative priors
 
+setwd("code/Mordecai_2017")
 load("aedes_prior_gamma_fits.Rsave")
 
 # Refit everything using informative priors in modified BUGS functions
@@ -20,8 +21,9 @@ source("temp_functions_all.R")
 # Creating a small constant to keep denominators from being zero.
 ec<-0.000001 
 
-## Loading the data; my data will be called aegyptiDENVmodelTempData.csv 
-data.all <- read.csv("data/raw/aegyptiDENVmodelTempData_2016-03-30.csv", header=TRUE)
+## Loading the data; my data will be called aegyptiDENVmodelTempData.csv
+
+data.all <- read.csv("F:/GitHub/thermal-properties-mbps/data/raw/Mordecai_2017/aegyptiDENVmodelTempData_2016-03-30.csv", header=TRUE)
 
 # Exclude the Focks & Barrera 2006 data because they're from a model
 data.all = subset(data.all, ref!=as.character("Focks_Barrera_2006_Research&TrainingTropicalDis_Geneva_Paper"))

@@ -95,7 +95,7 @@ TPC_df <- data.in.transform %>%
     !(is.na(EFOC * a)) ~ EFOC * a,
     !(is.na(EPR * pO)) ~ EV * EPR * pO * a
   )) %>% 
-  mutate(bc = ifelse(is.na(bc), b * c, bc)) %>% 
+  mutate(bc = ifelse(is.na(b) & is.na(c), bc, b * c)) %>% 
   # throw out traits that are no longer needed
   dplyr::select(system_ID, sample_num, Temperature,
                 a, bc, PDR, e2a, EFD, lf, MDR) %>% 
@@ -122,21 +122,21 @@ combined_df <- left_join(Infection_df, noInfection_df)%>%
   relocate(system_ID, mosquito_species, pathogen, Temperature, sample_num)
 
 
-# Check what data we're missing (we'll go back and use substitutes for these)
-missing_traits_df <- combined_df %>% 
-  pivot_longer(cols = bc:MDR) %>% 
-  dplyr::filter(is.na(value)) %>% 
-  dplyr::select(-c(sample_num, Temperature)) %>% 
-  filter(system_ID %in% c(
-    "Aedes aegypti / DENV", "Aedes aegypti / none",
-    "Aedes aegypti / ZIKV", "Aedes aegypti / none",
-    "Aedes albopictus / DENV", "Aedes albopictus / none",
-    "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
-    "Anopheles gambiae / Plasmodium falciparum",
-    "Anopheles gambiae / none"
-  )) %>% 
-  unique()
-# Should just show: Culex quinquefasciatus / WNV / bc
+# # Check what data we're missing (we'll go back and use substitutes for these)
+# missing_traits_df <- combined_df %>% 
+#   pivot_longer(cols = bc:MDR) %>% 
+#   dplyr::filter(is.na(value)) %>% 
+#   dplyr::select(-c(sample_num, Temperature)) %>% 
+#   filter(system_ID %in% c(
+#     "Aedes aegypti / DENV", "Aedes aegypti / none",
+#     "Aedes aegypti / ZIKV", "Aedes aegypti / none",
+#     "Aedes albopictus / DENV", "Aedes albopictus / none",
+#     "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
+#     "Anopheles gambiae / Plasmodium falciparum",
+#     "Anopheles gambiae / none"
+#   )) %>% 
+#   unique()
+# # Should just show: Culex quinquefasciatus / WNV / bc
 
 # Similar to Shocket 2020: use Culex spp. / WNV / bc data for Culex quinquefasciatus / WNV / bc
 # This combines data for Culex univittatus, tarsalis, and pipiens
@@ -187,27 +187,22 @@ data.in.params <- combined_df %>%
 # *) Diagnostics & visualizations -----------------------------------------
 
 if (plot_bool) {
+  
 library(cowplot)
+  
 # For each mosquito species, trait, and sample, get a thermal response curve
-TPC_df <- data.in.params %>% 
+TPC_df <- data.in.params %>%  
   ungroup() %>% 
-  dplyr::select(-c(muL, etaL)) %>%
-  melt(id = c("system_ID", "mosquito_species","pathogen", "Temperature", "sample_num"),
+  dplyr::select(-c(muL, etaL, mosquito_species, pathogen)) %>%
+  melt(id = c("system_ID", "Temperature", "sample_num"),
        variable.name = "trait",
-       value.name = "Trait_val")
-
-# get mean TPC from samples
-meanTPC_df <- TPC_df %>%
+       value.name = "Trait_val") %>% 
   group_by(system_ID, trait, Temperature) %>%
-  summarise(mean_val = mean(Trait_val), .groups = "keep") %>%
-  unique() %>% ungroup()
-
-# get edges of 89% HCI of samples # !!! not calculated correctly?
-quantsTPC_df <- TPC_df %>%
-  group_by(system_ID, trait, Temperature) %>%
-  mutate(lowHCI_val = quantile(Trait_val, 0.055, na.rm = TRUE)) %>%
-  mutate(highHCI_val = quantile(Trait_val, 0.945, na.rm = TRUE)) %>%
-  dplyr::select(-c("sample_num", "Trait_val")) %>%
+  summarise(mean = mean(Trait_val),
+            median = median(Trait_val),
+            lowHCI = quantile(Trait_val, 0.05, na.rm = TRUE),
+            highHCI = quantile(Trait_val, 0.95, na.rm = TRUE),
+            .groups = "keep") %>%
   unique() %>% ungroup()
 
 TPC_plot <- TPC_df %>%
@@ -216,16 +211,14 @@ TPC_plot <- TPC_df %>%
   # group_by()
   ggplot() +
   # means of TPC curves
-  geom_line(
-    data = meanTPC_df,
-    aes(x = Temperature, y = mean_val, color = system_ID)
-  ) +
+  geom_path(aes(x = Temperature, y = mean, color = system_ID)) +
   # 89% HCI of TPC curves
-  geom_ribbon(
-    data = quantsTPC_df,
-    aes(x = Temperature, ymin = lowHCI_val, ymax = highHCI_val, fill = system_ID),
-    alpha = 0.1
-  ) +
+  geom_path(aes(x = Temperature, y = lowHCI, color = system_ID), lty = 2) +
+  geom_path(aes(x = Temperature, y = highHCI, color = system_ID), lty = 2) +
+  # geom_ribbon(
+  #   aes(x = Temperature, ymin = lowHCI, ymax = highHCI, fill = system_ID),
+  #   alpha = 0.1
+  # ) +
   ylab("") +
   facet_wrap(~trait, scales = "free", ncol = 2) +
   theme_minimal_grid(12)
