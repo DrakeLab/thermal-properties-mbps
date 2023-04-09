@@ -164,7 +164,7 @@ R0_TPC_func <- function(in_df, system_name) {
     group_by(system_ID, Model, sigmaH, KH) %>%
     mutate(norm_R0 = R0 / max(R0)) %>%
     ungroup() %>%
-    dplyr::select(system_ID, Temperature, Model, sigmaH, KH, norm_R0) %>%
+    dplyr::select(system_ID, Temperature, Model, sigmaH, KH, norm_R0, R0) %>%
     pivot_longer(cols = c(R0, norm_R0), names_to = "variable", values_to = "value") %>%
     group_by(system_ID, Temperature, Model, sigmaH, KH, variable) %>%
     partition(cluster) %>%
@@ -357,7 +357,7 @@ for (system_name in unique(data.Vec$system_ID)) {
       # parallel compute CT values over host trait values
       # for (index_KH in unique(data.Host.CT$KH)) {
       system.time(Topt.df <- data.Topt %>%
-                    filter(sigmaH == index_sigmaH,
+                    filter(sigmaH %in% index_sigmaH,
                            KH %in% index_KH) %>%
                     Topt_heat_func(., system_name) %>%
                     rbind(Topt.df))
@@ -373,30 +373,35 @@ write_rds(Topt.df, "results/Topt_vals.rds", compress = "gz")
 
 # CTmin, max, and width vs. sigma and KH ----------------------------------
 
-data.Host.CT <- data.Host #%>%
+data.CT <- data.Host #%>%
 # filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 4)]) %>%
 # filter(sigmaH %in% unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 4)])
 
 CT.df <- init.df
 
 gc()
-system.time(
-  for (system_name in unique(data.Vec$system_ID)) {
-    print(paste0("CT vals: ", system_name))
-    for (index_sigmaH in unique(data.Host.CT$sigmaH)) {
-      print(paste0(which(unique(data.Host.CT$sigmaH)== index_sigmaH)/length(unique(data.Host.CT$sigmaH))*100, "% complete"))
+for (system_name in unique(data.Vec$system_ID)) {
+  print(paste0("Topt vals: ", system_name))
+  KHslice_num <- 1
+  for(index_KH in KH_slices) {
+    print(paste0("KH slice number ", KHslice_num, " out of ", length(KH_slices)))
+    sigmaHslice_num <- 1
+    for (index_sigmaH in sigmaH_slices) {
+      print(paste0("sigmaH slice number ", sigmaHslice_num, " out of ", length(sigmaH_slices)))
       # parallel compute CT values over host trait values
       # for (index_KH in unique(data.Host.CT$KH)) {
-      CT.df <- data.Host.CT %>%
-        filter(sigmaH == index_sigmaH) %>%
-        CT_heat_func(., system_name) %>%
-        rbind(CT.df)
+      system.time(CT.df <- data.CT %>%
+                    filter(sigmaH %in% index_sigmaH,
+                           KH %in% index_KH) %>%
+                    CT_heat_func(., system_name) %>%
+                    rbind(CT.df))
       # }
+      sigmaHslice_num <- sigmaHslice_num  + 1
     }
+    KHslice_num <- KHslice_num +1
     gc()
   }
-)
-
+}
 # smallest CTmin ~13.85
 # largest CTmax ~34.45
 
