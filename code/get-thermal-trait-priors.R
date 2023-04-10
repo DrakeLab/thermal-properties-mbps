@@ -246,10 +246,10 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
     )
   } else {
     case_when(
-      TPC_function == "Briere" & is.null(prev_hypers) & trait_in != "EFFD" ~ "code/jags-models/jags-briere.bug",
-      TPC_function == "Briere" & is.null(prev_hypers) & trait_in == "EFFD" ~ "code/jags-models/jags-briere-EFD.bug",
-      TPC_function == "Briere" & !is.null(prev_hypers) & trait_in != "EFFD" ~ "code/jags-models/jags-briere-informative.bug",
-      TPC_function == "Briere" & !is.null(prev_hypers) & trait_in == "EFFD" ~ "code/jags-models/jags-briere-EFD-informative.bug",
+      TPC_function == "Briere" & is.null(prev_hypers) & trait_in != "EFD" ~ "code/jags-models/jags-briere.bug",
+      TPC_function == "Briere" & is.null(prev_hypers) & trait_in == "EFD" ~ "code/jags-models/jags-briere-EFD.bug",
+      TPC_function == "Briere" & !is.null(prev_hypers) & trait_in != "EFD" ~ "code/jags-models/jags-briere-informative.bug",
+      TPC_function == "Briere" & !is.null(prev_hypers) & trait_in == "EFD" ~ "code/jags-models/jags-briere-EFD-informative.bug",
       TPC_function == "Quadratic" & is.null(prev_hypers) ~ "code/jags-models/jags-quad-neg.bug",
       TPC_function == "Quadratic" & !is.null(prev_hypers) ~ "code/jags-models/jags-quad-neg-informative.bug",
       TPC_function == "Linear" & is.null(prev_hypers) ~ "code/jags-models/jags-linear.bug",

@@ -62,7 +62,7 @@ plot_bool <- TRUE
 Temps <- seq(10, 40, length.out = 301) # full: length.out = 601, thin: length.out = 301
 
 # Thin samples
-thin_size <- 100 # full = 600, thin = 100
+thin_size <- 600 # full = 600, thin = 100
 plot_bool = TRUE
 # source("code/trait-transform.R")
 
