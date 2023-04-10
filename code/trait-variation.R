@@ -41,6 +41,8 @@ if (!exists("cluster")) {
 
 # 1) Define accessory functions -------------------------------------------
 
+eps <- .Machine$double.eps
+
 # Function: Slice data to optimize usage of parallel processing and memory
 slice<-function(x,n) {
   N<-length(x);
@@ -126,7 +128,7 @@ Topt_heat_func <- function(in_df, system_name) {
 #           prob. intervals across samples
 CT_heat_func <- function(in_df, system_name) {
   out_df <- in_df %>%
-    expand_grid(filter(data.Vec, system_ID == system_name)) %>% 
+    expand_grid(filter(data.Vec, system_ID == system_name)) %>%
     data.table::data.table() %>%
     mutate(RV = ifelse(is.infinite(sigmaH),
                        sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
@@ -155,7 +157,8 @@ CT_heat_func <- function(in_df, system_name) {
   # If R0 < 1 across all temperatures, report the following:
   #  CTmin = Inf, CTmax = -Inf, CTwidth = 0
   if (dim(out_df)[1] == 0) {
-    out_df <- expand_grid(system_ID = system_name, sigmaH = in_df$sigmaH, KH = in_df$KH,
+    out_df <- expand_grid(select(in_df, sigmaH, KH, Model),
+                                 system_ID = system_name,
                           variable = c("CTmax", "CTmin", "CTwidth")) %>%
       distinct() %>%
       mutate(mean = case_when(
@@ -245,8 +248,6 @@ data.Vec <- data.in.params %>%
   mutate(V0 = ifelse( sigmaV_f * deltaL < (1 / lf),
                       0,
                       KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL))))
-
-# rm(data.in.params)
 
 # 4) Combine and save data frames -----------------------------------------
 
@@ -425,19 +426,22 @@ missing_entries <- full_combo.df$all[which(!(full_combo.df$all %in% reduce_CT.df
 (num_missing_entries == length(missing_entries))
 
 # Get the parameters of the missing entries
-missing_CT.df <-  as.data.frame(missing_entries) %>%
+missing_CT.df <- as.data.frame(missing_entries) %>%
   rename(united_vals = missing_entries) %>% 
   separate_wider_delim(united_vals, delim = "_", 
                        names = c("system_ID", "sigmaH", "KH", "variable")) %>% 
   select(-variable) %>% 
-  distinct()
+  distinct() %>% 
+  mutate(sigmaH = as.double(sigmaH),
+         KH = as.double(KH))
 
 # Go back and compute CT vals for these entries
 # Set up host trait data frame
 data.CT <- data.Host %>% 
   select(-c(sigmaH,KH, Model)) %>% 
   distinct() %>% 
-  cross_join(select(missing_CT.df, sigmaH,KH) %>% distinct())
+  cross_join(select(missing_CT.df, sigmaH,KH) %>% distinct()) %>%
+  mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model"))
 
 # Slice host trait data 
 sigmaH_slices <- slice(unique(data.CT$sigmaH), 10)
@@ -458,11 +462,27 @@ for (system_name in unique(data.Vec$system_ID)) {
       print(paste0("sigmaH slice number ", sigmaHslice_num, " out of ", length(sigmaH_slices)))
       newCT.df <- data.CT %>%
         filter(sigmaH %in% index_sigmaH,
-               KH %in% index_KH) %>%
+               KH %in% index_KH) %>%    
         CT_heat_func(., system_name) %>%
         rbind(newCT.df)
+      
+      # Check outputs as we go along
+      test_df <- filter(newCT.df,
+                        system_ID == system_name,
+                        sigmaH %in% index_sigmaH,
+                        KH %in% index_KH) %>% 
+        ungroup() %>% 
+        select(-c(system_ID, Model, lowHCI, highHCI, median)) %>% 
+        distinct() %>% 
+        pivot_wider(names_from = "variable", values_from = "mean") %>% 
+        select(-c(sigmaH, KH)) %>% 
+        distinct()
+      
+      print(test_df)
+      
       sigmaHslice_num <- sigmaHslice_num  + 1
     }
+    
     KHslice_num <- KHslice_num +1
     gc()
   }
