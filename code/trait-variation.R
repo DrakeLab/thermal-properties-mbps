@@ -66,13 +66,11 @@ R0_TPC_func <- function(in_df, system_name) {
                        bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>%
     # Basic reproduction number
     mutate(R0 = sqrt(RV*RH))%>%
-    dplyr::select(system_ID, sample_num, Temperature, Model, sigmaH, KH, V0, R0) %>%
+    dplyr::select(system_ID, sample_num, Temperature, Model, sigmaH, KH, R0) %>%
     # Normalize R0 across temperature
     group_by(system_ID, Model, sigmaH, KH) %>%
-    mutate(norm_R0 = R0 / max(R0)) %>%
     ungroup() %>%
-    dplyr::select(system_ID, Temperature, Model, sigmaH, KH, norm_R0, R0) %>%
-    pivot_longer(cols = c(R0, norm_R0), names_to = "variable", values_to = "value") %>%
+    pivot_longer(cols = c(R0), names_to = "variable", values_to = "value") %>%
     group_by(system_ID, Temperature, Model, sigmaH, KH, variable) %>%
     partition(cluster) %>%
     summarise(
@@ -81,9 +79,7 @@ R0_TPC_func <- function(in_df, system_name) {
       mean = mean(value),
       median = median(value)
     ) %>%
-    collect() %>%
-    arrange(system_ID, sigmaH, KH) %>%
-    distinct()
+    collect()
 }
 
 # Function: evaluate Topt and its mean, median, and highest prob. intervals across
@@ -119,9 +115,7 @@ Topt_heat_func <- function(in_df, system_name) {
       mean = mean(value),
       median = median(value)
     ) %>%
-    collect() %>%
-    arrange(system_ID, sigmaH, KH) %>%
-    distinct()
+    collect()
 }
 
 # Function: evaluate CTmin, CTmax, CTwidth and their means, medians, and highest
@@ -179,9 +173,7 @@ CT_heat_func <- function(in_df, system_name) {
         mean = mean(value),
         median = median(value)
       ) %>%
-      collect() %>%
-      arrange(system_ID, sigmaH, KH) %>%
-      distinct()
+      collect()
   }
   return(out_df)
 }
@@ -323,19 +315,18 @@ gc()
 for (system_name in unique(data.Vec$system_ID)) {
   print(paste0("Topt vals: ", system_name))
   KHslice_num <- 1
-  for(index_KH in KH_slices) {
+  for (index_KH in KH_slices) {
     print(paste0("KH slice number ", KHslice_num, " out of ", length(KH_slices)))
     sigmaHslice_num <- 1
     for (index_sigmaH in sigmaH_slices) {
       print(paste0("sigmaH slice number ", sigmaHslice_num, " out of ", length(sigmaH_slices)))
-      # parallel compute CT values over host trait values
-      # for (index_KH in unique(data.Host.CT$KH)) {
-      system.time(Topt.df <- data.Topt %>%
+      
+      Topt.df <- data.Topt %>%
                     filter(sigmaH %in% index_sigmaH,
                            KH %in% index_KH) %>%
                     Topt_heat_func(., system_name) %>%
-                    rbind(Topt.df))
-      # }
+                    rbind(Topt.df)
+      
       sigmaHslice_num <- sigmaHslice_num  + 1
     }
     KHslice_num <- KHslice_num +1
