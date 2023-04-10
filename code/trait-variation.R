@@ -79,9 +79,7 @@ R0_TPC_func <- function(in_df, system_name) {
       mean = mean(value),
       median = median(value)
     ) %>%
-    collect() %>%
-    arrange(system_ID, sigmaH, KH) %>%
-    distinct()
+    collect()
 }
 
 # Function: evaluate Topt and its mean, median, and highest prob. intervals across
@@ -117,9 +115,7 @@ Topt_heat_func <- function(in_df, system_name) {
       mean = mean(value),
       median = median(value)
     ) %>%
-    collect() %>%
-    arrange(system_ID, sigmaH, KH) %>%
-    distinct()
+    collect()
 }
 
 # Function: evaluate CTmin, CTmax, CTwidth and their means, medians, and highest
@@ -176,9 +172,7 @@ CT_heat_func <- function(in_df, system_name) {
         mean = mean(value),
         median = median(value)
       ) %>%
-      collect() %>%
-      arrange(system_ID, sigmaH, KH) %>%
-      distinct()
+      collect()
   }
   return(out_df)
 }
@@ -322,19 +316,18 @@ gc()
 for (system_name in unique(data.Vec$system_ID)) {
   print(paste0("Topt vals: ", system_name))
   KHslice_num <- 1
-  for(index_KH in KH_slices) {
+  for (index_KH in KH_slices) {
     print(paste0("KH slice number ", KHslice_num, " out of ", length(KH_slices)))
     sigmaHslice_num <- 1
     for (index_sigmaH in sigmaH_slices) {
       print(paste0("sigmaH slice number ", sigmaHslice_num, " out of ", length(sigmaH_slices)))
-      # parallel compute CT values over host trait values
-      # for (index_KH in unique(data.Host.CT$KH)) {
-      system.time(Topt.df <- data.Topt %>%
+      
+      Topt.df <- data.Topt %>%
                     filter(sigmaH %in% index_sigmaH,
                            KH %in% index_KH) %>%
                     Topt_heat_func(., system_name) %>%
-                    rbind(Topt.df))
-      # }
+                    rbind(Topt.df)
+      
       sigmaHslice_num <- sigmaHslice_num  + 1
     }
     KHslice_num <- KHslice_num +1
