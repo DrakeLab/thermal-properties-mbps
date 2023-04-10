@@ -35,6 +35,11 @@ library(MetBrewer) #nec
 library(svglite) #nec
 
 # Load in data sets
+data.CT <- read_rds("results/CT_vals.rds")
+data.R0 <- read_rds("results/R0_vals.rds")
+data.Topt <- read_rds("results/Topt_vals.rds")
+
+
 data.in.thermchars <- read_rds("results/AllThermChar_thin.rds") #%>% 
 # Focus on two systems for now
 # filter(system_ID %in% c("Aedes albopictus / DENV", "Anopheles spp. / Plasmodium"))
@@ -71,36 +76,45 @@ shift_legend <- function(p) {
 # curve 1 = Ross-Macdonald R0 (shape doesn't depend on KH)
 # curves  = Chitnis dynamic R0,
 #   - colour = value of KH. place it on a color scale in the bottom right corner
+newKH_vals <- unique(data.R0$KH)[seq(1, length(unique(data.R0$KH)), length.out = 21)]
 
-
-R0_df <- read_rds("results/R0_vals.rds") %>% 
-  # filter(KH %in% 10^seq(-2,5)) %>% 
-  arrange(system_ID, KH, sigmaH, Temperature)
+data.R0_norm <- data.R0 %>% 
+  filter(KH %in% newKH_vals) %>% 
+  filter(variable == "R0") %>%
+  select(-variable) %>%
+  # normalize variables to have a maximum of 1
+  group_by(system_ID, Model, sigmaH, KH) %>% 
+  mutate(mean_norm = mean / max(mean)) %>% 
+  mutate(median_norm = median / max(median)) %>%
+  mutate(highHCI_norm = highHCI / max(median)) %>% 
+  mutate(lowHCI_norm = lowHCI / max(median)) %>% 
+  arrange(system_ID, sigmaH, KH, Temperature, mean_norm)
 
 R0_plot <- ggplot(mapping = aes(x = Temperature, group = KH)) +
   # path of mean, normalized R0 as a function of temperature (finite sigmaH):
   geom_path(
-    data = filter(R0_df, sigmaH == 100),
-    aes(y = mean, colour = KH, linetype = "finite")
+    data = filter(data.R0_norm, sigmaH == 100),
+    aes(y = mean_norm, colour = KH, linetype = "finite"),
+    lwd = 1
   ) +
   # path of mean, normalized R0 as a function of temperature (infinite sigmaH):
   geom_path(
-    data = filter(R0_df, sigmaH == Inf),
-    aes(y = mean, linetype = "infinite", colour = "black"),
+    data = filter(data.R0_norm, sigmaH == Inf),
+    aes(y = mean_norm, linetype = "infinite", colour = "black"),
     colour = "black",
     lwd = 1.5
   ) +
-  # 89% HCI of R0 TPC curves
-  geom_ribbon(
-    data = filter(R0_df, sigmaH == 100),
-    aes(ymin = lowHCI, ymax = highHCI, fill = KH),
-    alpha = 0.1
-  ) +
+  # # 89% HCI of R0 TPC curves
+  # geom_ribbon(
+  #   data = filter(data.R0_norm, sigmaH == 100),
+  #   aes(ymin = lowHCI_norm, ymax = highHCI_norm, fill = KH),
+  #   alpha = 0.1
+  # ) +
   # x-axis:
   scale_x_continuous(
     name = "Temperature (C)",
     expand = c(0, 0),
-    limits = c(15, 35)
+    limits = c(14, 34)
   ) +
   # y-axis:
   scale_y_continuous(
@@ -171,7 +185,7 @@ R0_plot <- ggplot(mapping = aes(x = Temperature, group = KH)) +
 # Plot
 R0_plot <- shift_legend(R0_plot)
 
-ggsave("figures/R0_TPCs.svg", R0_plot,
+ggsave("figures/R0_TPCs_Mean.svg", R0_plot,
        width = 16, height = 9)
 
 # Figure 5: Topt heatmap --------------------------------------------------
