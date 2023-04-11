@@ -29,8 +29,9 @@ library(tidyverse)
 library(reshape2)
 library(multidplyr)
 library(foreach)
+library(doParallel)
 
-source("code/output-functions.R") # needed for compute.variable functions
+# source("code/output-functions.R") # needed for compute.variable functions
 
 # Set up parallel
 if (!exists("cluster")) {
@@ -137,22 +138,13 @@ CT_heat_func <- function(in_df, system_name) {
     mutate(R0 = sqrt(RV*RH)) %>%
     # Filter to maximum value of R0
     group_by(system_ID, sample_num, sigmaH, KH) %>%
-    filter(R0 > 1) %>%
-    # Get lowest temperature at which R0 exceeds one
-    mutate(CTmin = min(Temperature)) %>%
-    # Get highest temperature at which R0 exceeds one
-    mutate(CTmax = max(Temperature)) %>%
-    # Get width of critical thermal interval
-    mutate(CTwidth = CTmax - CTmin)%>%
-    ungroup() %>%
-    dplyr::select(system_ID, Model, sigmaH, KH, CTmin, CTmax, CTwidth) %>%
-    pivot_longer(cols = c(CTwidth, CTmin, CTmax), names_to = "variable", values_to = "value")
+    filter(R0 > 1) 
   
   # If R0 < 1 across all temperatures, report the following:
   #  CTmin = Inf, CTmax = -Inf, CTwidth = 0
   if (dim(out_df)[1] == 0) {
     out_df <- expand_grid(select(in_df, sigmaH, KH, Model),
-                                 system_ID = system_name,
+                          system_ID = system_name,
                           variable = c("CTmax", "CTmin", "CTwidth")) %>%
       distinct() %>%
       mutate(mean = case_when(
@@ -165,21 +157,33 @@ CT_heat_func <- function(in_df, system_name) {
       mutate(lowHCI = mean)
   } else {
     out_df <- out_df %>%
+      # Get lowest temperature at which R0 exceeds one
+      mutate(CTmin = min(Temperature)) %>%
+      # Get highest temperature at which R0 exceeds one
+      mutate(CTmax = max(Temperature)) %>%
+      # Get width of critical thermal interval
+      mutate(CTwidth = ifelse(is.finite(CTmax), 
+                              CTmax - CTmin,
+                              0))%>%
+      ungroup() %>%
+      dplyr::select(system_ID, Model, sigmaH, KH, CTmin, CTmax, CTwidth) %>%
+      pivot_longer(cols = c(CTwidth, CTmin, CTmax), names_to = "variable", values_to = "value") %>% 
       group_by(system_ID, Model, sigmaH, KH, variable) %>%
-      partition(cluster) %>%
+      # partition(cluster) %>%
       summarise(
         lowHCI = quantile(value, 0.055),
         highHCI = quantile(value, 0.945),
         mean = mean(value),
-        median = median(value)
-      ) %>%
-      collect()
+        median = median(value),
+        .groups = "keep"
+      ) #%>%
+    # collect()
   }
   return(out_df)
 }
 # 2) Set *host* parameters --------------------------------
 
-## Host life history & behavioral traits ----
+## Host life history & behavioral traits
 # Host recruitment rate:
 # upper estimate from range for Primate traits: (0.001150685, 0.009624300)
 lambdaH_baseline <- .005
@@ -322,10 +326,10 @@ for (system_name in unique(data.Vec$system_ID)) {
       print(paste0("sigmaH slice number ", sigmaHslice_num, " out of ", length(sigmaH_slices)))
       
       Topt.df <- data.Topt %>%
-                    filter(sigmaH %in% index_sigmaH,
-                           KH %in% index_KH) %>%
-                    Topt_heat_func(., system_name) %>%
-                    rbind(Topt.df)
+        filter(sigmaH %in% index_sigmaH,
+               KH %in% index_KH) %>%
+        Topt_heat_func(., system_name) %>%
+        rbind(Topt.df)
       
       sigmaHslice_num <- sigmaHslice_num  + 1
     }
@@ -344,37 +348,64 @@ if (exists(Topt.df) & dim(Topt.df)[1] == proper_dim)
 }
 
 ### CTmin, CTmax, and CTwidth ----
+
+## Set up alternative parallelization
+# Close old cluster connections
+rm(cluster)
+gc()
+# Start new cluster for doParallel
+my.cluster <- parallel::makeCluster(
+  parallel::detectCores() - 1, 
+  type = "PSOCK"
+)
+# Register cluster for doParallel
+doParallel::registerDoParallel(cl = my.cluster)
+
 # Set up host trait data frame
 data.CT <- data.Host
 
 # Slice host trait data 
-sigmaH_slices <- slice(unique(data.CT$sigmaH), 10)
-KH_slices <- slice(unique(data.CT$KH), cluster_size)
+
+sigmaH_slices <- slice(unique(data.CT$sigmaH), 1)
+KH_slices <- slice(unique(data.CT$KH), 1)
 
 # Initialize CT data frame
 CT.df <- init.df
+
+# Set up progress bar
+# pb = txtProgressBar(min = 0, max = length(sigmaH_slices), initial = 0) 
 
 gc()
 # Collect CTmin/max/width data across systems and host trait values
 for (system_name in unique(data.Vec$system_ID)) {
   print(paste0("CTmin/max/width vals: ", system_name))
-  KHslice_num <- 1
-  for(index_KH in KH_slices) {
-    print(paste0("KH slice number ", KHslice_num, " out of ", length(KH_slices)))
-    sigmaHslice_num <- 1
-    for (index_sigmaH in sigmaH_slices) {
-      print(paste0("sigmaH slice number ", sigmaHslice_num, " out of ", length(sigmaH_slices)))
-      CT.df <- data.CT %>%
-        filter(sigmaH %in% index_sigmaH,
-               KH %in% index_KH) %>%
-        CT_heat_func(., system_name) %>%
-        rbind(CT.df)
-      sigmaHslice_num <- sigmaHslice_num  + 1
-    }
-    KHslice_num <- KHslice_num +1
-    gc()
-  }
+  temp_df <- foreach(index_KH = data.CT$KH[1:2],
+          index_sigmaH = data.CT$sigmaH[1:2],
+          .packages = "tidyverse",
+          .combine = rbind) %dopar% {
+            
+            
+            # KHslice_num <- 1
+            # for(index_KH in KH_slices) {
+            # print(paste0("KH slice number ", KHslice_num, " out of ", length(KH_slices)))
+            # sigmaHslice_num <- 1
+            # for (index_sigmaH in sigmaH_slices) {
+            # setTxtProgressBar(pb,sigmaHslice_num)
+            # print(paste0("sigmaH slice number ", sigmaHslice_num, " out of ", length(sigmaH_slices)))
+            data.CT %>%
+              filter(sigmaH %in% index_sigmaH,
+                     KH %in% index_KH) %>%
+              CT_heat_func(., system_name) #%>%
+              # rbind(CT.df)
+            # sigmaHslice_num <- sigmaHslice_num  + 1
+            # }
+            # KHslice_num <- KHslice_num +1
+            # gc()
+            # }
+          }
+  CT.df <- rbind(CT.df,temp_df)
 }
+close(pb)
 # smallest CTmin ~13.85
 # largest CTmax ~34.45
 
@@ -397,7 +428,7 @@ full_combo.df <- expand_grid(system_ID = unique(data.Vec$system_ID),
                              sigmaH = unique(data.Host$sigmaH),
                              KH = unique(data.Host$KH),
                              variable = unique(CT.df$variable)
-                             ) %>%
+) %>%
   arrange(system_ID, sigmaH, KH, variable) %>% 
   # combine all columns into a single one for easier comparison
   unite("all", sep = "_")
