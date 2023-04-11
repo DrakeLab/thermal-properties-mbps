@@ -347,7 +347,8 @@ if (exists(Topt.df) & dim(Topt.df)[1] == proper_dim)
   warning("No file written. Topt.df either empty or not complete.")
 }
 
-### CTmin, CTmax, and CTwidth ----
+
+### CTmin, CTmax, and CTwidth -------------------------------------------
 
 ## Set up alternative parallelization
 # Close old cluster connections
@@ -359,155 +360,157 @@ my.cluster <- parallel::makeCluster(
   type = "PSOCK"
 )
 # Register cluster for doParallel
-doParallel::registerDoParallel(cl = my.cluster)
+doSNOW::registerDoSNOW(cl = my.cluster)
+
 
 # Set up host trait data frame
 data.CT <- data.Host
 
-# Slice host trait data 
-
-sigmaH_slices <- slice(unique(data.CT$sigmaH), 1)
-KH_slices <- slice(unique(data.CT$KH), 1)
-
 # Initialize CT data frame
 CT.df <- init.df
 
-# Set up progress bar
-# pb = txtProgressBar(min = 0, max = length(sigmaH_slices), initial = 0) 
-
 gc()
 # Collect CTmin/max/width data across systems and host trait values
-for (system_name in unique(data.Vec$system_ID)) {
-  print(paste0("CTmin/max/width vals: ", system_name))
-  temp_df <- foreach(index_KH = data.CT$KH[1:2],
-          index_sigmaH = data.CT$sigmaH[1:2],
-          .packages = "tidyverse",
-          .combine = rbind) %dopar% {
-            
-            
-            # KHslice_num <- 1
-            # for(index_KH in KH_slices) {
-            # print(paste0("KH slice number ", KHslice_num, " out of ", length(KH_slices)))
-            # sigmaHslice_num <- 1
-            # for (index_sigmaH in sigmaH_slices) {
-            # setTxtProgressBar(pb,sigmaHslice_num)
-            # print(paste0("sigmaH slice number ", sigmaHslice_num, " out of ", length(sigmaH_slices)))
-            data.CT %>%
-              filter(sigmaH %in% index_sigmaH,
-                     KH %in% index_KH) %>%
-              CT_heat_func(., system_name) #%>%
-              # rbind(CT.df)
-            # sigmaHslice_num <- sigmaHslice_num  + 1
-            # }
-            # KHslice_num <- KHslice_num +1
-            # gc()
-            # }
-          }
-  CT.df <- rbind(CT.df,temp_df)
+# for (system_name in unique(data.Vec$system_ID)) {
+# print(paste0("CTmin/max/width vals: ", system_name))
+
+# Set up iteration grid
+iter_grid <- expand_grid(system_ID = unique(data.Vec$system_ID),
+                         tibble(KH = data.CT$KH,
+                                sigmaH = data.CT$sigmaH))
+library(progress)
+iterations <- dim(iter_grid)[1]
+
+pb <- progress_bar$new(
+  format = ":spin :system progress = :percent [:bar] :elapsed | eta: :eta",
+  total = iterations,    # 100 
+  width = 120)                                                                                                         
+
+progress <- function(n){
+  pb$tick(tokens = list(system = iter_grid$system_ID[n]))
 }
+opts <- list(progress = progress)
+
+CT.df <- foreach(
+  system_name = iter_grid$system_ID,
+  index_KH = iter_grid$KH,
+  index_sigmaH = iter_grid$sigmaH,
+  .packages = "tidyverse",
+  .combine = rbind,
+  .options.snow = opts) %dopar% {
+    # tibble(system_ID = system_name, sigmaH = index_sigmaH, KH = index_KH)
+    data.CT %>%
+      filter(sigmaH %in% index_sigmaH,
+             KH %in% index_KH) %>%
+      CT_heat_func(., system_name)
+  }
+
 close(pb)
+
 # smallest CTmin ~13.85
 # largest CTmax ~34.45
 
 # Save CT data
-proper_dim <- 3 * dim(data.CT)[1] * length(unique(data.Vec$system_ID))
+(proper_dim <- 3 * dim(data.CT)[1] * length(unique(data.Vec$system_ID)))
 
-if (exists(CT.df) & dim(CT.df)[1] == proper_dim)
+if (exists("CT.df") & dim(CT.df)[1] == proper_dim)
 {write_rds(CT.df, "results/CT_vals.rds", compress = "gz")
 } else {
   warning("No file written. CT.df either empty or not complete.")
 }
 
+stopCluster(cl) 
+
 # 5) Diagnostics & visualizations -----------------------------------------
-
-# Figure out what's missing from CT.df
-CT.df <- read_rds("results/CT_vals.rds")
-
-# Make a full list of all the combinations we should have
-full_combo.df <- expand_grid(system_ID = unique(data.Vec$system_ID),
-                             sigmaH = unique(data.Host$sigmaH),
-                             KH = unique(data.Host$KH),
-                             variable = unique(CT.df$variable)
-) %>%
-  arrange(system_ID, sigmaH, KH, variable) %>% 
-  # combine all columns into a single one for easier comparison
-  unite("all", sep = "_")
-
-reduce_CT.df <- select(CT.df, system_ID, sigmaH, KH, variable) %>% 
-  arrange(system_ID, sigmaH, KH, variable) %>% 
-  # combine all columns into a single one for easier comparison
-  unite("all", sep = "_")
-
-# Number of missing entries
-(num_missing_entries = dim(full_combo.df)[1] - dim(reduce_CT.df)[1])
-
-# Find rows of full_combo.df that don't appear in CT.df
-missing_entries <- full_combo.df$all[which(!(full_combo.df$all %in% reduce_CT.df$all))]
-
-# Check we caught all the missing entries
-(num_missing_entries == length(missing_entries))
-
-# Get the parameters of the missing entries
-missing_CT.df <- as.data.frame(missing_entries) %>%
-  rename(united_vals = missing_entries) %>% 
-  separate_wider_delim(united_vals, delim = "_", 
-                       names = c("system_ID", "sigmaH", "KH", "variable")) %>% 
-  select(-variable) %>% 
-  distinct() %>% 
-  mutate(sigmaH = as.double(sigmaH),
-         KH = as.double(KH))
-
-# Go back and compute CT vals for these entries
-# Set up host trait data frame
-data.CT <- data.Host %>% 
-  select(-c(sigmaH,KH, Model)) %>% 
-  distinct() %>% 
-  cross_join(select(missing_CT.df, sigmaH,KH) %>% distinct()) %>%
-  mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model"))
-
-# Slice host trait data 
-sigmaH_slices <- slice(unique(data.CT$sigmaH), 10)
-KH_slices <- slice(unique(data.CT$KH), cluster_size)
-
-# Initialize CT data frame
-newCT.df <- init.df
-
-gc()
-# Collect CTmin/max/width data across systems and host trait values
-for (system_name in unique(data.Vec$system_ID)) {
-  print(paste0("CTmin/max/width vals: ", system_name))
-  KHslice_num <- 1
-  for(index_KH in KH_slices) {
-    print(paste0("KH slice number ", KHslice_num, " out of ", length(KH_slices)))
-    sigmaHslice_num <- 1
-    for (index_sigmaH in sigmaH_slices) {
-      print(paste0("sigmaH slice number ", sigmaHslice_num, " out of ", length(sigmaH_slices)))
-      newCT.df <- data.CT %>%
-        filter(sigmaH %in% index_sigmaH,
-               KH %in% index_KH) %>%    
-        CT_heat_func(., system_name) %>%
-        rbind(newCT.df)
-      
-      # Check outputs as we go along
-      test_df <- filter(newCT.df,
-                        system_ID == system_name,
-                        sigmaH %in% index_sigmaH,
-                        KH %in% index_KH) %>% 
-        ungroup() %>% 
-        select(-c(system_ID, Model, lowHCI, highHCI, median)) %>% 
-        distinct() %>% 
-        pivot_wider(names_from = "variable", values_from = "mean") %>% 
-        select(-c(sigmaH, KH)) %>% 
-        distinct()
-      
-      print(test_df)
-      
-      sigmaHslice_num <- sigmaHslice_num  + 1
-    }
-    
-    KHslice_num <- KHslice_num +1
-    gc()
-  }
-}
-# smallest CTmin ~13.85
-# largest CTmax ~34.45
+# 
+# # Figure out what's missing from CT.df
+# CT.df <- read_rds("results/CT_vals.rds")
+# 
+# # Make a full list of all the combinations we should have
+# full_combo.df <- expand_grid(system_ID = unique(data.Vec$system_ID),
+#                              sigmaH = unique(data.Host$sigmaH),
+#                              KH = unique(data.Host$KH),
+#                              variable = unique(CT.df$variable)
+# ) %>%
+#   arrange(system_ID, sigmaH, KH, variable) %>% 
+#   # combine all columns into a single one for easier comparison
+#   unite("all", sep = "_")
+# 
+# reduce_CT.df <- select(CT.df, system_ID, sigmaH, KH, variable) %>% 
+#   arrange(system_ID, sigmaH, KH, variable) %>% 
+#   # combine all columns into a single one for easier comparison
+#   unite("all", sep = "_")
+# 
+# # Number of missing entries
+# (num_missing_entries = dim(full_combo.df)[1] - dim(reduce_CT.df)[1])
+# 
+# # Find rows of full_combo.df that don't appear in CT.df
+# missing_entries <- full_combo.df$all[which(!(full_combo.df$all %in% reduce_CT.df$all))]
+# 
+# # Check we caught all the missing entries
+# (num_missing_entries == length(missing_entries))
+# 
+# # Get the parameters of the missing entries
+# missing_CT.df <- as.data.frame(missing_entries) %>%
+#   rename(united_vals = missing_entries) %>% 
+#   separate_wider_delim(united_vals, delim = "_", 
+#                        names = c("system_ID", "sigmaH", "KH", "variable")) %>% 
+#   select(-variable) %>% 
+#   distinct() %>% 
+#   mutate(sigmaH = as.double(sigmaH),
+#          KH = as.double(KH))
+# 
+# # Go back and compute CT vals for these entries
+# # Set up host trait data frame
+# data.CT <- data.Host %>% 
+#   select(-c(sigmaH,KH, Model)) %>% 
+#   distinct() %>% 
+#   cross_join(select(missing_CT.df, sigmaH,KH) %>% distinct()) %>%
+#   mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model"))
+# 
+# # Slice host trait data 
+# sigmaH_slices <- slice(unique(data.CT$sigmaH), 10)
+# KH_slices <- slice(unique(data.CT$KH), cluster_size)
+# 
+# # Initialize CT data frame
+# newCT.df <- init.df
+# 
+# gc()
+# # Collect CTmin/max/width data across systems and host trait values
+# for (system_name in unique(data.Vec$system_ID)) {
+#   print(paste0("CTmin/max/width vals: ", system_name))
+#   KHslice_num <- 1
+#   for(index_KH in KH_slices) {
+#     print(paste0("KH slice number ", KHslice_num, " out of ", length(KH_slices)))
+#     sigmaHslice_num <- 1
+#     for (index_sigmaH in sigmaH_slices) {
+#       print(paste0("sigmaH slice number ", sigmaHslice_num, " out of ", length(sigmaH_slices)))
+#       newCT.df <- data.CT %>%
+#         filter(sigmaH %in% index_sigmaH,
+#                KH %in% index_KH) %>%    
+#         CT_heat_func(., system_name) %>%
+#         rbind(newCT.df)
+#       
+#       # Check outputs as we go along
+#       test_df <- filter(newCT.df,
+#                         system_ID == system_name,
+#                         sigmaH %in% index_sigmaH,
+#                         KH %in% index_KH) %>% 
+#         ungroup() %>% 
+#         select(-c(system_ID, Model, lowHCI, highHCI, median)) %>% 
+#         distinct() %>% 
+#         pivot_wider(names_from = "variable", values_from = "mean") %>% 
+#         select(-c(sigmaH, KH)) %>% 
+#         distinct()
+#       
+#       print(test_df)
+#       
+#       sigmaHslice_num <- sigmaHslice_num  + 1
+#     }
+#     
+#     KHslice_num <- KHslice_num +1
+#     gc()
+#   }
+# }
+# # smallest CTmin ~13.85
+# # largest CTmax ~34.45
