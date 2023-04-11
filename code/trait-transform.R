@@ -173,7 +173,6 @@ data.in.params <- combined_df %>%
   # Aquatic-stage mosquito mortality rate. This should be ~infinite if deltaL = 0
   mutate(muL = etaL - rhoL) %>%   
   # Adult mosquito average lifespan
-  mutate(lf = lf) %>% 
   # Pathogen development rate.
   mutate(etaV = PDR) %>%
   # Mosquito infection probability.
@@ -189,6 +188,7 @@ data.in.params <- combined_df %>%
 if (plot_bool) {
   
 library(cowplot)
+library(svglite)  
   
 # For each mosquito species, trait, and sample, get a thermal response curve
 TPC_df <- data.in.params %>%  

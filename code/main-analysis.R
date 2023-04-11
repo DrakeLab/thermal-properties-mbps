@@ -63,10 +63,10 @@ Temps <- seq(10, 40, length.out = 601) # full: length.out = 601, thin: length.ou
 
 # Thin samples
 thin_size <- 600 # full = 600, thin = 100
-plot_bool = TRUE
+plot_bool = FALSE
 # source("code/trait-transform.R")
 
-# write_rds(data.in.transform, "data/clean/parameter_TPCs.rds", compress = "gz")
+# write_rds(data.in.params, "data/clean/parameter_TPCs.rds", compress = "gz")
 # write_rds(data.in.params, "data/clean/parameter_TPCs_thin.rds", compress = "gz")
 
 # remove work sets
