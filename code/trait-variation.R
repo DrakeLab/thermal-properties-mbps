@@ -30,15 +30,7 @@ library(reshape2)
 library(multidplyr)
 library(foreach)
 library(doParallel)
-
-# source("code/output-functions.R") # needed for compute.variable functions
-
-# Set up parallel
-if (!exists("cluster")) {
-  cluster_size <- parallel::detectCores() - 1
-  cluster <- new_cluster(cluster_size)
-  cluster_library(cluster, c("dplyr", "tidyr"))
-}
+library(progress)
 
 # 1) Define accessory functions -------------------------------------------
 
@@ -109,14 +101,15 @@ Topt_heat_func <- function(in_df, system_name) {
     ungroup() %>%
     pivot_longer(cols = Topt, names_to = "variable", values_to = "value") %>%
     group_by(system_ID, Model, sigmaH, KH, variable) %>%
-    partition(cluster) %>%
+    # partition(cluster) %>%
     summarise(
       lowHCI = quantile(value, 0.055),
       highHCI = quantile(value, 0.945),
       mean = mean(value),
-      median = median(value)
-    ) %>%
-    collect()
+      median = median(value),
+      .groups = "keep"
+    ) #%>%
+    # collect()
 }
 
 # Function: evaluate CTmin, CTmax, CTwidth and their means, medians, and highest
@@ -256,14 +249,22 @@ init.df <- tibble(system_ID = c(), Temperature = c(), Model = c(),
 rm(data.in.params)
 
 ### R0 TPCs ----
+
+# Set up parallel
+if (!exists("cluster")) {
+  cluster_size <- parallel::detectCores() - 1
+  cluster <- new_cluster(cluster_size)
+  cluster_library(cluster, c("dplyr", "tidyr"))
+}
+
 # Set up host trait data frame (for future visualization)
 data.R0 <- data.Host %>%
   filter(sigmaH %in% c(100, Inf)) %>% 
   filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 21)])
 
 # Slice host trait data
-sigmaH_slices <- slice(unique(data.R0$sigmaH), 10)
-KH_slices <- slice(unique(data.R0$KH), cluster_size)
+sigmaH_slices <- slice(unique(data.R0$sigmaH), 1)
+KH_slices <- slice(unique(data.R0$KH), 1)
 
 # Initialize R0 data frame
 R0.df <- init.df
@@ -294,7 +295,7 @@ for (system_name in unique(data.Vec$system_ID)) {
 # Save data
 proper_dim <- 2 * dim(data.R0)[1] * length(unique(data.Vec$system_ID)) * length(unique(data.Vec$Temperature))
 
-if (exists(R0.df) & dim(R0.df)[1] == proper_dim)
+if (exists("R0.df") & dim(R0.df)[1] == proper_dim)
 {write_rds(R0.df, "results/R0_vals.rds", compress = "gz")
 } else {
   warning("No file written. R0.df either empty or not complete.")
@@ -302,46 +303,58 @@ if (exists(R0.df) & dim(R0.df)[1] == proper_dim)
 
 
 ### Topt ----
-
-# Set up host trait data frame
-data.Topt <- data.Host
-
-# Slice host trait data 
-sigmaH_slices <- slice(unique(data.Topt$sigmaH), 10)
-KH_slices <- slice(unique(data.Topt$KH), cluster_size)
-
-# Initialize Topt data frame
-Topt.df <- init.df
-
+# Set up new cluster
+# Close old cluster connections
+rm(cluster)
 gc()
+# Start new cluster for doParallel
+cluster_size <- parallel::detectCores() - 2
 
-# Collect Topt data across systems and host trait values
-for (system_name in unique(data.Vec$system_ID)) {
-  print(paste0("Topt vals: ", system_name))
-  KHslice_num <- 1
-  for (index_KH in KH_slices) {
-    print(paste0("KH slice number ", KHslice_num, " out of ", length(KH_slices)))
-    sigmaHslice_num <- 1
-    for (index_sigmaH in sigmaH_slices) {
-      print(paste0("sigmaH slice number ", sigmaHslice_num, " out of ", length(sigmaH_slices)))
-      
-      Topt.df <- data.Topt %>%
-        filter(sigmaH %in% index_sigmaH,
-               KH %in% index_KH) %>%
-        Topt_heat_func(., system_name) %>%
-        rbind(Topt.df)
-      
-      sigmaHslice_num <- sigmaHslice_num  + 1
-    }
-    KHslice_num <- KHslice_num +1
-    gc()
-  }
+my.cluster <- parallel::makeCluster(
+  cluster_size, 
+  type = "PSOCK"
+)
+# Register cluster for doParallel
+doSNOW::registerDoSNOW(cl = my.cluster)
+
+# Set up iteration grid
+iter_grid <- expand_grid(system_ID = unique(data.Vec$system_ID),
+                         tibble(KH = data.Host$KH,
+                                sigmaH = data.Host$sigmaH))
+# Set up progress bar
+iterations <- dim(iter_grid)[1]
+
+pb <- progress_bar$new(
+  format = ":spin :system progress = :percent [:bar] :elapsed | eta: :eta",
+  total = iterations,
+  width = 120)                                                                                                         
+
+progress <- function(n){
+  pb$tick(tokens = list(system = iter_grid$system_ID[n]))
 }
+opts <- list(progress = progress)
+
+Topt.df <- foreach(
+  system_name = iter_grid$system_ID,
+  index_KH = iter_grid$KH,
+  index_sigmaH = iter_grid$sigmaH,
+  .packages = "tidyverse",
+  .combine = rbind,
+  .options.snow = opts) %dopar% {
+    data.Host %>%
+      filter(sigmaH %in% index_sigmaH,
+             KH %in% index_KH) %>%
+      Topt_heat_func(., system_name)
+  }
+
+close(pb)
+
 
 # Save Topt data
 proper_dim <- (dim(data.Topt)[1] * length(unique(data.Vec$system_ID)))
+dim(Topt.df)[1] == proper_dim
 
-if (exists(Topt.df) & dim(Topt.df)[1] == proper_dim)
+if (exists("Topt.df") & dim(Topt.df)[1] == proper_dim)
 {write_rds(Topt.df, "results/Topt_vals.rds", compress = "gz")
 } else {
   warning("No file written. Topt.df either empty or not complete.")
@@ -350,47 +363,6 @@ if (exists(Topt.df) & dim(Topt.df)[1] == proper_dim)
 
 ### CTmin, CTmax, and CTwidth -------------------------------------------
 
-## Set up alternative parallelization
-# Close old cluster connections
-rm(cluster)
-gc()
-# Start new cluster for doParallel
-my.cluster <- parallel::makeCluster(
-  parallel::detectCores() - 1, 
-  type = "PSOCK"
-)
-# Register cluster for doParallel
-doSNOW::registerDoSNOW(cl = my.cluster)
-
-
-# Set up host trait data frame
-data.CT <- data.Host
-
-# Initialize CT data frame
-CT.df <- init.df
-
-gc()
-# Collect CTmin/max/width data across systems and host trait values
-# for (system_name in unique(data.Vec$system_ID)) {
-# print(paste0("CTmin/max/width vals: ", system_name))
-
-# Set up iteration grid
-iter_grid <- expand_grid(system_ID = unique(data.Vec$system_ID),
-                         tibble(KH = data.CT$KH,
-                                sigmaH = data.CT$sigmaH))
-library(progress)
-iterations <- dim(iter_grid)[1]
-
-pb <- progress_bar$new(
-  format = ":spin :system progress = :percent [:bar] :elapsed | eta: :eta",
-  total = iterations,    # 100 
-  width = 120)                                                                                                         
-
-progress <- function(n){
-  pb$tick(tokens = list(system = iter_grid$system_ID[n]))
-}
-opts <- list(progress = progress)
-
 CT.df <- foreach(
   system_name = iter_grid$system_ID,
   index_KH = iter_grid$KH,
@@ -398,7 +370,6 @@ CT.df <- foreach(
   .packages = "tidyverse",
   .combine = rbind,
   .options.snow = opts) %dopar% {
-    # tibble(system_ID = system_name, sigmaH = index_sigmaH, KH = index_KH)
     data.CT %>%
       filter(sigmaH %in% index_sigmaH,
              KH %in% index_KH) %>%
@@ -406,9 +377,6 @@ CT.df <- foreach(
   }
 
 close(pb)
-
-# smallest CTmin ~13.85
-# largest CTmax ~34.45
 
 # Save CT data
 (proper_dim <- 3 * dim(data.CT)[1] * length(unique(data.Vec$system_ID)))
