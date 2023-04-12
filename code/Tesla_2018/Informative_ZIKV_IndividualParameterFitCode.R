@@ -1,7 +1,7 @@
 ### This file will process the temperature data and create the individual parameter 
 ### samples for all the traits that are included in the DENV R0 model. 
 
-wd = "/Users/erinmordecai/Documents/projects/Stanford projects/temperature and vector-borne disease/R0 for Ae aegypti and Ae albopictus/Final Code Package"
+wd = "C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/code/Tesla_2018"
 
 ## Loading the required packages and supplementary code for sampling and analysis.
 library(IDPmisc)
@@ -9,10 +9,11 @@ library('rjags')
 library('MASS')
 
 # This file contains tools for analysis and visualization.
-source(paste(wd, "mcmc_utils_all.R", sep = "/")) 
+source("C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/code/Tesla_2018/mcmc_utils_all.R")
 
-# This file contains the thermal response functions
-source(paste(wd, "temp_functions_all.R", sep = "/")) 
+# This file contains the thermal response functions and their derivatives.
+source("C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/code/Tesla_2018/temp_functions_all.R")
+
 
 # Load posterior distributions of traits previously fit for Aedes aegypti and DENV
 load(paste(wd, "LifespanFits_2016-03-30-informative.Rsave", sep = "/"))
@@ -35,7 +36,8 @@ gamma.fits.c = apply(c.samps, 2, function(df) fitdistr(df, "gamma")$estimate)
 ec<-0.000001 
 
 ## Loading the data
-data.all <- read.csv("zikv_traits.csv", header=TRUE)
+data.all <- read.csv(
+  "C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/data/raw/Tesla_2018/zikv_traits.csv", header=TRUE)
 head(data.all)
 str(data.all)
 
@@ -67,7 +69,7 @@ plot(trait ~ T, data = data)
 
 hypers = gamma.fits.c
 
-jags <- jags.model(paste(wd, 'jags-briere-informative.bug', sep = "/"),
+jags <- jags.model('C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/code/jags-models/jags-briere-informative.bug',
                    data = list('Y' = data$trait, 'T' = data$T, 'N'= length(data$T), 'hypers' = hypers),
                    n.chains = n.chains, inits = list(Tm = 31, T0 = 5, c = 0.00007),
                    n.adapt = n.adapt)
@@ -141,7 +143,7 @@ hypers = gamma.fits.lf
 
 # Given the data we've chosen to use the Quadratic function. 
 
-jags <- jags.model(paste(wd, 'jags-quad-neg-informative.bug', sep = "/"),
+jags <- jags.model('C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/code/Mordecai_2017/jags-quad-neg-informative.bug',
                    data = list('Y' = data$trait, 'T' = data$T, 'N'= length(data$T), 'hypers' = hypers),
                    n.chains = n.chains, inits = list(Tm = 31, T0 = 5, n.qd=0.005),
                    n.adapt = n.adapt)
@@ -166,11 +168,11 @@ lf.samps <- samps
 priors1<-list()
 priors1$names<-c( "T0", "Tm", "qd","tau")
 priors1$fun<-c( "gamma", "gamma", "gamma","gamma")
-priors1$hyper<-matrix(NA, ncol=4, nrow=3)
-priors1$hyper[,1]<-c(hypers[1,1], hypers[2,1], NA)
-priors1$hyper[,2]<-c(hypers[1,2], hypers[2,2], NA)
-priors1$hyper[,3]<-c(hypers[1,3], hypers[2,3], NA)
-priors1$hyper[,4]<-c(hypers[1,4], hypers[2,4], NA)
+priors1$hyper<-matrix(NA, ncol=4, nrow=2)
+priors1$hyper[,1]<-c(hypers[1,1], hypers[2,1])
+priors1$hyper[,2]<-c(hypers[1,2], hypers[2,2])
+priors1$hyper[,3]<-c(hypers[1,3], hypers[2,3])
+priors1$hyper[,4]<-c(hypers[1,4], hypers[2,4])
 
 ## the plot.hists command can be used to plot histograms of posterior
 ## samples of parameters with overlying priors
@@ -215,7 +217,7 @@ hypers[,2] = hypers[,2]*3
 # Given the data the Briere fuction is chosen. Jag-briere.bug contains the specifics of 
 # the Briere model with the default priors.
 
-jags <- jags.model(paste(wd, 'jags-briere-informative.bug', sep = "/"),
+jags <- jags.model('C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/code/Mordecai_2017/jags-briere-informative.bug',
                    data = list('Y' = data$trait, 'T' = data$T, 'N' = length(data$T), 'hypers' = hypers),
                    n.chains = n.chains, inits = list(Tm = 38, T0 = 5, c = 0.00007),
                    n.adapt = n.adapt) 

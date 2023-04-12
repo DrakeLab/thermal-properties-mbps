@@ -87,7 +87,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
     if (trait_in == "EFD") { # use revised initial values from Mordecai 2017
       list(T0 = 15, Tm = 34, c = 0.01)
     } else {
-      list(T0 = 5, Tm = 31, c = 0.00007)
+      list(T0 = 5, Tm = 38, c = 0.00007)
     }
   } else if (TPC_function == "Quadratic") {
     list(c = 0.005, Tm = 33, T0 = 5)
@@ -160,7 +160,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         get.prior_hyperparams(
           other_data, TPC_function, variable_names,
           jags_other, inits_list,
-          n.chains, n.adapt, 100, prob_bool
+          n.chains, n.adapt, 5000, prob_bool
         ),
         until = function(val, cnd) {
           !is.null(val)
@@ -226,13 +226,6 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
     arrange(year, lead_author) %>%
     distinct(lead_author, year)
 
-  # SPECIAL CASE: Alternate data for Aedes aegypti fecundity (from Ae. albopictus)
-  #               is substantially different than original data. Do not use it
-  #               to inform the TPC parameter prior distribution
-  # if (trait_in == "EFD" & mosquito_in == "Aedes aegypti") {
-  #   prev_hypers <- c()
-  # }
-
   # Select the appropriate bugs model
   jags_choice <- if (prob_bool) {
     # probabilities (truncates at 1)
@@ -270,15 +263,32 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
 
     data_temp <- dplyr::filter(working_data, lead_author == index_author, year == index_year)
 
-    jags_data <- if (is.null(prev_hypers)) {
-      list(
+    if (is.null(prev_hypers)) {
+      jags_data <-   list(
         "Y" = data_temp$trait, "T" = data_temp$T,
         "N" = length(data_temp$T)
       )
     } else {
-      list(
+      # Following past work, reduce variance of hypers by a given factor
+      hyper_relax_factor <- case_when(
+        trait_in == "PDR" ~ 0.5,
+        trait_in == "e2a" ~ 0.1,
+        trait_in == "MDR" ~ 0.1,
+        trait_in == "EFD" ~ 0.1,
+        trait_in == "lf" ~ 0.01,
+        trait_in == "c" ~ 0.5,
+        trait_in == "b" ~ 0.5,
+        trait_in == "a" ~ 0.5,
+        trait_in == "EFOC" ~ 3,
+        trait_in == "bc" ~ 0.5,
+        trait_in == "EPR" ~ 1,
+        trait_in == "pO" ~ 0.5,
+        trait_in == "EV" ~ 0.1,
+        trait_in == "pLA" ~ 0.1
+      )
+      jags_data <- list(
         "Y" = data_temp$trait, "T" = data_temp$T,
-        "N" = length(data_temp$T), "hypers" = prev_hypers
+        "N" = length(data_temp$T), "hypers" = prev_hypers * hyper_relax_factor
       )
     }
 

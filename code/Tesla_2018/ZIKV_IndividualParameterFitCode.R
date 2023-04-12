@@ -55,7 +55,7 @@ plot(trait ~ T, data = data)
 
 # Given the data we've chosen to use the Quadratic function. 
 
-jags <- jags.model('jags-quad-neg.bug',
+jags <- jags.model('C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/code/Mordecai_2017/jags-quad-neg.bug',
                    data = list('Y' = data$trait, 'T' = data$T, 'N'= length(data$T)),
                    n.chains = n.chains, inits = list(Tm = 31, T0 = 5, n.qd=0.005),
                    n.adapt = n.adapt)

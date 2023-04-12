@@ -147,10 +147,13 @@ data.Tesla2018 <- read.csv("data/raw/Tesla_2018/zikv_traits.csv", header = TRUE)
   filter(!trait.name %in% c("MDR", "pEA", "EFD", "a")) %>% 
   mutate(mosquito_species = "Aedes aegypti") %>%
   mutate(infection_status = stringr::word(rep, 2, 2, sep = "-")) %>%
+  # Although Tesla et al kept track of infection status, they combined lifespan
+  # data across infected and uninfected mosquitoes
   mutate(pathogen = case_when(
     trait.name %in% c("bc", "EIR") ~ "ZIKV",
-    infection_status == "inf" ~ "ZIKV")
-  ) %>%
+    (infection_status == "inf" & trait.name != "lf") ~ "ZIKV",
+    TRUE ~ NA
+  )) %>%
   mutate(lead_author = "Tesla") %>%
   mutate(year = "2018") %>%
   dplyr::select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year)
@@ -178,6 +181,8 @@ data.Shocket2020 <- read.csv("data/raw/Shocket_2020/TraitData_a.csv", header = T
           rename(trait.name = Trait.Name) %>%
           dplyr::select(trait.name, T, trait, host.code, paras.code)) %>%
   rbind(read.csv("data/raw/Shocket_2020/TraitData_EV.csv", header = TRUE) %>%
+          # Following Shocket et al 2020: Remove Oda data - it shows no temp-dep, and briere fit doesn't work with it (T0 = 0)
+          filter(Citation != "Oda_1980_TropMed") %>% 
           dplyr::select(trait.name, T, trait, host.code, paras.code)) %>%
   rbind(read.csv("data/raw/Shocket_2020/TraitData_lf.csv", header = TRUE) %>%
           dplyr::select(trait.name, T, trait, host.code, paras.code)) %>%

@@ -45,7 +45,7 @@ n.adapt <- 5000 # 100 # 5000
 n.samps <- 5000 # 1000 # 5000
 
 # Do you want to look at diagnostic plots?
-plot_bool <- TRUE
+plot_bool <- FALSE
 
 # # Run this to generate samples of trait TPC parameters from informed posterior distributions
 # source("code/get-thermal-trait-priors.R")
