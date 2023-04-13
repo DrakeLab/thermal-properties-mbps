@@ -270,6 +270,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
       )
     } else {
       # Following past work, reduce variance of hypers by a given factor
+      # These mostly come from Shocket 2020 and Mordecai 2017
       hyper_relax_factor <- case_when(
         trait_in == "PDR" ~ 0.5,
         trait_in == "e2a" ~ 0.1,

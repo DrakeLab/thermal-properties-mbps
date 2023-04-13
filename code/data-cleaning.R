@@ -377,7 +377,7 @@ write_rds(data.in.TPC, "data/clean/data_for_TPC_fitting.rds")
 # 5) Data visualizations / diagnostics ------------------------------------
 
 ###* Visualize traits as functions of temperature
-plot_bool <- FALSE # decide whether you'd like to generate a diagnostic plot
+plot_bool <- TRUE # decide whether you'd like to generate a diagnostic plot
 
 if (plot_bool) {
   library(cowplot)
