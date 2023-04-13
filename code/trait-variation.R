@@ -252,7 +252,7 @@ rm(data.in.params)
 
 # Set up parallel
 if (!exists("cluster")) {
-  cluster_size <- parallel::detectCores() - 1
+  cluster_size <- min(21, parallel::detectCores() - 2)
   cluster <- new_cluster(cluster_size)
   cluster_library(cluster, c("dplyr", "tidyr"))
 }
@@ -263,8 +263,8 @@ data.R0 <- data.Host %>%
   filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 21)])
 
 # Slice host trait data
-sigmaH_slices <- slice(unique(data.R0$sigmaH), 1)
-KH_slices <- slice(unique(data.R0$KH), 1)
+sigmaH_slices <- slice(unique(data.R0$sigmaH), 2)
+KH_slices <- slice(unique(data.R0$KH), cluster_size)
 
 # Initialize R0 data frame
 R0.df <- init.df
@@ -293,7 +293,7 @@ for (system_name in unique(data.Vec$system_ID)) {
 }
 
 # Save data
-proper_dim <- 2 * dim(data.R0)[1] * length(unique(data.Vec$system_ID)) * length(unique(data.Vec$Temperature))
+proper_dim <- dim(data.R0)[1] * length(unique(data.Vec$system_ID)) * length(unique(data.Vec$Temperature))
 
 if (exists("R0.df") & dim(R0.df)[1] == proper_dim)
 {write_rds(R0.df, "results/R0_vals.rds", compress = "gz")
