@@ -86,6 +86,8 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
   inits_list <- if (TPC_function == "Briere") {
     if (trait_in == "EFD") { # use revised initial values from Mordecai 2017
       list(T0 = 15, Tm = 34, c = 0.01)
+    } else if (trait_in == "EV") {
+      list(T0 = 5, Tm = 31, c = 0.00007)
     } else {
       list(T0 = 5, Tm = 38, c = 0.00007)
     }
@@ -112,10 +114,11 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
     # Gather data from other species of the same genus
     other_species <- working_data %>%
       dplyr::filter(stringr::word(mosquito_species, 1, 1) == stringr::word(mosquito_in, 1, 1)) %>%
-      dplyr::filter(mosquito_species != mosquito_in) %>% 
-      distinct(T,trait, .keep_all = TRUE)
+      dplyr::filter(mosquito_species != mosquito_in) %>%
+      distinct(T, trait, .keep_all = TRUE)
 
-    # If data was recorded for infections, use infections in other species to inform priors
+    # If data was recorded for infections, use infections of the same pathogen
+    # in other species to inform priors
     if (pathogen_in != "none") {
       other_species <- working_data %>%
         dplyr::filter(mosquito_species != mosquito_in) %>%
@@ -136,7 +139,6 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         "N" = length(other_species$T)
       )
 
-      # Select the appropriate bugs model
       jags_other <- if (prob_bool) {
         # for probabilities (truncates at 1)
         case_when(
@@ -264,7 +266,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
     data_temp <- dplyr::filter(working_data, lead_author == index_author, year == index_year)
 
     if (is.null(prev_hypers)) {
-      jags_data <-   list(
+      jags_data <- list(
         "Y" = data_temp$trait, "T" = data_temp$T,
         "N" = length(data_temp$T)
       )
@@ -276,7 +278,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         trait_in == "e2a" ~ 0.1,
         trait_in == "MDR" ~ 0.1,
         trait_in == "EFD" ~ 0.1,
-        trait_in == "lf" ~ 0.01,
+        trait_in == "lf" ~ 0.05,
         trait_in == "c" ~ 0.5,
         trait_in == "b" ~ 0.5,
         trait_in == "a" ~ 0.5,
@@ -336,6 +338,8 @@ get.prior_hyperparams <- function(in_data, TPC_function, variable_names,
                                   scale_factor = 100, prob_bool) {
   # Initialize the hyperparameter list
   hypers <- NULL
+
+  # inits_list <- list(T0 = 5, Tm = 31, c = 0.00007)
 
   # get samples from trait TPC parameter distributions
   temp_samples <- run.jags(
@@ -493,7 +497,7 @@ distinct_combos <- data_in %>%
   # Remove unused Culex spp. / WNV data (we only need b, c, and bc)
   filter(system_ID != "Culex spp. / WNV" | trait.name != "MDR") %>%
   filter(system_ID != "Culex spp. / WNV" | trait.name != "PDR")
-  
+
 
 samples <- tibble(
   trait = as.character(),
@@ -507,41 +511,41 @@ samples <- tibble(
 
 # Go through all trait/system combinations to generate TPC parameter posterior samples
 # system.time(
-  for (system_index in 1:dim(distinct_combos)[1]) {
-    # Pull system information
-    system_sample <- distinct_combos$system_ID[system_index]
-    trait_in <- distinct_combos$trait.name[system_index]
-    mosquito_in <- filter(data_in, system_ID == system_sample) %>%
-      dplyr::select(mosquito_species) %>%
-      unique() %>%
-      as.character()
-    pathogen_in <- filter(data_in, system_ID == system_sample, trait.name == trait_in) %>%
-      dplyr::select(pathogen) %>%
-      unique() %>%
-      as.character()
+for (system_index in 1:dim(distinct_combos)[1]) {
+  # Pull system information
+  system_sample <- distinct_combos$system_ID[system_index]
+  trait_in <- distinct_combos$trait.name[system_index]
+  mosquito_in <- filter(data_in, system_ID == system_sample) %>%
+    dplyr::select(mosquito_species) %>%
+    unique() %>%
+    as.character()
+  pathogen_in <- filter(data_in, system_ID == system_sample, trait.name == trait_in) %>%
+    dplyr::select(pathogen) %>%
+    unique() %>%
+    as.character()
 
-    # Give a progress report
-    print(paste0(
-      "System # ", system_index, " of ", dim(distinct_combos)[1], ": ", mosquito_in, " / ", pathogen_in, " / ", trait_in,
-      " -------------------------------------------------------------------------------"
-    ))
+  # Give a progress report
+  print(paste0(
+    "System # ", system_index, " of ", dim(distinct_combos)[1], ": ", mosquito_in, " / ", pathogen_in, " / ", trait_in,
+    " -------------------------------------------------------------------------------"
+  ))
 
 
-    # generate TPC parameter posterior samples
-    temp_sample <- thermtrait.prior.sample(data_in, trait_in, mosquito_in, pathogen_in,
-      n.chains, n.adapt, n.samps,
-      old_informative = FALSE
+  # generate TPC parameter posterior samples
+  temp_sample <- thermtrait.prior.sample(data_in, trait_in, mosquito_in, pathogen_in,
+    n.chains, n.adapt, n.samps,
+    old_informative = FALSE
+  )
+
+  # add in name of system and trait to list of samples
+  temp_sample <- temp_sample %>%
+    mutate(
+      trait = trait_in,
+      system_ID = system_sample
     )
-
-    # add in name of system and trait to list of samples
-    temp_sample <- temp_sample %>%
-      mutate(
-        trait = trait_in,
-        system_ID = system_sample
-      )
-    # add samples to running list
-    samples <- rbind(samples, temp_sample)
-  }
+  # add samples to running list
+  samples <- rbind(samples, temp_sample)
+}
 # )
 
 data.in.transform <- samples
@@ -561,8 +565,7 @@ print(distinct_samples)
 focal_bool <- TRUE
 
 if (plot_bool) {
-  
-  plot_samples <- data.in.transform %>%  #read_rds("data/clean/TPC_param_samples.rds") %>% 
+  plot_samples <- data.in.transform %>% # read_rds("data/clean/TPC_param_samples.rds") %>%
     filter(sample_num %in% 1:1000)
 
   if (focal_bool) {
