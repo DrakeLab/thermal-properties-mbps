@@ -351,7 +351,7 @@ close(pb)
 
 
 # Save Topt data
-proper_dim <- (dim(data.Topt)[1] * length(unique(data.Vec$system_ID)))
+proper_dim <- (dim(iter_grid)[1])
 dim(Topt.df)[1] == proper_dim
 
 if (exists("Topt.df") & dim(Topt.df)[1] == proper_dim)
