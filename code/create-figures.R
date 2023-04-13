@@ -315,7 +315,7 @@ Toptalt_plots <- Toptalt_df %>%
     show.limits = TRUE
   )) +
   # theme options:
-  theme_minimal(11) +
+  theme_minimal(16) +
   theme(
     legend.box = "vertical",
     legend.position = "right",
@@ -435,7 +435,7 @@ CTWidth_heat_plots <- CTwidth_df %>%
     show.limits = TRUE
   )) +
   # theme options:
-  theme_minimal(11) +
+  theme_minimal(16) +
   theme(
     legend.box = "horizontal",
     legend.position = "bottom",
@@ -482,10 +482,10 @@ Topt_plot <- Topt_df %>%
   # color = sigmaH
   ggplot(aes(x = KH, colour = as.factor(sigmaH))) +
   # Topt curves:
-  geom_path(aes(y = median), lwd = 1) +
-  # Add dotted lines showing 89% HCI limits
-  geom_path(aes(y = lowHCI), linetype = "dashed") +
-  geom_path(aes(y = highHCI), linetype = "dashed") +
+  geom_path(aes(y = mean), lwd = 1) +
+  # # Add dotted lines showing 89% HCI limits
+  # geom_path(aes(y = lowHCI), linetype = "dashed") +
+  # geom_path(aes(y = highHCI), linetype = "dashed") +
   # x-axis: log10 scale, no buffer space
   scale_x_log10(
     name = TeX("Vertebrate host population density (ind/ha)"),
@@ -499,8 +499,9 @@ Topt_plot <- Topt_df %>%
   # y-axis
   scale_y_continuous(
     name = expression("Thermal optimum "(degree * C)),
-    expand = c(0.05, 0.05)#,
-    # limits = c(11,39)
+    expand = c(0.05, 0.05),
+    limits = c(21,32), # mean: 21-31, median: 21-32
+    breaks = seq(21,32, by = 1)
   ) +
   # color:
   scale_colour_manual(
@@ -520,7 +521,7 @@ Topt_plot <- Topt_df %>%
   # faceting:
   facet_wrap(~system_ID, scales = "free", nrow = 2, labeller = labeller()) +
   # theme options:
-  theme_minimal_hgrid(11) +
+  theme_minimal_hgrid(16) +
   guides(color = guide_legend(override.aes = list(size = 4))) +
   theme(
     legend.position = "bottom",
@@ -545,7 +546,7 @@ Topt_plot <- Topt_df %>%
 # Plot
 Topt_plot <- shift_legend(Topt_plot)
 
-ggsave("figures/Topt_KH_median.svg", Topt_plot,
+ggsave("figures/Topt_KH_mean.svg", Topt_plot,
        width = 16, height = 9)
 
 # Figure S3: Topt as a function of sigmaH ---------------------------------
@@ -614,7 +615,7 @@ Topt_plot <- read_rds("results/Topt_vals.rds") %>%
              nrow = 2,
              labeller = labeller()  ) +
   # theme options:
-  theme_minimal_hgrid(11) +
+  theme_minimal_hgrid(16) +
   guides(color = guide_legend(override.aes = list(size = 4))) +
   theme(
     legend.position = "bottom",
@@ -746,7 +747,7 @@ CTmin_heat_plots <- CTmin_df %>%
     show.limits = TRUE
   )) +
   # theme options:
-  theme_minimal(11) +
+  theme_minimal(16) +
   theme(
     legend.box = "horizontal",
     legend.position = "bottom",
@@ -863,7 +864,7 @@ CTmax_heat_plots <- CTmax_df %>%
     show.limits = TRUE
   )) +
   # theme options:
-  theme_minimal(11) +
+  theme_minimal(16) +
   theme(
     legend.box = "horizontal",
     legend.position = "bottom",
@@ -946,7 +947,7 @@ Toptstdev_plots <- Toptalt_df %>%
     show.limits = TRUE
   )) +
   # theme options:
-  theme_minimal(11) +
+  theme_minimal(16) +
   theme(
     legend.box = "vertical",
     legend.position = "right",
