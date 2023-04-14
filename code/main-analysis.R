@@ -48,9 +48,9 @@ n.samps <- 5000 # 1000 # 5000
 plot_bool <- TRUE
 
 # # Run this to generate samples of trait TPC parameters from informed posterior distributions
-# source("code/get-thermal-trait-priors.R")
+source("code/get-thermal-trait-priors.R")
 
-# write_rds(data.in.transform, "data/clean/TPC_param_samples.rds")
+write_rds(data.in.transform, "data/clean/TPC_param_samples.rds")
 
 # # Run this to load pre-processed data set
 # data.in.transform <- read_rds("data/clean/TPC_param_samples.rds")
@@ -58,14 +58,14 @@ plot_bool <- TRUE
 # 3) Translate traits into model parameters -------------------------------
 
 # Define temperature range of study
-Temps <- seq(10, 40, length.out = 301) # full: length.out = 601, thin: length.out = 301
+Temps <- seq(10, 40, length.out = 601) # full: length.out = 601, thin: length.out = 301
 
 # Thin samples
-thin_size <- 100 # full = 600, thin = 100
-plot_bool = FALSE
+thin_size <- 600 # full = 600, thin = 100
+plot_bool = TRUE
 source("code/trait-transform.R")
 
-# write_rds(data.in.params, "data/clean/parameter_TPCs.rds", compress = "gz")
+write_rds(data.in.params, "data/clean/parameter_TPCs.rds", compress = "gz")
 # write_rds(data.in.params, "data/clean/parameter_TPCs_thin.rds", compress = "gz")
 
 # remove work sets
