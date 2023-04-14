@@ -63,10 +63,10 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
                                     old_informative = FALSE) {
   # restrict the dataset to the trait we care about
   working_data <- dplyr::filter(data_in, trait.name == trait_in)
-
+  
   # check if the trait is a probability
   prob_bool <- trait_in %in% c("b", "c", "bc", "e2a", "pLA", "pRH", "pO", "EV")
-
+  
   # Get the proper TPC function
   TPC_function <- read_csv("data/clean/trait_TPC_forms.csv", show_col_types = FALSE) %>%
     # when the TPC function can't be found from literature (this occurs for 10 systems)
@@ -81,11 +81,13 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
     ) %>%
     dplyr::select(TPC.function) %>%
     as.character()
-
+  
   # set initial values for jags model
   inits_list <- if (TPC_function == "Briere") {
     if (trait_in == "EFD") { # use revised initial values from Mordecai 2017
       list(T0 = 15, Tm = 34, c = 0.01)
+    }  else  if (trait_in == "bc") { # use revised initial values from Mordecai 2017
+      list(T0 = 20, Tm = 35, c = 1e-4)
     } else if (trait_in == "EV") {
       list(T0 = 5, Tm = 31, c = 0.00007)
     } else {
@@ -96,7 +98,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
   } else if (TPC_function == "Linear") {
     list(z = 0.2, c = 0.005) # corresponds to Tm = 40
   }
-
+  
   # designate the TPC hyperparameters to be fit
   variable_names <- if (TPC_function == "Briere") {
     c("c", "Tm", "T0", "sigma")
@@ -105,7 +107,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
   } else if (TPC_function == "Linear") {
     c("c", "z", "sigma")
   }
-
+  
   # If you choose not to use previously published TPC hyperparameters from Mordecai et al., 2017:
   # 1) use default priors
   # 2) update these using any related species
@@ -116,7 +118,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
       dplyr::filter(stringr::word(mosquito_species, 1, 1) == stringr::word(mosquito_in, 1, 1)) %>%
       dplyr::filter(mosquito_species != mosquito_in) %>%
       distinct(T, trait, .keep_all = TRUE)
-
+    
     # If data was recorded for infections, use infections of the same pathogen
     # in other species to inform priors
     if (pathogen_in != "none") {
@@ -125,20 +127,20 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         dplyr::filter(stringr::word(pathogen, 1, 1) == stringr::word(pathogen_in, 1, 1)) %>%
         rbind(other_species)
     }
-
+    
     # if data from congeners is unavailable, use data from species outside of the focal genera (that is, not Aedes, Culex, or Anopheles)
     if (dim(other_species)[1] == 0) {
       other_species <- working_data %>%
         dplyr::filter(mosquito_species == "Other spp.")
     }
-
+    
     # get hyperparameters of TPC parameter priors using this data, if available
     if (dim(other_species)[1] > 0) {
       other_data <- list(
         "Y" = other_species$trait, "T" = other_species$T,
         "N" = length(other_species$T)
       )
-
+      
       jags_other <- if (prob_bool) {
         # for probabilities (truncates at 1)
         case_when(
@@ -154,7 +156,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
           TPC_function == "Linear" ~ "code/jags-models/jags-linear.bug"
         )
       }
-
+      
       print("Getting hyperparameters for informed prior distribution from other species...")
       # get hyperparameters of informed TPC parameter distributions
       # by resampling, this function repeats the fitting process until it converges
@@ -171,7 +173,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
     } else { # if no trait data is available for any other species, start with uninformed priors
       prev_hypers <- c()
     }
-
+    
     # Use previously published TPC hyperparameters from Mordecai et al., 2017
   } else if (old_informative == TRUE) {
     # get previous hyperparameters
@@ -187,11 +189,11 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
       as.data.frame() %>%
       `rownames<-`(.[, 1]) %>%
       dplyr::select(-Var1)
-
+    
     if (dim(prev_hypers)[1] == 0) {
       stop("No saved TPC hyperparameter data. Switch old_informative to false")
     }
-
+    
     jags_choice <- if (prob_bool) {
       # probabilities (truncates at 1)
       case_when(
@@ -207,12 +209,12 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         TPC_function == "Linear" ~ "code/jags-models/jags-linear-informative.bug"
       )
     }
-
+    
     jags_data <- list(
       "Y" = working_data$trait, "T" = working_data$T,
       "N" = length(working_data$T), "hypers" = prev_hypers
     )
-
+    
     samps <- run.jags(
       jags_data, TPC_function, variable_names,
       jags_choice, inits_list,
@@ -221,13 +223,13 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
   }
   # Begin using data on the focal species to create and generate samples from
   # the TPC parameter posterior distributions
-
+  
   # get all of studies with data reported for the particular trait and mosquito species
   other_studies <- working_data %>%
     dplyr::filter(mosquito_species == mosquito_in) %>%
     arrange(year, lead_author) %>%
     distinct(lead_author, year)
-
+  
   # Select the appropriate bugs model
   jags_choice <- if (prob_bool) {
     # probabilities (truncates at 1)
@@ -251,7 +253,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
       TPC_function == "Linear" & !is.null(prev_hypers) ~ "code/jags-models/jags-linear-informative.bug"
     )
   }
-
+  
   # Use these other studies to update the TPC parameter priors
   print(paste0(
     "Found ", dim(other_studies)[1] - 1, " other studies for ",
@@ -262,9 +264,9 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
     # Identify study
     index_author <- other_studies$lead_author[ii]
     index_year <- other_studies$year[ii]
-
+    
     data_temp <- dplyr::filter(working_data, lead_author == index_author, year == index_year)
-
+    
     if (is.null(prev_hypers)) {
       jags_data <- list(
         "Y" = data_temp$trait, "T" = data_temp$T,
@@ -278,12 +280,12 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         trait_in == "e2a" ~ 0.1,
         trait_in == "MDR" ~ 0.1,
         trait_in == "EFD" ~ 0.5,
-        trait_in == "lf" ~ 0.1,
+        trait_in == "lf" ~ 0.5,
         trait_in == "c" ~ 0.5,
         trait_in == "b" ~ 0.5,
         trait_in == "a" ~ 0.5,
-        trait_in == "EFOC" ~ 3,
-        trait_in == "bc" ~ 1,
+        trait_in == "EFOC" ~ 1,
+        trait_in == "bc" ~ 0.1,
         trait_in == "EPR" ~ 1,
         trait_in == "pO" ~ 0.5,
         trait_in == "EV" ~ 0.1,
@@ -294,11 +296,11 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         "N" = length(data_temp$T), "hypers" = prev_hypers * hyper_relax_factor
       )
     }
-
+    
     if (ii < dim(other_studies)[1]) {
       # using older studies, generate posterior distributions to estimate
       # hyperparameters for future fitting
-
+      
       prev_hypers <- retry( # keep trying until distribution fitting converges
         get.prior_hyperparams(
           jags_data, TPC_function, variable_names,
@@ -311,13 +313,13 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         }
       )
     } else if (ii == dim(other_studies)[1]) { # for the final entry, generate the samples from the jags.model
-
+      
       samps <- run.jags(
         jags_data, TPC_function, variable_names,
         jags_choice, inits_list,
         n.chains, n.adapt, n.samps, prob_bool
       )
-
+      
       # for the linear model (which doesn't have T0 as a parameter), add NAs)
       if (is.null(samps$T0)) {
         samps$T0 <- NA
@@ -326,7 +328,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
   }
   samps <- mutate(samps, func = as.character(TPC_function))
   out.samps <- dplyr::select(samps, -c(sigma, tau))
-
+  
   return(out.samps)
 }
 
@@ -338,37 +340,37 @@ get.prior_hyperparams <- function(in_data, TPC_function, variable_names,
                                   scale_factor = 100, prob_bool) {
   # Initialize the hyperparameter list
   hypers <- NULL
-
+  
   # inits_list <- list(T0 = 5, Tm = 31, c = 0.00007)
-
+  
   # get samples from trait TPC parameter distributions
   temp_samples <- run.jags(
     in_data, TPC_function, variable_names,
     jags_choice, inits_list,
     n.chains, n.adapt, n.samps, prob_bool
   )
-
+  
   # transform TPC parameters for the Linear TPC
   if (TPC_function == "Linear") {
     temp_samples <- mutate(temp_samples, z = c * Tm) %>%
       dplyr::select(-c(Tm, T0))
   }
-
+  
   # rescale TPC parameters to ease fitting
   temp_samples <- temp_samples / scale_factor
   temp_samples <- dplyr::select(temp_samples, -sample_num)
-
+  
   # calculate hyperparameters of gamma distribution fit to TPC parameter distributions
   hypers <- apply(temp_samples, 2, function(df) {
     fitdistr(df, "gamma",
-      method = "Nelder-Mead",
-      hessian = FALSE
+             method = "Nelder-Mead",
+             hessian = FALSE
     )$estimate
   })
-
+  
   # return to original scale
   hypers["rate", ] <- hypers["rate", ] / scale_factor
-
+  
   return(hypers)
 }
 
@@ -378,15 +380,15 @@ run.jags <- function(jags_data, TPC_function, variable_names,
                      n.chains, n.adapt, n.samps, prob_bool = FALSE) {
   # initialize jags model
   jags <- jags.model(jags_choice,
-    data = jags_data,
-    n.chains = n.chains, inits = inits_list,
-    n.adapt = n.adapt,
-    quiet = TRUE # switch to FALSE to show messages and progress bars
+                     data = jags_data,
+                     n.chains = n.chains, inits = inits_list,
+                     n.adapt = n.adapt,
+                     quiet = TRUE # switch to FALSE to show messages and progress bars
   )
   # get n.samps new samples from the trait TPC parameter posterior distributions
   print("Sampling...")
   coda.samps <- coda.samples(jags, variable_names, n.samps)
-
+  
   # put coda.samples into the format used for further analyses.
   if (TPC_function == "Briere") {
     samps <- make.briere.samps(coda.samps, nchains = n.chains, samp.lims = c(1, n.samps))
@@ -400,10 +402,10 @@ run.jags <- function(jags_data, TPC_function, variable_names,
       mutate(T0 = NA) %>%
       dplyr::select(c, T0, Tm, sigma)
   }
-
+  
   # Remove samples where the minimum temperature exceeds the maximum
   samps <- dplyr::filter(samps, is.na(T0) | Tm > T0)
-
+  
   # extra processing if the trait is a probability
   if (prob_bool) {
     quad_max_func <- function(c, T0, Tm) {
@@ -425,7 +427,7 @@ run.jags <- function(jags_data, TPC_function, variable_names,
       dplyr::filter(between(test, 0, 1)) %>%
       dplyr::select(-test)
   }
-
+  
   # Resample until we obtain enough real samples
   while (dim(samps)[1] < n.chains * n.samps) {
     print("Resampling to ensure T0 < Tm ...")
@@ -443,7 +445,7 @@ run.jags <- function(jags_data, TPC_function, variable_names,
     }
     temp_samps <- dplyr::filter(temp_samps, is.na(T0) | Tm > T0) %>%
       dplyr::filter(!is.na(Tm))
-
+    
     # Resample if the max value for a probability trait exceeds 1
     if (prob_bool) {
       print("...and maximum does not exceed 1 for a probability")
@@ -456,21 +458,21 @@ run.jags <- function(jags_data, TPC_function, variable_names,
         dplyr::select(-test) %>%
         dplyr::filter(!is.na(Tm))
     }
-
+    
     print(paste0(
       "***Added an additional ",
       ifelse(dim(samps)[1] + dim(temp_samps)[1] > n.chains * n.samps,
-        n.chains * n.samps - dim(samps)[1],
-        dim(temp_samps)[1]
+             n.chains * n.samps - dim(samps)[1],
+             dim(temp_samps)[1]
       ),
       " samples from re-sampling***"
     ))
-
+    
     samps <- rbind(samps, temp_samps)
     print(paste0(min(100, 100 * round(dim(samps)[1] / (n.chains * n.samps), 2)), "% complete with resampling"))
   }
   samps <- samps[1:(n.chains * n.samps), ]
-
+  
   samps$tau <- 1 / samps$sigma
   if (is.null(samps$c)) {
     samps <- mutate(samps, c = qd, .keep = "unused")
@@ -523,20 +525,20 @@ for (system_index in 1:dim(distinct_combos)[1]) {
     dplyr::select(pathogen) %>%
     unique() %>%
     as.character()
-
+  
   # Give a progress report
   print(paste0(
     "System # ", system_index, " of ", dim(distinct_combos)[1], ": ", mosquito_in, " / ", pathogen_in, " / ", trait_in,
     " -------------------------------------------------------------------------------"
   ))
-
-
+  
+  
   # generate TPC parameter posterior samples
   temp_sample <- thermtrait.prior.sample(data_in, trait_in, mosquito_in, pathogen_in,
-    n.chains, n.adapt, n.samps,
-    old_informative = FALSE
+                                         n.chains, n.adapt, n.samps,
+                                         old_informative = FALSE
   )
-
+  
   # add in name of system and trait to list of samples
   temp_sample <- temp_sample %>%
     mutate(
@@ -567,7 +569,7 @@ focal_bool <- TRUE
 if (plot_bool) {
   plot_samples <- data.in.transform %>% # read_rds("data/clean/TPC_param_samples.rds") %>%
     filter(sample_num %in% 1:1000)
-
+  
   if (focal_bool) {
     plot_samples <- filter(plot_samples, system_ID %in% c(
       "Aedes aegypti / DENV", "Aedes aegypti / none",
@@ -609,7 +611,7 @@ if (plot_bool) {
     }
     ret <- unique(df)[seq(1, length(unique(df)), length.out = new_length)]
   }
-
+  
   # Figure: Histograms of parameter distributions of thermal traits ----
   # distributions should be clumped (except for c)
   # logc should be clumped
@@ -619,27 +621,27 @@ if (plot_bool) {
     mutate(temp_diff = Tm - T0) %>%
     mutate(logc = log(c)) %>%
     melt(id = c("system_ID", "trait", "sample_num"))
-
+  
   parm_hists <- plot_df %>%
     filter(variable != "c") %>%
     ggplot(aes(value, color = system_ID, fill = system_ID)) +
     geom_histogram(aes(), bins = 100) +
     facet_grid(trait ~ variable, scales = "free") +
     theme_minimal_grid(12)
-
+  
   # Save figure
   ggsave("figures/parm_hists.svg",
-    device = "svg",
-    width = 16, height = 9, units = "in"
+         device = "svg",
+         width = 16, height = 9, units = "in"
   )
-
+  
   ###* Figure: TPC curves with 89% high confidence intervals ----
-
+  
   # Temperature vector used for visualizations
   Temps <- seq(0, 50, length.out = 200)
-
+  
   # thin_size <- 100
-
+  
   # For each mosquito species, trait, and sample, get a thermal response curve
   TPC_df <- plot_samples %>%
     # filter(sample_num %in% seq(1, thin_size)) %>%
@@ -650,13 +652,13 @@ if (plot_bool) {
       func == "Linear" ~ Linear(c, Tm)(Temperature)
     )) %>%
     dplyr::select(-c("c", "T0", "Tm"))
-
+  
   # get mean TPC from samples
   meanTPC_df <- TPC_df %>%
     group_by(system_ID, trait, Temperature) %>%
     summarise(mean_val = mean(Trait_val), .groups = "keep") %>%
     unique()
-
+  
   # get edges of 89% HCI of samples # !!! not calculated correctly?
   quantsTPC_df <- TPC_df %>%
     group_by(system_ID, trait, Temperature) %>%
@@ -664,7 +666,7 @@ if (plot_bool) {
     mutate(highHCI_val = quantile(Trait_val, 0.945)) %>%
     dplyr::select(-c("sample_num", "Trait_val", "func")) %>%
     unique()
-
+  
   TPC_plot <- TPC_df %>%
     group_by(sample_num) %>%
     arrange(Temperature) %>%
@@ -684,10 +686,10 @@ if (plot_bool) {
     ylab("") +
     facet_wrap(~trait, scales = "free", ncol = 2) +
     theme_minimal_grid(12)
-
+  
   # Save figure
   ggsave("figures/TPC_plot.svg",
-    device = "svg",
-    width = 16, height = 9, units = "in"
+         device = "svg",
+         width = 16, height = 9, units = "in"
   )
 }

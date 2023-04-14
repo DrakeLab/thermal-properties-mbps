@@ -335,6 +335,8 @@ data.Reduced <- data.All %>%
     TRUE ~ pathogen
     # TRUE ~ NA
   )) %>% 
+  # Remove other togavirus data as these are not used in our study
+  filter(pathogen != "other togavirus") %>% 
   # Combine lifespan data for Aedes aegypti with and without ZIKV since we don't account for virulence in this model
   mutate(pathogen = ifelse((mosquito_species == "Aedes aegypti" & trait.name == "lf"),
                            "none",pathogen)) %>% 
