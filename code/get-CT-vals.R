@@ -82,6 +82,13 @@ CT_heat_func <- function(in_df, system_name) {
 }
 # 2) Set *host* parameters --------------------------------
 
+## Set resolution for host trait variation
+# Host density vector: Number of values to include to consider for vertebrate host density
+KH_vec_length <- 100 # full = 200, thin = 20
+
+# Biting tolerance vector: Number of values to consider for biting tolerance
+sigmaH_vec_length <- 100 # full = 200, thin = 20
+
 ## Host life history & behavioral traits
 # Host recruitment rate:
 # upper estimate from range for Primate traits: (0.001150685, 0.009624300)
@@ -127,7 +134,7 @@ data.Host <- expand_grid(
   mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model"))
 
 # 3) Set non-TPC *mosquito* parameters ------------------------------------
-
+data.in.params <- read_rds("data/clean/parameter_TPCs.rds")
 ## Carrying capacity for larval mosquitoes
 # NB: In the absence of good estimates for each species or temperature-dependence of this trait, we assume that this parameter is constant. It can be used as a  scaling parameter for overall mosquito abundance
 # (it could alternately be used to fix the maximum adult mosquito density across species)
