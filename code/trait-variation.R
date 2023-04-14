@@ -370,7 +370,7 @@ CT.df <- foreach(
   .packages = "tidyverse",
   .combine = rbind,
   .options.snow = opts) %dopar% {
-    data.CT %>%
+    data.Host %>%
       filter(sigmaH %in% index_sigmaH,
              KH %in% index_KH) %>%
       CT_heat_func(., system_name)
@@ -379,7 +379,9 @@ CT.df <- foreach(
 close(pb)
 
 # Save CT data
-(proper_dim <- 3 * dim(data.CT)[1] * length(unique(data.Vec$system_ID)))
+(proper_dim <- 3 * dim(iter_grid)[1])
+
+(proper_dim == dim(CT.df)[1])
 
 if (exists("CT.df") & dim(CT.df)[1] == proper_dim)
 {write_rds(CT.df, "results/CT_vals.rds", compress = "gz")
