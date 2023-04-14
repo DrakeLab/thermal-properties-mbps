@@ -207,8 +207,6 @@ CT.df <- foreach(
       CT_heat_func(., system_name)
   }
 
-close(pb)
-
 # Save CT data
 (proper_dim <- 3 * dim(iter_grid)[1])
 
