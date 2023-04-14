@@ -56,6 +56,8 @@ data.Mordecai2017.Aegypti <- read.csv("data/raw/Mordecai_2017/aegyptiDENVmodelTe
   filter(ref != "Focks_Barrera_2006_Research&TrainingTropicalDis_Geneva_Paper") %>%
   # Exclude the Rohani et al 2009 data because it has "unrealistically long lifespans"
   filter(ref != "Rohani_et_al_2009_SEJTropMedPH") %>%
+  # Exclude outliers from Beserra 2009 data
+  filter(!(ref == "Beserra_2009" & trait.name == "EFD" & trait > 15)) %>% 
   mutate(mosquito_species = "Aedes aegypti") %>%
   mutate(pathogen = ifelse(trait.name %in% c("b", "c", "PDR", "EIP"), case_when(
     ref == "Alto&Bettinardi_2013_AJTMH" ~ "DENV",
@@ -89,7 +91,7 @@ data.Mordecai2017.AedesSpp <- read.csv("data/raw/Mordecai_2017/Aedes_prior_data.
   mutate(mosquito_species = "Aedes spp.") %>%
   dplyr::select(-mosquito.species) %>% 
   mutate(pathogen = ifelse(trait.name %in% c("b", "c", "PDR", "EIP"), "other", NA)) 
-  
+
 
 data.Mordecai2017.PDRaddl <- read.csv("data/raw/Mordecai_2017/EIP_priors_2015-12-04.csv", header = TRUE) %>%
   rename(pathogen = virus, mosquito_species = mosquito)
@@ -146,7 +148,9 @@ data.Tesla2018 <- read.csv("data/raw/Tesla_2018/zikv_traits.csv", header = TRUE)
   # NB: MDR, pEA, EFD, and a are same as Mordecai 2017
   filter(!trait.name %in% c("MDR", "pEA", "EFD", "a")) %>% 
   mutate(mosquito_species = "Aedes aegypti") %>%
-  mutate(infection_status = stringr::word(rep, 2, 2, sep = "-")) %>%
+  mutate(infection_status = stringr::word(rep, 2, 2, sep = "-")) %>% 
+  # Remove extremely long lifespans for infected mosquitoes
+  filter(trait.name != "lf" | infection_status != "inf") %>%
   # Although Tesla et al kept track of infection status, they combined lifespan
   # data across infected and uninfected mosquitoes
   mutate(pathogen = case_when(

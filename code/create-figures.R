@@ -483,9 +483,9 @@ Topt_plot <- Topt_df %>%
   ggplot(aes(x = KH, colour = as.factor(sigmaH))) +
   # Topt curves:
   geom_path(aes(y = mean), lwd = 1) +
-  # # Add dotted lines showing 89% HCI limits
-  # geom_path(aes(y = lowHCI), linetype = "dashed") +
-  # geom_path(aes(y = highHCI), linetype = "dashed") +
+  # Add dotted lines showing 89% HCI limits
+  geom_path(aes(y = lowHCI), linetype = "dashed") +
+  geom_path(aes(y = highHCI), linetype = "dashed") +
   # x-axis: log10 scale, no buffer space
   scale_x_log10(
     name = TeX("Vertebrate host population density (ind/ha)"),
