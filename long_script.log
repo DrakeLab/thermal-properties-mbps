@@ -1,0 +1,36 @@
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.1     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.0
+✔ ggplot2   3.4.2     ✔ tibble    3.2.1
+✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+✔ purrr     1.0.1     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+Attaching package: ‘reshape2’
+
+The following object is masked from ‘package:tidyr’:
+
+    smiths
+
+
+Attaching package: ‘foreach’
+
+The following objects are masked from ‘package:purrr’:
+
+    accumulate, when
+
+Loading required package: iterators
+Loading required package: parallel
+Warning message:
+In rm(cluster) : object 'cluster' not found
+           used  (Mb) gc trigger  (Mb) max used  (Mb)
+Ncells   894452  47.8    1743381  93.2  1282431  68.5
+Vcells 29474240 224.9   47883189 365.4 39405589 300.7
+[1] 159000
+[1] TRUE
+Error in defaultCluster(cl) : object 'cl' not found
+Calls: stopCluster -> defaultCluster
+Execution halted
