@@ -96,12 +96,12 @@ R0_plot <- ggplot(mapping = aes(x = Temperature, group = KH)) +
     colour = "black",
     lwd = 1.5
   ) +
-  # # 89% HCI of R0 TPC curves
-  # geom_ribbon(
-  #   data = filter(data.R0_norm, sigmaH == 100),
-  #   aes(ymin = lowHCI_norm, ymax = highHCI_norm, fill = KH),
-  #   alpha = 0.1
-  # ) +
+  # 89% HCI of R0 TPC curves
+  geom_ribbon(
+    data = filter(data.R0_norm, sigmaH == 100),
+    aes(ymin = lowHCI_norm, ymax = highHCI_norm, fill = KH),
+    alpha = 0.1
+  ) +
   # x-axis:
   scale_x_continuous(
     name = "Temperature (C)",
