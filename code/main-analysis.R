@@ -65,7 +65,7 @@ thin_size <- 600 # full = 600, thin = 100
 plot_bool = TRUE
 source("code/trait-transform.R")
 
-write_rds(data.in.params, "data/clean/parameter_TPCs.rds", compress = "gz")
+# write_rds(data.in.params, "data/clean/parameter_TPCs.rds", compress = "gz")
 # write_rds(data.in.params, "data/clean/parameter_TPCs_thin.rds", compress = "gz")
 
 # remove work sets

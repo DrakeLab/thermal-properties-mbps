@@ -177,7 +177,7 @@ R0_plot <- ggplot(mapping = aes(x = Temperature, group = KH)) +
 # Plot
 R0_plot <- shift_legend(R0_plot)
 
-ggsave("figures/R0_TPCs_median.svg", R0_plot,
+ggsave("figures/results/R0_TPCs_median.svg", R0_plot,
        width = 16, height = 9)
 
 # Figure 5: Topt heatmap --------------------------------------------------
@@ -341,7 +341,7 @@ Toptalt_plots <- Toptalt_df %>%
 # Plot
 Toptalt_plots <- shift_legend(Toptalt_plots)
 
-ggsave("figures/Topt_median.svg", Toptalt_plots,
+ggsave("figures/results/Topt_median.svg", Toptalt_plots,
        width = 16, height = 9)
 
 
@@ -461,7 +461,7 @@ CTWidth_heat_plots <- CTwidth_df %>%
 # Plot
 CTWidth_heat_plots <- shift_legend(CTWidth_heat_plots)
 
-ggsave("figures/CTwidth_mean.svg", CTWidth_heat_plots,
+ggsave("figures/results/CTwidth_mean.svg", CTWidth_heat_plots,
        width = 16, height = 9)
 
 # *Supplementary Figures* ----
@@ -552,7 +552,7 @@ Topt_plot <- Topt_df %>%
 # Plot
 Topt_plot <- shift_legend(Topt_plot)
 
-ggsave("figures/Topt_KH_median.svg", Topt_plot,
+ggsave("figures/results/Topt_KH_median.svg", Topt_plot,
        width = 16, height = 9)
 
 # Figure S3: Topt as a function of sigmaH ---------------------------------
@@ -647,7 +647,7 @@ Topt_plot <- read_rds("results/Topt_vals.rds") %>%
 # Plot
 Topt_plot <- shift_legend(Topt_plot)
 
-ggsave("figures/Topt_sigmaH_mean.svg", Topt_plot,
+ggsave("figures/results/Topt_sigmaH_mean.svg", Topt_plot,
        width = 16, height = 9)
 
 # Figure S4: CTmin heatmap ------------------------------------------------
@@ -774,7 +774,7 @@ CTmin_heat_plots <- CTmin_df %>%
 # Plot
 CTmin_heat_plots <- shift_legend(CTmin_heat_plots)
 
-ggsave("figures/CTmin_mean.svg", CTmin_heat_plots,
+ggsave("figures/results/CTmin_mean.svg", CTmin_heat_plots,
        width = 16, height = 9)
 
 # Figure S5: CTmax heatmap ------------------------------------------------
@@ -835,7 +835,7 @@ CTmax_heat_plots <- CTmax_df %>%
   # x = biting tolerance (with a point at infinity),
   # y = vertebrate host population density,
   # color = CTmax
-  ggplot(aes(x = KH, y = sigmaH_proxy, z = median)) +
+  ggplot(aes(x = KH, y = sigmaH_proxy, z = mean)) +
   # CTmax for FINITE sigmaH:
   geom_contour_filled(
     data = filter(CTmax_df, sigmaH_proxy < 100)
@@ -894,7 +894,7 @@ CTmax_heat_plots <- CTmax_df %>%
 # Plot
 CTmax_heat_plots <- shift_legend(CTmax_heat_plots)
 
-ggsave("figures/CTmax_median.svg", CTmax_heat_plots,
+ggsave("figures/results/CTmax_mean.svg", CTmax_heat_plots,
        width = 16, height = 9)
 
 # Figure S6: CTmin/max as functions of KH ---------------------------------
@@ -976,6 +976,6 @@ Toptstdev_plots <- Toptalt_df %>%
 
 # Plot
 Toptstdev_plots <- shift_legend(Toptstdev_plots)
-ggsave("figures/Topt_stdev.svg", Toptstdev_plots,
+ggsave("figures/results/Topt_stdev.svg", Toptstdev_plots,
        width = 16, height = 9)
 

@@ -567,7 +567,7 @@ print(distinct_samples)
 focal_bool <- TRUE
 
 if (plot_bool) {
-  plot_samples <- data.in.transform %>% # read_rds("data/clean/TPC_param_samples.rds") %>%
+  plot_samples <- read_rds("data/clean/TPC_param_samples.rds") %>% #data.in.transform %>%
     filter(sample_num %in% 1:1000)
   
   if (focal_bool) {
@@ -630,7 +630,7 @@ if (plot_bool) {
     theme_minimal_grid(12)
   
   # Save figure
-  ggsave("figures/parm_hists.svg",
+  ggsave("figures/imputed_traits/parm_hists.svg",
          device = "svg",
          width = 16, height = 9, units = "in"
   )
@@ -688,7 +688,7 @@ if (plot_bool) {
     theme_minimal_grid(12)
   
   # Save figure
-  ggsave("figures/TPC_plot.svg",
+  ggsave("figures/imputed_traits/TPC_plot.svg", TPC_plot,
          device = "svg",
          width = 16, height = 9, units = "in"
   )

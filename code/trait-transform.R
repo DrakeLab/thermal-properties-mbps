@@ -190,6 +190,19 @@ if (plot_bool) {
 library(cowplot)
 library(svglite)  
   
+  # Helper function to place legends in empty facets of plot grids
+  # Code by: Artem Sokolov, found here: https://stackoverflow.com/questions/54438495/shift-legend-into-empty-facets-of-a-faceted-plot-in-ggplot2
+  shift_legend <- function(p) {
+    pnls <- cowplot::plot_to_gtable(p) %>%
+      gtable::gtable_filter("panel") %>%
+      with(setNames(grobs, layout$name)) %>%
+      purrr::keep(~ identical(.x, zeroGrob()))
+    
+    if (length(pnls) == 0) {return(p)} #stop("No empty facets in the plot")
+    
+    lemon::reposition_legend(p, "center", panel = names(pnls))
+  }
+  
 # For each mosquito species, trait, and sample, get a thermal response curve
 TPC_df <- data.in.params %>%  
   ungroup() %>% 
@@ -213,18 +226,20 @@ TPC_plot <- TPC_df %>%
   # means of TPC curves
   geom_path(aes(x = Temperature, y = mean, color = system_ID)) +
   # 89% HCI of TPC curves
-  geom_path(aes(x = Temperature, y = lowHCI, color = system_ID), lty = 2) +
-  geom_path(aes(x = Temperature, y = highHCI, color = system_ID), lty = 2) +
-  # geom_ribbon(
-  #   aes(x = Temperature, ymin = lowHCI, ymax = highHCI, fill = system_ID),
-  #   alpha = 0.1
-  # ) +
+  # geom_path(aes(x = Temperature, y = lowHCI, color = system_ID), lty = 2) +
+  # geom_path(aes(x = Temperature, y = highHCI, color = system_ID), lty = 2) +
+  geom_ribbon(
+    aes(x = Temperature, ymin = lowHCI, ymax = highHCI, fill = system_ID),
+    alpha = 0.1
+  ) +
   ylab("") +
   facet_wrap(~trait, scales = "free", ncol = 2) +
   theme_minimal_grid(12)
 
+TPC_plot <- shift_legend(TPC_plot)
+
 # Save figure
-ggsave("figures/param_TPC_plot.svg",
+ggsave("figures/imputed_traits/param_TPC_plot.svg",
        plot = TPC_plot,
        device = "svg",
        width = 16, height = 9, units = "in")
