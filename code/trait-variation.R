@@ -308,7 +308,7 @@ if (exists("R0.df") & dim(R0.df)[1] == proper_dim)
 rm(cluster)
 gc()
 # Start new cluster for doParallel
-cluster_size <- parallel::detectCores()
+cluster_size <- parallel::detectCores()-1
 
 my.cluster <- parallel::makeCluster(
   cluster_size, 
