@@ -112,6 +112,44 @@ Topt_heat_func <- function(in_df, system_name) {
     # collect()
 }
 
+# ALTERNATE Function: evaluate Topt ONLY WHEN R0>1 and its mean, median, and highest prob. intervals across
+#           samples
+Topt_heat_func_restricted <- function(in_df, system_name) {
+  out_df <- in_df %>%
+    expand_grid(filter(data.Vec, system_ID == system_name)) %>% 
+    data.table::data.table() %>%
+    mutate(RV = ifelse(is.infinite(sigmaH),
+                       sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
+                       sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>%
+    mutate(bV = ifelse(is.infinite(sigmaH),
+                       sigmaV, # Ross-Macdonald model
+                       sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>%
+    mutate(RH = ifelse(V0 == 0,
+                       0,
+                       bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>%
+    # Basic reproduction number
+    mutate(R0 = sqrt(RV*RH)) %>%
+    # Filter to maximum value of R0
+    group_by(system_ID, sample_num, sigmaH, KH) %>%
+    filter(R0 == max(R0)) %>%
+    filter(R0 > 1) %>% 
+    # Get temperature at which R0 is maximized
+    rename(Topt = Temperature) %>%
+    dplyr::select(system_ID, sample_num, Model, sigmaH, KH, Topt) %>%
+    ungroup() %>%
+    pivot_longer(cols = Topt, names_to = "variable", values_to = "value") %>%
+    group_by(system_ID, Model, sigmaH, KH, variable) %>%
+    # partition(cluster) %>%
+    summarise(
+      lowHCI = quantile(value, 0.055),
+      highHCI = quantile(value, 0.945),
+      mean = mean(value),
+      median = median(value),
+      .groups = "keep"
+    ) #%>%
+  # collect()
+}
+
 # Function: evaluate CTmin, CTmax, CTwidth and their means, medians, and highest
 #           prob. intervals across samples
 CT_heat_func <- function(in_df, system_name) {
@@ -360,6 +398,34 @@ if (exists("Topt.df") & dim(Topt.df)[1] == proper_dim)
   warning("No file written. Topt.df either empty or not complete.")
 }
 
+
+# Topt alternate: restrict to R0 > 1  -------------------------------------
+
+Topt_alt.df <- foreach(
+  system_name = iter_grid$system_ID,
+  index_KH = iter_grid$KH,
+  index_sigmaH = iter_grid$sigmaH,
+  .packages = "tidyverse",
+  .combine = rbind,
+  .options.snow = opts) %dopar% {
+    data.Host %>%
+      filter(sigmaH %in% index_sigmaH,
+             KH %in% index_KH) %>%
+      Topt_heat_func_restricted(., system_name)
+  }
+
+close(pb)
+
+
+# Save Topt data
+proper_dim <- (dim(iter_grid)[1])
+dim(Topt.df)[1] == proper_dim
+
+if (exists("Topt_alt.df") & dim(Topt_alt.df)[1] == proper_dim)
+{write_rds(Topt_alt.df, "results/Topt_alt_vals.rds", compress = "gz")
+} else {
+  warning("No file written. Topt.df either empty or not complete.")
+}
 
 ### CTmin, CTmax, and CTwidth -------------------------------------------
 

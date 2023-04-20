@@ -472,8 +472,19 @@ ggsave("figures/results/CTwidth_mean.svg", CTWidth_heat_plots,
 
 # Figure S2: Topt as a function of KH -------------------------------------
 Topt_df <- read_rds("results/Topt_vals.rds") %>% 
+  pivot_wider(id_cols = c("system_ID", "Model", "sigmaH", "KH"), 
+              names_from = variable,
+              values_from = c("mean", "median", "lowHCI", "highHCI"))  %>% 
+  right_join(read_rds("results/CT_vals.rds") %>% 
+               filter(variable == "CTwidth") %>% 
+               pivot_wider(id_cols = c("system_ID", "Model", "sigmaH", "KH"), 
+                           names_from = "variable",
+                           values_from = c("mean", "median", "lowHCI", "highHCI"))) %>% 
   filter(sigmaH %in% c(1, 10, 100, Inf)) %>% 
-  select(-c(variable)) %>%
+  filter(mean_CTwidth>0) %>% 
+  select(-c(mean_CTwidth, median_CTwidth, lowHCI_CTwidth, highHCI_CTwidth)) %>%
+  rename(mean = mean_Topt, median = median_Topt, lowHCI = lowHCI_Topt, 
+         highHCI = highHCI_Topt) %>% 
   # filter(KH > 0.01) %>%
   # filter(sigmaH %in% 10^seq(0, 2) | is.infinite(sigmaH)) %>%
   group_by(KH) %>%
@@ -506,8 +517,8 @@ Topt_plot <- Topt_df %>%
   scale_y_continuous(
     name = expression("Thermal optimum "(degree * C)),
     expand = c(0.05, 0.05),
-    limits = c(21,32), # mean: 21-31, median: 21-32
-    breaks = seq(21,32, by = 1)
+    # limits = c(21,32), # mean: 21-31, median: 21-32
+    # breaks = seq(21,32, by = 1)
   ) +
   # color:
   scale_colour_manual(
