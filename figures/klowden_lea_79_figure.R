@@ -27,6 +27,6 @@ defense_plot <- defense_df %>%
                stat = "identity",
                outlier.shape = NA) +
   scale_x_discrete(name = "") +
-  scale_y_continuous(name = "Percent of mosquitoes fed") +
+  scale_y_continuous(name = "Proportion of mosquitoes fed") +
   ggtitle("Across species, mosquito feeding success is significantly higher when hosts are restrained (Klowden & Lea 1979)") +
   theme_minimal_hgrid(16) 
