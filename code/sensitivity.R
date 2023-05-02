@@ -1,16 +1,20 @@
-## Title: Calculate Topt and critical thermal extrema #######################
+## Title: Sensitivty analysis of Topt, CTwidth, CTmin, and CTmax ###############
 ##
 ## Project: Global zoonoses - spillover of mosquito-borne pathogens
 ##
-## Purpose: Transform trait values, which we have fit TPCs to from data, in
-##          order to use in model analyses
+## Purpose: Determine which traits most underlie the variation in key outputs
 ##
-## Contents: 0) Set-up, load in necessary packages and data-sets
+## Contents: 0) Set up, load in necessary packages and data-sets
 ##           1) Define accessory functions
-##           2) Calculate R0 TPCs
-##           3) Calculate Topt
-##           4) Calculate Topt alternate: restrict to R0 > 1
-##           5) Calculate CTmin, CTmax, and CTwidth
+##           2) Set up data frames
+##           3) Local sensitivity: Topt
+##           4) Global sensitivity: Topt
+##           5) Local sensitivity: CTmin
+##           6) Global sensitivity: CTmin
+##           7) Local sensitivity: CTmax
+##           8) Global sensitivity: CTmax
+##           9) Local sensitivity: CTwidth
+##           10) Global sensitivity: CTwidth
 ##           *) Diagnostics and visualizations
 ##
 ##

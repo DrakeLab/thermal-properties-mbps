@@ -90,7 +90,7 @@ source("code/trait-variation.R")
 
 # data.in.analysis <- read_rds("data/clean/full_traitset.rds")
 
-# source("code/get-outputs.R")
+source("code/get-outputs.R")
 
 # 6) Illustrate model outputs (might be done separately) ------------------
 
@@ -99,3 +99,5 @@ source("code/create-figures.R")
 # 7) Conduct sensitivity analysis -----------------------------------------
 
 # sensitivity-analysis.R = conduct sensitivity analyses as described in Shocket 2018 and 2020
+
+source("code/sensitivity.R")

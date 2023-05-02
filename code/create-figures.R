@@ -38,6 +38,7 @@ library(svglite) #nec
 data.CT <- read_rds("results/CT_vals.rds")
 data.R0 <- read_rds("results/R0_vals.rds")
 data.Topt <- read_rds("results/Topt_vals.rds")
+data.Topt.restrict <- read_rds("results/Topt_alt_vals.rds")
 
 # Helper function to place legends in empty facets of plot grids
 # Code by: Artem Sokolov, found here: https://stackoverflow.com/questions/54438495/shift-legend-into-empty-facets-of-a-faceted-plot-in-ggplot2
