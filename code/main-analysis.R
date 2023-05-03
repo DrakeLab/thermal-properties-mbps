@@ -60,9 +60,10 @@ write_rds(data.in.transform, "data/clean/TPC_param_samples.rds")
 # Define temperature range of study
 Temps <- seq(10, 40, length.out = 601) # full: length.out = 601, thin: length.out = 301
 
-# Thin samples
-thin_size <- 600 # full = 600, thin = 100
-plot_bool = TRUE
+# Thin sample size
+thin_size <- 1000 # full = 600, thin = 100
+
+plot_bool = FALSE
 source("code/trait-transform.R")
 
 # write_rds(data.in.params, "data/clean/parameter_TPCs.rds", compress = "gz")
@@ -75,13 +76,14 @@ rm("combined_df", "Infection_df", "noInfection_df", "TPC_df", "missing_traits_df
 
 ## Set resolution for host trait variation
 # Host density vector: Number of values to include to consider for vertebrate host density
-KH_vec_length <- 300 # full = 200, thin = 20
+KH_vec_length <- 300 # full = 300, thin = 20
 
 # Biting tolerance vector: Number of values to consider for biting tolerance
-sigmaH_vec_length <- 300 # full = 200, thin = 20
+sigmaH_vec_length <- 300 # full = 300, thin = 20
 
-# data.in.params <- read_rds("data/clean/parameter_TPCs.rds")
-data.in.params <- read_rds("data/clean/parameter_TPCs_thin.rds") # !!! thin
+
+data.in.params <- read_rds("data/clean/parameter_TPCs.rds")
+# data.in.params <- read_rds("data/clean/parameter_TPCs_thin.rds") # !!! thin
 
 source("code/trait-variation.R")
 
@@ -89,6 +91,9 @@ source("code/trait-variation.R")
 # 5) Calculate model outputs ----------------------------------------------
 
 # data.in.analysis <- read_rds("data/clean/full_traitset.rds")
+
+# Thin sample size
+thin_size <- 600 # full = 600, thin = 100
 
 source("code/get-outputs.R")
 

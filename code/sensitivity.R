@@ -31,6 +31,18 @@ library(multidplyr)
 library(foreach)
 library(doParallel)
 library(progress)
+library(latex2exp) # nec
+library(viridis) # nec
+library(cowplot) # nec
+library(MetBrewer) #nec
+library(svglite) #nec
+
+# Set up parallel
+if (!exists("cluster")) {
+  cluster_size <- min(21, parallel::detectCores() - 2)
+  cluster <- new_cluster(cluster_size)
+  cluster_library(cluster, c("dplyr", "tidyr"))
+}
 
 eps <- .Machine$double.eps
 
@@ -245,75 +257,50 @@ mean.Vec <- data.Vec %>%
 # 3) Topt local, global sensitivity, uncertainty --------------------------
 
 ###* Density of Topt ----
-# Set up parallel
-if (!exists("cluster")) {
-  cluster_size <- min(21, parallel::detectCores() - 2)
-  cluster <- new_cluster(cluster_size)
-  cluster_library(cluster, c("dplyr", "tidyr"))
-}
 
-data.R0 <- data.Host %>%
+data.Topt <- data.Host %>%
   filter(sigmaH %in% c(100, Inf)) %>%
-  # filter(KH == 10)
-  filter(KH %in% 10^seq(-2,5))
+  filter(KH %in% 10^seq(-2,4))
 
-# Slice host trait data
-sigmaH_slices <- slice(unique(data.R0$sigmaH), 2)
-KH_slices <- slice(unique(data.R0$KH), cluster_size)
+Topt.density.df <- expand_grid(data.Topt, data.Vec) %>% 
+  data.table::data.table() %>%
+  mutate(RV = ifelse(is.infinite(sigmaH),
+                     sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
+                     sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>%
+  mutate(bV = ifelse(is.infinite(sigmaH),
+                     sigmaV, # Ross-Macdonald model
+                     sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>%
+  mutate(RH = ifelse(V0 == 0,
+                     0,
+                     bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>%
+  # Basic reproduction number
+  mutate(R0 = sqrt(RV*RH)) %>%
+  # Filter to maximum value of R0
+  filter(R0>0) %>% 
+  select(system_ID, sample_num, Model, sigmaH, KH, Temperature, R0) %>% 
+  group_by(system_ID, sample_num, sigmaH, KH) %>%
+  filter(R0 == max(R0)) %>%
+  distinct() %>% 
+  # Get temperature at which R0 is maximized
+  rename(Topt = Temperature) %>%
+  dplyr::select(system_ID, sample_num, Model, sigmaH, KH, Topt, R0) #%>%
+  #distinct() 
 
-# Initialize R0 data frame
-Topt.density.df <- init.df
+Topt.density.df <- full_join(Topt.density.df,
+                           expand_grid(data.CT, data.Vec) %>% 
+                             select(c(Model, system_ID, sample_num, sigmaH,KH)) %>% 
+                             distinct())
 
-gc()
-
-# Collect R0 TPC data across systems and host trait values
-for (system_name in unique(data.Vec$system_ID)) {
-  print(paste0("Topt density: ", system_name))
-  KHslice_num <- 1
-  for(index_KH in KH_slices) {
-    print(paste0("KH slice number ", KHslice_num, " out of ", length(KH_slices)))
-    sigmaHslice_num <- 1
-    for (index_sigmaH in sigmaH_slices) {
-      print(paste0("sigmaH slice number ", sigmaHslice_num, " out of ", length(sigmaH_slices)))
-      Topt.density.df <- data.R0 %>%
-        filter(sigmaH %in% index_sigmaH,
-               KH %in% index_KH) %>%
-        expand_grid(filter(data.Vec, system_ID == system_name)) %>% 
-        data.table::data.table() %>%
-        mutate(RV = ifelse(is.infinite(sigmaH),
-                           sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
-                           sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>%
-        mutate(bV = ifelse(is.infinite(sigmaH),
-                           sigmaV, # Ross-Macdonald model
-                           sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>%
-        mutate(RH = ifelse(V0 == 0,
-                           0,
-                           bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>%
-        # Basic reproduction number
-        mutate(R0 = sqrt(RV*RH)) %>%
-        # Filter to maximum value of R0
-        group_by(system_ID, sample_num, sigmaH, KH) %>%
-        filter(R0 == max(R0)) %>%
-        # Get temperature at which R0 is maximized
-        rename(Topt = Temperature) %>%
-        dplyr::select(system_ID, sample_num, Model, sigmaH, KH, Topt) %>% 
-        rbind(Topt.density.df)
-      sigmaHslice_num <- sigmaHslice_num  + 1
-    }
-    KHslice_num <- KHslice_num +1
-    gc()
-  }
-}
 
 plot.Topt.density <- Topt.density.df %>% 
-  filter(sigmaH %in% c(100)) %>%
-  # filter(KH == 1E-1) %>%
+  # filter(sigmaH %in% Inf) %>%
+  # filter(KH < 1E3) %>%
   ggplot(aes(x = Topt)) +
-  geom_density(aes(color = as.factor(KH)),
-               lwd = 1) +
-  geom_density(data = filter(Topt.density.df, sigmaH == Inf),
-               linetype = 1,
-               lwd = 2) +
+  geom_density(aes(color = as.factor(KH), linetype = as.factor(sigmaH)),
+               lwd = 1, adjust = 1) +
+  # geom_density(data = filter(Topt.density.df, sigmaH == Inf),
+  #              linetype = 1,
+  #              lwd = 2) +
   # color: scaled log10, color-blind friendly
   scale_color_viridis_d(
     name = "Vertebrate host population\ndensity (ind/ha)",
@@ -324,183 +311,63 @@ plot.Topt.density <- Topt.density.df %>%
   facet_wrap(~system_ID, scales = "free") +
   theme_minimal_grid()
 
+plot.Topt.density
 
 ###* Global sensitivity (following Johnson 2015) ----
 # 
 
-# For each parameter,
-# 1) Fix that parameter to its mean value
-# 2) Calculate _Topt_ across the variation in all the other parameters
-# 3) 
-
-# Set up new cluster
-# Close old cluster connections
-rm(cluster)
-gc()
-# Start new cluster for doParallel
-cluster_size <- parallel::detectCores()-1
-
-my.cluster <- parallel::makeCluster(
-  cluster_size, 
-  type = "PSOCK"
-)
-# Register cluster for doParallel
-doSNOW::registerDoSNOW(cl = my.cluster)
-
-# Set up iteration grid
-iter_grid <- expand_grid(system_ID = unique(data.Vec$system_ID),
-                         tibble(KH = data.Host$KH,
-                                sigmaH = data.Host$sigmaH))
-# Set up progress bar
-iterations <- dim(iter_grid)[1]
-
-pb <- progress_bar$new(
-  format = ":spin :system progress = :percent [:bar] :elapsed | eta: :eta",
-  total = iterations,
-  width = 120)                                                                                                         
-
-progress <- function(n){
-  pb$tick(tokens = list(system = iter_grid$system_ID[n]))
-}
-opts <- list(progress = progress)
-
-Topt.df <- foreach(
-  system_name = iter_grid$system_ID,
-  index_KH = iter_grid$KH,
-  index_sigmaH = iter_grid$sigmaH,
-  .packages = "tidyverse",
-  .combine = rbind,
-  .options.snow = opts) %dopar% {
-    data.Host %>%
-      filter(sigmaH %in% index_sigmaH,
-             KH %in% index_KH) %>%
-      Topt_heat_func(., system_name)
-  }
-
-close(pb)
-
 
 # 4) CTmin local, global sensitivity, uncertainty -------------------------
 
-###* Density of CTmin ----
-
-data.R0 <- data.Host %>%
-  filter(sigmaH %in% c(100, Inf)) %>%
-  filter(KH %in% 10^seq(-2,4))
-
-# Slice host trait data
-sigmaH_slices <- slice(unique(data.R0$sigmaH), 2)
-KH_slices <- slice(unique(data.R0$KH), cluster_size)
+###* Density of CTmin,max,width ----
 
 # Initialize R0 data frame
 CT.density.df <- init.df
 
 gc()
 
-# Collect R0 TPC data across systems and host trait values
-for (system_name in unique(data.Vec$system_ID)) {
-  print(paste0("Topt density: ", system_name))
-  KHslice_num <- 1
-  for(index_KH in KH_slices) {
-    print(paste0("KH slice number ", KHslice_num, " out of ", length(KH_slices)))
-    sigmaHslice_num <- 1
-    for (index_sigmaH in sigmaH_slices) {
-      print(paste0("sigmaH slice number ", sigmaHslice_num, " out of ", length(sigmaH_slices)))
-      CT.density.df <- data.R0 %>%
-        filter(sigmaH %in% index_sigmaH,
-               KH %in% index_KH) %>%
-        expand_grid(filter(data.Vec, system_ID == system_name)) %>% 
-        data.table::data.table() %>%
-        mutate(RV = ifelse(is.infinite(sigmaH),
-                           sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
-                           sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>%
-        mutate(bV = ifelse(is.infinite(sigmaH),
-                           sigmaV, # Ross-Macdonald model
-                           sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>%
-        mutate(RH = ifelse(V0 == 0,
-                           0,
-                           bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>%
-        # Basic reproduction number
-        mutate(R0 = sqrt(RV*RH)) %>%
-        # Filter to maximum value of R0
-        group_by(system_ID, sample_num, sigmaH, KH) %>%
-        filter(R0 > 1) %>%
-        # Get lowest temperature at which R0 exceeds one
-        mutate(CTmin = min(Temperature)) %>%
-        # Get highest temperature at which R0 exceeds one
-        mutate(CTmax = max(Temperature)) %>%
-        # Get width of critical thermal interval
-        mutate(CTwidth = ifelse(is.finite(CTmax), 
-                                CTmax - CTmin,
-                                0)) %>%
-        dplyr::select(system_ID, sample_num, Model, sigmaH, KH, CTmin, CTmax, CTwidth) %>% 
-        rbind(CT.density.df)
-      sigmaHslice_num <- sigmaHslice_num  + 1
-    }
-    KHslice_num <- KHslice_num +1
-    gc()
-  }
-}
+data.CT <- data.Host %>%
+  filter(sigmaH %in% c(100, Inf)) %>%
+  filter(KH %in% 10^seq(-2,4))
 
-plot.CTmin.density <- CT.density.df %>% 
-  filter(sigmaH %in% c(100)) %>%
-  # filter(KH == 1E-1) %>%
-  ggplot(aes(x = CTmin)) +
-  geom_density(aes(color = as.factor(KH)),
-               lwd = 1) +
-  geom_density(data = filter(CT.density.df, sigmaH == Inf),
-               linetype = 1,
-               lwd = 2) +
-  # color: scaled log10, color-blind friendly
-  scale_color_viridis_d(
-    name = "Vertebrate host population\ndensity (ind/ha)",
-    breaks = 10^seq(-2, 4),
-    labels = unname(c(0.01, 0.1, 1, 10, 100, TeX("$10^3$"), TeX("$10^4$"))),
-    option = "plasma"
-  ) +
-  facet_wrap(~system_ID, scales = "free") +
-  theme_minimal_grid() +
-  ggtitle("Density of CTmin")
+# Slice host trait data
+sigmaH_slices <- slice(unique(data.CT$sigmaH), 2)
+KH_slices <- slice(unique(data.CT$KH), cluster_size)
 
-plot.CTmax.density <- CT.density.df %>% 
-  filter(sigmaH %in% c(100)) %>%
-  # filter(KH == 1E-1) %>%
-  ggplot(aes(x = CTmax)) +
-  geom_density(aes(color = as.factor(KH)),
-               lwd = 1) +
-  geom_density(data = filter(CT.density.df, sigmaH == Inf),
-               linetype = 1,
-               lwd = 2) +
-  # color: scaled log10, color-blind friendly
-  scale_color_viridis_d(
-    name = "Vertebrate host population\ndensity (ind/ha)",
-    breaks = 10^seq(-2, 4),
-    labels = unname(c(0.01, 0.1, 1, 10, 100, TeX("$10^3$"), TeX("$10^4$"))),
-    option = "plasma"
-  ) +
-  facet_wrap(~system_ID, scales = "free") +
-  theme_minimal_grid() +
-  ggtitle("Density of CTmax")
+CT.density.df <- expand_grid(data.CT, data.Vec) %>% 
+  data.table::data.table() %>%
+  mutate(RV = ifelse(is.infinite(sigmaH),
+                     sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
+                     sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>%
+  mutate(bV = ifelse(is.infinite(sigmaH),
+                     sigmaV, # Ross-Macdonald model
+                     sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>%
+  mutate(RH = ifelse(V0 == 0,
+                     0,
+                     bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>%
+  # Basic reproduction number
+  mutate(R0 = sqrt(RV*RH)) %>%
+  # Filter to maximum value of R0
+  group_by(system_ID, sample_num, sigmaH, KH) %>%
+  filter(R0 > 1) %>%
+  # Get lowest temperature at which R0 exceeds one
+  mutate(CTmin = min(Temperature)) %>%
+  # Get highest temperature at which R0 exceeds one
+  mutate(CTmax = max(Temperature)) %>%
+  # Get width of critical thermal interval
+  mutate(CTwidth = CTmax - CTmin) %>%
+  dplyr::select(system_ID, sample_num, Model, sigmaH, KH, CTmin, CTmax, CTwidth) %>% 
+  distinct()
 
-plot.CTwidth.density <- CT.density.df %>% 
-  filter(sigmaH %in% c(100)) %>%
-  # filter(KH == 1E-1) %>%
-  ggplot(aes(x = CTwidth)) +
-  geom_density(aes(color = as.factor(KH)),
-               lwd = 1) +
-  geom_density(data = filter(CT.density.df, sigmaH == Inf),
-               linetype = 1,
-               lwd = 2) +
-  # color: scaled log10, color-blind friendly
-  scale_color_viridis_d(
-    name = "Vertebrate host population\ndensity (ind/ha)",
-    breaks = 10^seq(-2, 4),
-    labels = unname(c(0.01, 0.1, 1, 10, 100, TeX("$10^3$"), TeX("$10^4$"))),
-    option = "plasma"
-  ) +
-  facet_wrap(~system_ID, scales = "free") +
-  theme_minimal_grid() +
-  ggtitle("Density of CTwidth")
+# Add back values removed from filtering R0>1 above
+CT.density.df <- full_join(CT.density.df,
+                  expand_grid(data.CT, data.Vec) %>% 
+                    select(c(Model, system_ID, sample_num, sigmaH,KH)) %>% 
+                    distinct()) %>% 
+  replace_na(list(CTmin = Inf,
+             CTmax = -Inf,
+             CTwidth = 0))
+
 
 # 5) CTmax local, global sensitivity, uncertainty -------------------------
 
@@ -510,3 +377,109 @@ plot.CTwidth.density <- CT.density.df %>%
 
 
 # *) Diagnostics & visualizations -----------------------------------------
+
+
+###* Density plots of CTmin, Topt, CTmax ----
+
+# Combine data frames
+all.density.df <- right_join(Topt.density.df, CT.density.df) %>% 
+  select(-CTwidth) %>% 
+  pivot_longer(cols = c(CTmin, Topt, CTmax), names_to = "variable", values_to = "value") %>% 
+  mutate(system_ID = case_when(
+    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "An. gamb. / P. falciparum",
+    system_ID == "Aedes aegypti / DENV" ~ "Ae. aegypti / DENV",
+    system_ID == "Aedes albopictus / DENV" ~ "Ae. albopictus / DENV",
+    system_ID == "Aedes aegypti / ZIKV" ~ "Ae. aegypti / ZIKV",
+    system_ID == "Culex quinquefasciatus / WNV" ~ "Cx. quin. / WNV"
+  )) %>% 
+  mutate(variable = case_when(
+    variable == "CTmin" ~ "Critical thermal minimum",
+    variable == "Topt" ~ "Thermal optimum",
+    variable == "CTmax" ~ "Critical thermal maximum"
+  ))
+
+all.density.df$variable <- factor(all.density.df$variable, 
+                                  levels = c("Critical thermal minimum", "Thermal optimum","Critical thermal maximum"))
+
+# Dynamic: sigmaH = 100
+plot.densities_dynamic <- all.density.df  %>% 
+  filter(sigmaH %in% 100) %>%
+  # filter(KH < 1E3) %>%
+  ggplot(aes(x = value)) +
+  geom_density(aes(color = as.factor(KH)),
+               lwd = 1.5,
+               adjust = 2) +
+  scale_color_viridis_d(
+    name = "Vertebrate host population\ndensity (ind/ha)",
+    breaks = 10^seq(-2, 4),
+    labels = unname(c(0.01, 0.1, 1, 10, 100, TeX("$10^3$"), TeX("$10^4$"))),
+    limits = 10^seq(-2, 4),
+    option = "plasma"
+  ) +
+  facet_grid(rows = vars(system_ID), cols = vars(variable), scales = "free") +
+  theme_minimal_grid() 
+
+plot.densities_dynamic
+
+ggsave("figures/results/thermal_densities_dynamic.svg",
+       plot = plot.densities_dynamic,
+       width = 16, height = 9)
+# Static: sigmaH = Inf
+plot.densities_RM <- all.density.df  %>% 
+  filter(sigmaH %in% Inf) %>%
+  # filter(KH < 1E3) %>%
+  ggplot(aes(x = value)) +
+  geom_density(aes(color = as.factor(KH)),
+               lwd = 1.5,
+               adjust = 2) +
+  scale_color_viridis_d(
+    name = "Vertebrate host population\ndensity (ind/ha)",
+    breaks = 10^seq(-2, 4),
+    labels = unname(c(0.01, 0.1, 1, 10, 100, TeX("$10^3$"), TeX("$10^4$"))),
+    limits = 10^seq(-2, 4),
+    option = "plasma"
+  ) +
+  facet_grid(rows = vars(system_ID), cols = vars(variable), scales = "free") +
+  theme_minimal_grid() 
+
+plot.densities_RM
+
+ggsave("figures/results/thermal_densities_RM.svg",
+       plot = plot.densities_RM,
+       width = 16, height = 9)
+
+###* Density plot of CTwidth ----
+plot.CTwidth.density <- CT.density.df %>% 
+filter(CTwidth > 0) %>% 
+  ggplot(aes(x = CTwidth)) +
+  geom_density(aes(color = as.factor(KH), linetype = as.factor(sigmaH)),
+               lwd = 1, adjust = 1) +
+  # geom_density(data = filter(Topt.density.df, sigmaH == Inf),
+  #              linetype = 1,
+  #              lwd = 2) +
+  # color: scaled log10, color-blind friendly
+  scale_color_viridis_d(
+    name = "Vertebrate host population\ndensity (ind/ha)",
+    breaks = 10^seq(-2, 5),
+    labels = unname(c(0.01, 0.1, 1, 10, 100, TeX("$10^3$"), TeX("$10^4$"), TeX("$10^5$"))),
+    option = "plasma"
+  ) +
+  facet_wrap(~system_ID, scales = "free", ncol = 1) +
+  theme_minimal_grid()
+
+plot.CTwidth.density
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

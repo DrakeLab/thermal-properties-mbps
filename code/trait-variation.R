@@ -83,12 +83,8 @@ data.Host <- expand_grid(
 # (it could alternately be used to fix the maximum adult mosquito density across species)
 larval_mosquito_carrying_capacity <- 300
 
-# thin_size <- 300
-# num_samples <- length(unique(data.in.params$sample_num))
-# sample_inds <- sample(unique(data.in.params$sample_num), thin_size, replace = FALSE)
 
 data.Vec <- data.in.params %>%
-  # filter(sample_num %in% sample_inds) %>%
   mutate(KL = larval_mosquito_carrying_capacity) %>%
   mutate(V0 = ifelse( sigmaV_f * deltaL < (1 / lf),
                       0,

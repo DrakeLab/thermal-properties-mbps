@@ -39,6 +39,14 @@ init.df <- tibble(system_ID = c(), Temperature = c(), Model = c(),
                   sigmaH = c(), KH = c(), variable = c(),
                   lowHCI = c(), highHCI = c(), mean = c(), median = c())
 
+# Thin out the vector data set as necessary
+
+samples <- unique(data.Vec$sample_num)
+num_samples <- length(samples)
+sample_inds <- sample(samples, min(num_samples, thin_size), replace = FALSE)
+
+data.Vec <- filter(data.Vec, sample_num %in% sample_inds)
+
 
 # 1) Define accessory functions -------------------------------------------
 
