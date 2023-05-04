@@ -47,3 +47,6 @@ doc/manuscript-figures_files
 
 # TeX files
 *.tex
+
+# Large data files
+data/clean/parameter_TPCs.rds
