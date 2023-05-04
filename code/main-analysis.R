@@ -50,7 +50,7 @@ plot_bool <- TRUE
 # # Run this to generate samples of trait TPC parameters from informed posterior distributions
 source("code/get-thermal-trait-priors.R")
 
-write_rds(data.in.transform, "data/clean/TPC_param_samples.rds")
+# write_rds(data.in.transform, "data/clean/TPC_param_samples.rds")
 
 # # Run this to load pre-processed data set
 # data.in.transform <- read_rds("data/clean/TPC_param_samples.rds")
