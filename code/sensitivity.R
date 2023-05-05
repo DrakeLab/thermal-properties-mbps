@@ -690,7 +690,7 @@ temp_vars <- data.Vec %>%
   colnames() %>% c("muV")
 
 # Initialize data frame
-R0.HPD <- tibble(system_ID = c(), Temperature = c(), focal_var = c(),
+Topt.HPD <- tibble(system_ID = c(), Temperature = c(), focal_var = c(),
                  sigmaH = c(), KH = c(), 
                  HPD_width = c(), full_HPD_width = c(), rel_HPD_width = c())
 
@@ -710,7 +710,7 @@ for (var_name in temp_vars) {
                        KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL)))) %>%
     select(-lf)
   # b) Get posterior samples of R0 (as a function of temperature)
-  R0.HPD <- expand_grid(data.R0HPD, data.HPD.Vec) %>%
+  Topt.HPD <- expand_grid(data.ToptHPD, data.HPD.Vec) %>%
     mutate(lf = 1/muV) %>% 
     data.table::data.table() %>%
     mutate(RV = ifelse(is.infinite(sigmaH),
@@ -724,36 +724,38 @@ for (var_name in temp_vars) {
                        bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>%
     # Basic reproduction number
     mutate(R0 = sqrt(RV*RH)) %>%
+    # Filter to maximum value of R0
+    filter(R0>0) %>% 
     select(system_ID, sample_num, sigmaH, KH, Temperature, R0) %>% 
-    # c) Calculate the 95% HPD at each temperature
-    group_by(system_ID, sigmaH, KH, Temperature) %>% 
+    group_by(system_ID, sample_num, sigmaH, KH) %>%
+    filter(R0 == max(R0)) %>%
+    distinct() %>% 
+    # Get temperature at which R0 is maximized
+    rename(Topt = Temperature) %>% 
+    select(system_ID, sigmaH, KH, sample_num, Topt) %>% 
+    group_by(system_ID, sigmaH, KH) %>% 
     summarise(
-      HPD_low = hdi(R0, credMass = 0.95)[1],
-      HPD_high = hdi(R0, credMass = 0.95)[2],
+      HPD_low = hdi(Topt, credMass = 0.95)[1],
+      HPD_high = hdi(Topt, credMass = 0.95)[2],
       HPD_width = max(eps, HPD_high-HPD_low),
       .groups = "keep"
     ) %>% 
-    select(system_ID, sigmaH, KH, Temperature, HPD_width) %>% 
-    right_join(full.R0.HPD %>% 
+    select(system_ID, sigmaH, KH, HPD_width) %>% 
+    right_join(full.Topt.HPD %>% 
                  select(-c(HPD_low, HPD_high)) %>% 
                  rename(full_HPD_width = HPD_width)) %>% 
     mutate(focal_var = var_name) %>% 
-    group_by(system_ID, sigmaH, KH, focal_var, Temperature) %>% 
+    group_by(system_ID, sigmaH, KH, focal_var) %>% 
     # d) Normalize HPD width by the full HPD width when all parameters are allowed to vary
     mutate(rel_HPD_width = ifelse(full_HPD_width %in% c(0,eps), 0, HPD_width / full_HPD_width)) %>% 
-    rbind(R0.HPD)
+    rbind(Topt.HPD)
 }
 
-# Save R0 relative highest posterior density data
-write_rds(R0.HPD, "results/R0_HPD_sens.rds")
-# R0.HPD <- read_rds("results/R0_HPD_sens.rds")
+# Save Topt relative highest posterior density data
+write_rds(Topt.HPD, "results/Topt_HPD_sens.rds")
+# Topt.HPD <- read_rds("results/Topt_HPD_sens.rds")
 
-## Plot R0 uncertainty 
-plot_Temp_range <- R0.HPD %>% ungroup() %>% 
-  filter(HPD_width > eps) %>% 
-  filter(KH == KH_select) %>% 
-  select(Temperature) %>%  range()
-
+## Plot Topt uncertainty 
 var_name_table <- list(
   betaV = c(TeX("$\\beta_V$")),
   deltaL = c(TeX("$\\delta_L$")),
@@ -769,8 +771,7 @@ appender_sigmaH <- function(string) {
 appender_KH <- function(string) {
   unname(TeX(paste("$K_H = $", string)))}
 
-
-R0.uncertainty.plot <- R0.HPD %>% 
+Topt.uncertainty.plot <- Topt.HPD %>% 
   ungroup() %>% 
   # filter(focal_var %in% c("sigmaV_f")) %>%
   mutate(system_ID = case_when(
@@ -781,10 +782,10 @@ R0.uncertainty.plot <- R0.HPD %>%
     system_ID == "Culex quinquefasciatus / WNV" ~ "Cx. quin. / WNV"
   )) %>% 
   arrange(system_ID, sigmaH) %>% 
-  filter(KH %in% c(1, 100)) %>%
+  # filter(KH %in% c(1, 100)) %>%
   filter(rel_HPD_width < 1.01) %>%
   # arrange(system_ID, sigmaH, focal_var, Temperature) %>%
-  ggplot(aes(x = Temperature, y = rel_HPD_width, color = focal_var)) +
+  ggplot(aes(x = KH, y = rel_HPD_width, color = focal_var)) +
   geom_path(linewidth = 1) +
   scale_color_discrete(
     name = "Focal parameter",
@@ -794,22 +795,20 @@ R0.uncertainty.plot <- R0.HPD %>%
                            "$\\sigma_v f$")))
   ) +
   scale_x_continuous(
-    limits = plot_Temp_range
+    trans = 'log10'
   ) +
   scale_y_continuous(
     name = "Relative HPD width",
-    breaks = seq(0, 1, by = 0.2)
+    breaks = seq(0, 2, by = 0.2)
   ) +
-  facet_grid(rows = vars(system_ID), cols = vars(KH, sigmaH), 
-             labeller = labeller(sigmaH = as_labeller(appender_sigmaH, default = label_parsed),
-                                 KH = as_labeller(appender_KH, default = label_parsed)),
+  facet_grid(rows = vars(system_ID), 
              scales = "free") +
-  ggtitle("Uncertainty analysis of R0") +
+  ggtitle("Uncertainty analysis of Topt") +
   theme_minimal_grid(12)
-R0.uncertainty.plot
+Topt.uncertainty.plot
 
-ggsave("figures/results/R0_uncertainty.svg", 
-       plot = R0.uncertainty.plot,
+ggsave("figures/results/Topt_uncertainty.svg", 
+       plot = Topt.uncertainty.plot,
        width = 16, height = 9)
 
 
