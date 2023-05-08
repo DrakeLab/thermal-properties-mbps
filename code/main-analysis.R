@@ -82,7 +82,7 @@ KH_vec_length <- 300 # full = 300, thin = 20
 sigmaH_vec_length <- 300 # full = 300, thin = 20
 
 
-data.in.params <- read_rds("data/clean/parameter_TPCs.rds")
+# data.in.params <- read_rds("data/clean/parameter_TPCs.rds")
 # data.in.params <- read_rds("data/clean/parameter_TPCs_thin.rds") # !!! thin
 
 source("code/trait-variation.R")
