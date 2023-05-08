@@ -829,8 +829,9 @@ sigmaH_vec <- c(50, Inf)
 KH_vec <- 10^seq(-2,5)
 
 data.CTHPD <- dplyr::filter(data.Host, 
-                            sigmaH %in% sigmaH_vec) %>% 
-  dplyr::filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 11)])
+                            sigmaH %in% sigmaH_vec,
+                            KH < 1e3) #%>% 
+  #dplyr::filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 11)])
 
 full.CT.HPD <- tibble(system_ID = c(), Temperature = c(), Model = c(),
                       sigmaH = c(), KH = c(), variable = c(),
