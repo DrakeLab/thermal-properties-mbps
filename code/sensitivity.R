@@ -937,14 +937,14 @@ write_rds(full.CT.HPD, "results/full_CT_HPD.rds")
 
 # Diagnostic plot
 test.plot <- full.CT.HPD %>%
-  filter(variable == "CTmin") %>% 
+  # filter(variable == "CTmin") %>% 
   # dplyr::filter(KH == 1e-2) %>%
-  ggplot(aes(x = KH, y = HPD_width)) +
+  ggplot(aes(x = KH, y = HPD_width, color = as.factor(sigmaH))) +
   geom_path() +
   scale_x_continuous(
     trans = 'log10'
   ) +
-  facet_grid(rows = vars(system_ID), cols = vars(sigmaH), scales = "free")
+  facet_grid(rows = vars(system_ID), cols = vars(variable), scales = "free")
 test.plot
 ggsave("figures/results/test_plot.svg", 
        plot = test.plot,
