@@ -76,6 +76,7 @@ data.Host <- expand_grid(
 ) %>% as.data.frame() %>%
   mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model"))
 
+
 # 2) Set non-TPC *mosquito* parameters ------------------------------------
 
 ## Carrying capacity for larval mosquitoes
@@ -89,6 +90,7 @@ data.Vec <- data.in.params %>%
   mutate(V0 = ifelse( sigmaV_f * deltaL < (1 / lf),
                       0,
                       KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL))))
+
 
 # Remove the parameter data frame to free up memory
 rm(data.in.params)

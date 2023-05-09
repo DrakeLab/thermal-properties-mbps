@@ -61,16 +61,13 @@ source("code/get-thermal-trait-priors.R")
 Temps <- seq(10, 40, length.out = 601) # full: length.out = 601, thin: length.out = 301
 
 # Thin sample size
-thin_size <- 1000 # full = 600, thin = 100
+thin_size <- 1000 # full = 1000, thin = 100
 
 plot_bool = FALSE
 source("code/trait-transform.R")
 
 # write_rds(data.in.params, "data/clean/parameter_TPCs.rds", compress = "gz")
 # write_rds(data.in.params, "data/clean/parameter_TPCs_thin.rds", compress = "gz")
-
-# remove work sets
-rm("combined_df", "Infection_df", "noInfection_df", "TPC_df", "missing_traits_df")#, "data.in.transform")
 
 # 4) Build data set incorporating all axes of variation -------------------
 
@@ -91,6 +88,9 @@ source("code/trait-variation.R")
 # 5) Calculate model outputs ----------------------------------------------
 
 # data.in.analysis <- read_rds("data/clean/full_traitset.rds")
+
+data.Vec <- read_rds("data/clean/data_vector.rds")
+data.Host <- read_rds("data/clean/data_host.rds")
 
 # Thin sample size
 thin_size <- 600 # full = 600, thin = 100

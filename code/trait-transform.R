@@ -244,3 +244,6 @@ ggsave("figures/imputed_traits/param_TPC_plot.svg",
        device = "svg",
        width = 16, height = 9, units = "in")
 }
+
+# remove work sets
+rm("combined_df", "Infection_df", "noInfection_df", "TPC_df", "data.in.transform")
