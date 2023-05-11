@@ -588,7 +588,7 @@ data.R0_norm <- data.R0 %>%
   mutate(median_norm = median / max(median)) %>%
   # mutate(highHCI_norm = highHCI / max(median)) %>% 
   # mutate(lowHCI_norm = lowHCI / max(median)) %>% 
-  arrange(system_ID, sigmaH, KH, Temperature, mean_norm)
+  arrange(system_ID, sigmaH, KH, Temperature, median_norm)
 
 R0_plot <- ggplot(mapping = aes(x = Temperature, group = KH)) +
   # path of mean, normalized R0 as a function of temperature (finite sigmaH):
