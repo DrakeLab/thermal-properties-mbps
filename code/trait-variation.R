@@ -43,8 +43,8 @@ lambdaH_baseline <- .005
 muH_baseline <- 1 / (365 * 20)
 
 # Host maximum biting tolerance (mosquitoes bites per day)
-sigmaH_vec <- 10^seq(-0.25,2.25, length.out = sigmaH_vec_length - 6) %>%
-  c(1, 10, 20, 50, 100, Inf) %>%
+sigmaH_vec <- 10^seq(-0.25, 3.25, length.out = sigmaH_vec_length - 7) %>%
+  c(1, 10, 20, 50, 100, 1000, Inf) %>%
   unique() %>% sort()
 sigmaH_baseline <- 100
 

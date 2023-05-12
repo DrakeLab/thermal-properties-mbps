@@ -89,9 +89,6 @@ source("code/trait-variation.R")
 
 # data.in.analysis <- read_rds("data/clean/full_traitset.rds")
 
-data.Vec <- read_rds("data/clean/data_vector.rds")
-data.Host <- read_rds("data/clean/data_host.rds")
-
 # Thin sample size
 thin_size <- 600 # full = 600, thin = 100
 
