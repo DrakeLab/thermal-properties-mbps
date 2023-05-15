@@ -704,7 +704,7 @@ R0_plot <- shift_legend(R0_plot)
 
 ```
 
-```{r fig-5_Topt, dev = c('pdf','svg', 'png'), dev="cairo_pdf", message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt} The thermal optimum for transmission, $T_{opt}$, may be sensitive to vertebrate host population density and biting tolerance.'}
+```{r fig-5_Topt, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt} The thermal optimum for transmission, $T_{opt}$, may be sensitive to vertebrate host population density and biting tolerance.'}
 # Shows how the transmission thermal optimum depends on vertebrate host availability (density and biting tolerance) in each of the systems we consider.
 
 #   x    = biting tolerance (with a point at infinity)
@@ -833,7 +833,7 @@ Toptalt_plots <- shift_legend(Toptalt_plots)
 
 ```
 
-```{r fig-6_CT_Width, dev = c('pdf','svg', 'png'), dev="cairo_pdf", message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CT_Width} The parasite population thermal tolerance range, the range of temperatures at which parasite transmission is expected to persist, is widest when biting tolerance is high and vertebrate host population density is low.'}
+```{r fig-6_CT_Width, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CT_Width} The parasite population thermal tolerance range, the range of temperatures at which parasite transmission is expected to persist, is widest when biting tolerance is high and vertebrate host population density is low.'}
 # Shows how the parasite thermal niche (temperatures between CT_min and CT_max) 
 # depends on vertebrate host availability (density and biting tolerance) in each
 # of the focal systems.
