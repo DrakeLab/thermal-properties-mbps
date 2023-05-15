@@ -688,18 +688,18 @@ for (var_name in temp_vars) {
 }
 
 # Save Topt relative highest posterior density data
-write_rds(Topt.HPD, "results/Topt_HPD_sens.rds")
-# Topt.HPD <- read_rds("results/Topt_HPD_sens.rds")
+# write_rds(Topt.HPD, "results/Topt_HPD_sens.rds")
+Topt.HPD <- read_rds("results/Topt_HPD_sens.rds")
 
 ## Plot Topt uncertainty 
 var_name_table <- list(
-  betaV = c(TeX("$\\beta_V$")),
-  deltaL = c(TeX("$\\delta_L$")),
-  etaV = c(TeX("$\\eta_V$")),
-  muV = c(TeX("$\\mu_V$")),
-  rhoL = c(TeX("$\\rho_L$")),
-  sigmaV = c(TeX("$\\sigma_V$")),
-  sigmaV_f = c(TeX("$\\sigma_v f$"))
+  betaV = "Vector competence",
+  deltaL = "Pr(larval survival)",
+  etaV = "Parasite development rate",
+  muV = "Mortality rate",
+  rhoL = "Immature development rate",
+  sigmaV = "Max. biting rate",
+  sigmaV_f = "Eggs per female per day"
 )
 
 Topt.uncertainty.plot <- Topt.HPD %>% 
@@ -717,22 +717,24 @@ Topt.uncertainty.plot <- Topt.HPD %>%
   dplyr::filter(rel_HPD_width < 1.01) %>%
   # arrange(system_ID, sigmaH, focal_var, Temperature) %>%
   ggplot(aes(x = KH, y = rel_HPD_width, color = focal_var)) +
-  geom_path(linewidth = 1) +
+  geom_point(linewidth = 1) +
   scale_color_discrete(
     name = "Focal parameter",
     breaks = c("betaV", "deltaL", "etaV", "muV", "rhoL", "sigmaV", "sigmaV_f"),
-    labels =  unname(TeX(c("$\\beta_V$", "$\\delta_L$", "$\\eta_V$", 
-                           "$\\mu_V$", "$\\rho_L$", "$\\sigma_V$",
-                           "$\\sigma_v f$")))
-  ) +
+    labels =  c("Vector competence", "Pr(larval survival)", 
+                "Parasite development rate", "Mortality rate", 
+                "Immature development rate", "Max. biting rate", 
+                "Eggs per female per day")
+  )  +
   scale_x_continuous(
+    name = "Vertebrate host population density",
     trans = 'log10'
   ) +
   scale_y_continuous(
     name = "Relative HPD width",
     breaks = seq(0, 2, by = 0.2)
   ) +
-  facet_grid(rows = vars(system_ID), 
+  facet_grid(cols = vars(system_ID), 
              scales = "free") +
   ggtitle("Uncertainty analysis of Topt") +
   theme_minimal_grid(12)
