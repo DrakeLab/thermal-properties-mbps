@@ -601,8 +601,8 @@ for (index_KH in unique(data.ToptHPD$KH)) {
 
 
 # Save Topt highest posterior density data
-write_rds(full.Topt.HPD, "results/full_Topt_HPD.rds")
-# full.Topt.HPD <- read_rds("results/full_Topt_HPD.rds")
+# write_rds(full.Topt.HPD, "results/full_Topt_HPD.rds")
+full.Topt.HPD <- read_rds("results/full_Topt_HPD.rds")
 
 # # Diagnostic plot
 # test.plot <- full.Topt.HPD %>%
@@ -712,12 +712,12 @@ Topt.uncertainty.plot <- Topt.HPD %>%
     system_ID == "Aedes aegypti / ZIKV" ~ "Ae. aegypti / ZIKV",
     system_ID == "Culex quinquefasciatus / WNV" ~ "Cx. quin. / WNV"
   )) %>% 
-  arrange(system_ID, sigmaH) %>% 
+  arrange(system_ID, sigmaH, KH) %>% 
   # dplyr::filter(KH %in% c(1, 100)) %>%
   dplyr::filter(rel_HPD_width < 1.01) %>%
   # arrange(system_ID, sigmaH, focal_var, Temperature) %>%
   ggplot(aes(x = KH, y = rel_HPD_width, color = focal_var)) +
-  geom_point(linewidth = 1) +
+  geom_path(linewidth = 1) +
   scale_color_discrete(
     name = "Focal parameter",
     breaks = c("betaV", "deltaL", "etaV", "muV", "rhoL", "sigmaV", "sigmaV_f"),
@@ -809,12 +809,13 @@ full.CT.HPD <- tibble(system_ID = c(), Temperature = c(), Model = c(),
 
 
 # Save Topt highest posterior density data
-write_rds(full.CT.HPD, "results/full_CT_HPD.rds")
-# full.Topt.HPD <- read_rds("results/full_Topt_HPD.rds")
+# write_rds(full.CT.HPD, "results/full_CT_HPD.rds")
+full.CT.HPD <- read_rds("results/full_CT_HPD.rds")
 
 # # Diagnostic plot
 # test.plot <- full.CT.HPD %>%
-#   # filter(variable == "CTmin") %>% 
+#   filter(is.finite(HPD_width)) %>%
+#   # filter(variable == "CTmin") %>%
 #   # dplyr::filter(KH == 1e-2) %>%
 #   ggplot(aes(x = KH, y = HPD_width, color = as.factor(sigmaH))) +
 #   geom_path() +
@@ -881,17 +882,18 @@ for (var_name in temp_vars) {
       mutate(CTmax = max(Temperature)) %>%
       # Get width of critical thermal interval
       mutate(CTwidth = CTmax - CTmin) %>% 
+      select(system_ID, sample_num, sigmaH, KH, CTmin, CTmax, CTwidth) %>% 
+      distinct() %>% 
       # Add back values removed from dplyr::filtering R0>1 above
       # and assign the right NA values
-      full_join(expand_grid(dplyr::filter(data.CTHPD, KH == index_KH), 
-                            data.Vec) %>% 
-                  select(c(Model, system_ID, sample_num, sigmaH,KH)) %>% 
-                  distinct()) %>% 
+      # full_join(expand_grid(dplyr::filter(data.CTHPD, KH == index_KH), 
+      #                       data.Vec) %>% 
+      #             select(c(Model, system_ID, sample_num, sigmaH,KH)) %>% 
+      #             distinct()) %>% 
       replace_na(list(CTmin = Inf,
                       CTmax = -Inf,
                       CTwidth = 0)) %>% 
       pivot_longer(cols = c(CTmin, CTmax, CTwidth), names_to = "variable", values_to = "value") %>% 
-      select(system_ID, sample_num, sigmaH, KH, variable, value) %>%
       group_by(system_ID, sigmaH, KH, variable) %>% 
       summarise(
         HPD_low = hdi(value, credMass = 0.95)[1],
@@ -902,7 +904,8 @@ for (var_name in temp_vars) {
       select(system_ID, sigmaH, KH, variable, HPD_width) %>% 
       right_join(full.CT.HPD %>% 
                    select(-c(HPD_low, HPD_high)) %>% 
-                   rename(full_HPD_width = HPD_width)) %>% 
+                   rename(full_HPD_width = HPD_width) %>% 
+                   filter(KH == index_KH)) %>% 
       mutate(focal_var = var_name) %>% 
       group_by(system_ID, sigmaH, KH, focal_var) %>% 
       # d) Normalize HPD width by the full HPD width when all parameters are allowed to vary
@@ -913,7 +916,7 @@ for (var_name in temp_vars) {
 
 
 # Save CT relative highest posterior density data
-write_rds(CT.HPD, "results/CT_HPD_sens.rds", compress = 'gz')
+# write_rds(CT.HPD, "results/CT_HPD_sens.rds", compress = 'gz')
 # CT.HPD <- read_rds("results/CT_HPD_sens.rds")
 
 ## Plot Topt uncertainty 
@@ -927,8 +930,10 @@ var_name_table <- list(
   sigmaV_f = c(TeX("$\\sigma_v f$"))
 )
 
-CT.uncertainty.plot <- CT.HPD %>% 
+# CTwidth
+CTwidth.uncertainty.plot <- CT.HPD %>% 
   filter(variable == "CTwidth") %>% 
+  filter(!is.na(HPD_width)) %>% 
   ungroup() %>% 
   # dplyr::filter(focal_var %in% c("sigmaV_f")) %>%
   mutate(system_ID = case_when(
@@ -940,32 +945,138 @@ CT.uncertainty.plot <- CT.HPD %>%
   )) %>% 
   arrange(system_ID, sigmaH) %>% 
   # dplyr::filter(KH %in% c(1, 100)) %>%
-  dplyr::filter(rel_HPD_width < 1.01) %>%
-  # arrange(system_ID, sigmaH, focal_var, Temperature) %>%
-  ggplot(aes(x = KH, y = rel_HPD_width, color = focal_var)) +
+  dplyr::filter(rel_HPD_width < 1.2) %>%
+  arrange(system_ID, sigmaH, KH) %>%
+  ggplot(aes(x = KH, y = rel_HPD_width, color = focal_var, linetype = sigmaH)) +
   geom_path(linewidth = 1) +
+  scale_linetype_binned() +
   scale_color_discrete(
     name = "Focal parameter",
     breaks = c("betaV", "deltaL", "etaV", "muV", "rhoL", "sigmaV", "sigmaV_f"),
-    labels =  unname(TeX(c("$\\beta_V$", "$\\delta_L$", "$\\eta_V$", 
-                           "$\\mu_V$", "$\\rho_L$", "$\\sigma_V$",
-                           "$\\sigma_v f$")))
-  ) +
+    labels =  c("Vector competence", "Pr(larval survival)", 
+                "Parasite development rate", "Mortality rate", 
+                "Immature development rate", "Max. biting rate", 
+                "Eggs per female per day")
+  )  +
   scale_x_continuous(
+    name = "Vertebrate host population density",
     trans = 'log10'
   ) +
   scale_y_continuous(
     name = "Relative HPD width",
     breaks = seq(0, 2, by = 0.2)
   ) +
-  facet_grid(rows = vars(system_ID), 
-             scales = "free") +
+  facet_grid(cols = vars(sigmaH), rows = vars(system_ID), scales = "free",
+             labeller = labeller(sigmaH = as_labeller(appender_sigmaH,
+                                                      default = label_parsed),
+                                 KH = as_labeller(appender_KH, 
+                                                  default = label_parsed)),) +
   ggtitle("Uncertainty analysis of CTwidth") +
   theme_minimal_grid(12)
-CT.uncertainty.plot
+CTwidth.uncertainty.plot
 
-ggsave("figures/results/CT_uncertainty.svg", 
-       plot = CT.uncertainty.plot,
+ggsave("figures/results/CTwidth_uncertainty.svg", 
+       plot = CTwidth.uncertainty.plot,
+       width = 16, height = 9)
+
+
+# CTmin
+CTmin.uncertainty.plot <- CT.HPD %>% 
+  filter(variable == "CTmin") %>% 
+  filter(!is.na(HPD_width)) %>% 
+  ungroup() %>% 
+  # dplyr::filter(focal_var %in% c("sigmaV_f")) %>%
+  mutate(system_ID = case_when(
+    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "An. gamb. / P. falciparum",
+    system_ID == "Aedes aegypti / DENV" ~ "Ae. aegypti / DENV",
+    system_ID == "Aedes albopictus / DENV" ~ "Ae. albopictus / DENV",
+    system_ID == "Aedes aegypti / ZIKV" ~ "Ae. aegypti / ZIKV",
+    system_ID == "Culex quinquefasciatus / WNV" ~ "Cx. quin. / WNV"
+  )) %>% 
+  arrange(system_ID, sigmaH) %>% 
+  # dplyr::filter(KH %in% c(1, 100)) %>%
+  dplyr::filter(rel_HPD_width < 1.2) %>%
+  arrange(system_ID, sigmaH, KH) %>%
+  ggplot(aes(x = KH, y = rel_HPD_width, color = focal_var, linetype = sigmaH)) +
+  geom_path(linewidth = 1) +
+  scale_linetype_binned() +
+  scale_color_discrete(
+    name = "Focal parameter",
+    breaks = c("betaV", "deltaL", "etaV", "muV", "rhoL", "sigmaV", "sigmaV_f"),
+    labels =  c("Vector competence", "Pr(larval survival)", 
+                "Parasite development rate", "Mortality rate", 
+                "Immature development rate", "Max. biting rate", 
+                "Eggs per female per day")
+  )  +
+  scale_x_continuous(
+    name = "Vertebrate host population density",
+    trans = 'log10'
+  ) +
+  scale_y_continuous(
+    name = "Relative HPD width",
+    breaks = seq(0, 2, by = 0.2)
+  ) +
+  facet_grid(cols = vars(sigmaH), rows = vars(system_ID), scales = "free",
+             labeller = labeller(sigmaH = as_labeller(appender_sigmaH,
+                                                      default = label_parsed),
+                                 KH = as_labeller(appender_KH, 
+                                                  default = label_parsed)),) +
+  ggtitle("Uncertainty analysis of CTmin") +
+  theme_minimal_grid(12)
+CTmin.uncertainty.plot
+
+ggsave("figures/results/CTmin_uncertainty.svg", 
+       plot = CTmin.uncertainty.plot,
+       width = 16, height = 9)
+
+
+# CTmax
+CTmax.uncertainty.plot <- CT.HPD %>% 
+  filter(variable == "CTmax") %>% 
+  filter(!is.na(HPD_width)) %>% 
+  ungroup() %>% 
+  # dplyr::filter(focal_var %in% c("sigmaV_f")) %>%
+  mutate(system_ID = case_when(
+    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "An. gamb. / P. falciparum",
+    system_ID == "Aedes aegypti / DENV" ~ "Ae. aegypti / DENV",
+    system_ID == "Aedes albopictus / DENV" ~ "Ae. albopictus / DENV",
+    system_ID == "Aedes aegypti / ZIKV" ~ "Ae. aegypti / ZIKV",
+    system_ID == "Culex quinquefasciatus / WNV" ~ "Cx. quin. / WNV"
+  )) %>% 
+  arrange(system_ID, sigmaH) %>% 
+  # dplyr::filter(KH %in% c(1, 100)) %>%
+  dplyr::filter(rel_HPD_width < 1.2) %>%
+  arrange(system_ID, sigmaH, KH) %>%
+  ggplot(aes(x = KH, y = rel_HPD_width, color = focal_var, linetype = sigmaH)) +
+  geom_path(linewidth = 1) +
+  scale_linetype_binned() +
+  scale_color_discrete(
+    name = "Focal parameter",
+    breaks = c("betaV", "deltaL", "etaV", "muV", "rhoL", "sigmaV", "sigmaV_f"),
+    labels =  c("Vector competence", "Pr(larval survival)", 
+                "Parasite development rate", "Mortality rate", 
+                "Immature development rate", "Max. biting rate", 
+                "Eggs per female per day")
+  )  +
+  scale_x_continuous(
+    name = "Vertebrate host population density",
+    trans = 'log10'
+  ) +
+  scale_y_continuous(
+    name = "Relative HPD width",
+    breaks = seq(0, 2, by = 0.2)
+  ) +
+  facet_grid(cols = vars(sigmaH), rows = vars(system_ID), scales = "free",
+             labeller = labeller(sigmaH = as_labeller(appender_sigmaH,
+                                                      default = label_parsed),
+                                 KH = as_labeller(appender_KH, 
+                                                  default = label_parsed)),) +
+  ggtitle("Uncertainty analysis of CTmax") +
+  theme_minimal_grid(12)
+CTmax.uncertainty.plot
+
+ggsave("figures/results/CTmax_uncertainty.svg", 
+       plot = CTmax.uncertainty.plot,
        width = 16, height = 9)
 
 
