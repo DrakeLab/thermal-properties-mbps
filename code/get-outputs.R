@@ -238,7 +238,7 @@ if (!exists("cluster")) {
 
 # Set up host trait data frame (for future visualization)
 data.R0 <- data.Host %>%
-  filter(sigmaH %in% c(100, Inf)) %>% 
+  filter(sigmaH %in% c(1e-1, 1, 10, 100, Inf)) %>% 
   filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 21)])
 
 # Slice host trait data
