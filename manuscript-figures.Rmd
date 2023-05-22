@@ -95,28 +95,29 @@ shift_legend <- function(p) {
 ```{r load-data, include=FALSE}
 # Run analysis scripts to obtain data for plotting -----------------------------
 
-# Define temperature range of study
-Temps <- seq(10, 40, length.out = 601) # full: length.out = 601, thin: length.out = 301
-
-# Thin sample size
-thin_size <- 1000 # full = 1000, thin = 100
-
-plot_bool = FALSE
-source("code/trait-transform.R", local = TRUE)
-# Host density vector: Number of values to include to consider for vertebrate host density
-KH_vec_length <- 300 # full = 300, thin = 20
-
-# Biting tolerance vector: Number of values to consider for biting tolerance
-sigmaH_vec_length <- 300 # full = 300, thin = 20
-
-# Get data for plotting thermal performance curves (data.Vec)
-source("code/trait-variation.R", local = TRUE)
+# # Define temperature range of study
+# Temps <- seq(10, 40, length.out = 601) # full: length.out = 601, thin: length.out = 301
+# 
+# # Thin sample size
+# thin_size <- 1000 # full = 1000, thin = 100
+# 
+# plot_bool = FALSE
+# source("code/trait-transform.R", local = TRUE)
+# # Host density vector: Number of values to include to consider for vertebrate host density
+# KH_vec_length <- 300 # full = 300, thin = 20
+# 
+# # Biting tolerance vector: Number of values to consider for biting tolerance
+# sigmaH_vec_length <- 300 # full = 300, thin = 20
+# 
+# # Get data for plotting thermal performance curves (data.Vec)
+# !!! save a specific dataset to use for plotting trait TPCs
+# source("code/trait-variation.R", local = TRUE)
 
 # Load output data -------------------------------------------------------------
 # These data are produced by the code in code/get-outputs.R
 
-# R0 data
-data.R0 <- read_rds("results/R0_vals.rds") # !!! needs to be updated to include 1e-1, 1e0, 1e1
+# R0 data # !!! needs to be updated to include 1e-1, 1e0, 1e1
+data.R0 <- read_rds("results/R0_vals.rds")
 # Topt data
 data.Topt <- read_rds("results/Topt_vals.rds")
 # Critical thermal extrema data
@@ -596,6 +597,14 @@ shift_legend(MosqThermTraits_plot)
 newKH_vals <- unique(data.R0$KH)[seq(1, length(unique(data.R0$KH)), length.out = 21)]
 
 data.R0_norm <- data.R0 %>% 
+  ungroup() %>% 
+  mutate(system_label = case_when(
+    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* & DENV",
+    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* & ZIKV",
+    system_ID == "Aedes albopictus / DENV" ~ "(c) *Ae. albopictus* & DENV",
+    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *Anopheles* spp. & *P. falciparum*",
+    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* & WNV"
+  )) %>% 
   filter(KH %in% newKH_vals) %>% 
   filter(variable == "R0") %>%
   select(-variable) %>%
@@ -629,7 +638,7 @@ R0_plot <- ggplot(mapping = aes(x = Temperature, group = KH)) +
   # ) +
   # x-axis:
   scale_x_continuous(
-    name = "Temperature (C)",
+    name = "Temperature (°C)",
     expand = c(0, 0),
     limits = c(14, 34)
   ) +
@@ -662,7 +671,7 @@ R0_plot <- ggplot(mapping = aes(x = Temperature, group = KH)) +
     values = c("solid", "22")
   ) +
   # faceting:
-  facet_wrap(~system_ID, scales = "free", nrow = 2, labeller = labeller()) +
+  facet_wrap(~system_label, scales = "free", nrow = 2, labeller = labeller()) +
   # legend
   guides(
     color = guide_colourbar(
@@ -714,6 +723,13 @@ R0_plot <- shift_legend(R0_plot)
 
 Toptalt_df <- data.Topt %>%
   ungroup() %>%
+  mutate(system_label = case_when(
+    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* & DENV",
+    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* & ZIKV",
+    system_ID == "Aedes albopictus / DENV" ~ "(c) *Ae. albopictus* & DENV",
+    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *Anopheles* spp. & *P. falciparum*",
+    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* & WNV"
+  )) %>% 
   distinct() %>%
   # Arrange along the plotting variables
   arrange(system_ID, sigmaH, KH, mean) %>% 
@@ -794,7 +810,7 @@ Toptalt_plots <- Toptalt_df %>%
   # color:
   scale_colour_manual(
     name = "",
-    labels = c("R0=1" = unname(TeX("$R_0=1$"))),
+    labels = c("R0=1" = unname(TeX("$\\mathcal{R}_0=1$"))),
     values = c("black"),
     guide = guide_legend(
       order = 1,
@@ -803,7 +819,7 @@ Toptalt_plots <- Toptalt_df %>%
     )
   ) +
   # faceting:
-  facet_wrap(~system_ID, scales = "free", nrow = 2, labeller = labeller()) +
+  facet_wrap(~system_label, scales = "free", nrow = 2, labeller = labeller()) +
   # legend:
   guides(fill = guide_coloursteps(
     title.position = "top", title.hjust = 0,
@@ -817,7 +833,7 @@ Toptalt_plots <- Toptalt_df %>%
     legend.position = "right",
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
-    legend.direction = "vertical",
+    legend.direction = "horizontal",
     legend.justification = "left",
     axis.title.x = element_text(hjust = 0.5),
     strip.text = ggtext::element_markdown(
