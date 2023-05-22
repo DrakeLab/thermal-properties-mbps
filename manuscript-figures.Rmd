@@ -823,7 +823,7 @@ Toptalt_plots <- Toptalt_df %>%
   # legend:
   guides(fill = guide_coloursteps(
     title.position = "top", title.hjust = 0,
-    barwidth = unit(5, "cm"),
+    barwidth = unit(7, "cm"),
     show.limits = TRUE
   )) +
   # theme options:
