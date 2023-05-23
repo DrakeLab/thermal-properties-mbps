@@ -62,12 +62,12 @@ data.Topt <- read_rds("results/Topt_vals.rds")
 data.CT <- read_rds("results/CT_vals.rds")
 
 
-KH_vec_length <- 300 # full = 300, thin = 20
-
-# Biting tolerance vector: Number of values to consider for biting tolerance
-sigmaH_vec_length <- 300 # full = 300, thin = 20
-
-source("code/trait-variation.R")
+# KH_vec_length <- 300 # full = 300, thin = 20
+# 
+# # Biting tolerance vector: Number of values to consider for biting tolerance
+# sigmaH_vec_length <- 300 # full = 300, thin = 20
+# 
+# source("code/trait-variation.R")
 
 # 1) Define accessory functions -------------------------------------------
 
@@ -89,6 +89,8 @@ appender_KH <- function(string) {
 ###* Mean traits data frame ----
 
 # Get mean values of uncertain traits
+
+data.Vec <- read_rds("results/VecTPC_vals.rds")
 
 mean.Vec <- data.Vec %>% 
   select(-c(KL, mosquito_species, pathogen, muL, etaL)) %>% 
@@ -294,13 +296,13 @@ for (var_name in temp_vars) {
 }
 
 # Save R0 relative highest posterior density data
-write_rds(R0.HPD, "results/R0_HPD_sens.rds")
-# R0.HPD <- read_rds("results/R0_HPD_sens.rds")
+# write_rds(R0.HPD, "results/R0_HPD_sens.rds")
+R0.HPD <- read_rds("results/R0_HPD_sens.rds")
 
 ## Plot R0 uncertainty 
-plot_Temp_range <- R0.HPD %>% ungroup() %>% 
-  dplyr::filter(HPD_width > eps) %>% 
-  # dplyr::filter(KH == KH_select) %>% 
+plot_Temp_range <- R0.HPD %>% ungroup() %>%
+  dplyr::filter(HPD_width > eps) %>%
+  # dplyr::filter(KH == KH_select) %>%
   select(Temperature) %>% range()
 
 # var_name_table <- list(
@@ -339,7 +341,7 @@ R0.uncertainty.plot <- R0.HPD %>%
   dplyr::filter(KH %in% c(1, 100)) %>%
   dplyr::filter(rel_HPD_width < 1.01) %>%
   # arrange(system_ID, sigmaH, focal_var, Temperature) %>%
-  ggplot(aes(x = Temperature, y = rel_HPD_width, color = focal_var)) +
+  ggplot(aes(x = Temperature, y = rel_HPD_width, color = focal_var, fill = focal_var)) +
   geom_path(linewidth = 1) +
   scale_color_discrete(
     name = "Focal parameter",
