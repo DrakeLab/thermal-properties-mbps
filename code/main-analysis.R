@@ -53,7 +53,7 @@ source("code/get-thermal-trait-priors.R")
 # write_rds(data.in.transform, "data/clean/TPC_param_samples.rds")
 
 # # Run this to load pre-processed data set
-# data.in.transform <- read_rds("data/clean/TPC_param_samples.rds")
+data.in.transform <- read_rds("data/clean/TPC_param_samples.rds")
 
 # 3) Translate traits into model parameters -------------------------------
 

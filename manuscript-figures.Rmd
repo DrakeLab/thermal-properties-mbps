@@ -66,7 +66,7 @@ inf_skew_func <- function(df, skew, divide, n_rows_to_add) {
                                    added_sigma_vals[i]))
     
     df <- add_row(df, temp) %>% distinct()
-    }
+  }
   
   return(df)
   
@@ -94,6 +94,8 @@ shift_legend <- function(p) {
 
 ```{r load-data, include=FALSE}
 # Load results data -------------------------------------------------------------
+eps <- .Machine$double.eps
+
 # Vector trait TPC data
 data.Vec <- read_rds("results/VecTPC_vals.rds")
 # R0 data # !!! needs to be updated to include 1e-1, 1e0, 1e1
@@ -517,11 +519,11 @@ MosqThermTraits_plot <- MosqThermTraits_df %>%
     values = met.brewer("Egypt", 5, direction = -1),
     labels = function(x) {
       case_when(
-        x == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* & DENV",
-        x == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* & ZIKV",
-        x == "Aedes albopictus / DENV" ~ "(c) *Ae. albopictus* & DENV",
-        x == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *Anopheles* spp. & *P. falciparum*",
-        x == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* & WNV"
+        x == "Aedes aegypti / DENV" ~ "*Aedes aegypti* and DENV",
+        x == "Aedes aegypti / ZIKV" ~ "*Ae. aegypti* and ZIKV",
+        x == "Aedes albopictus / DENV" ~ "*Aedes albopictus* and DENV",
+        x == "Anopheles gambiae / Plasmodium falciparum" ~ "*Anopheles gambiae* and *Plasmodium falciparum*",
+        x == "Culex quinquefasciatus / WNV" ~ "*Culex quinquefasciatus* and WNV"
       )
     }
   ) +
@@ -577,14 +579,14 @@ shift_legend(MosqThermTraits_plot)
 newKH_vals <- unique(data.R0$KH)[seq(1, length(unique(data.R0$KH)), length.out = 21)]
 
 data.R0_norm <- data.R0 %>% 
-  ungroup() %>% 
+  ungroup() %>%
   mutate(system_label = case_when(
     system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* & DENV",
     system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* & ZIKV",
     system_ID == "Aedes albopictus / DENV" ~ "(c) *Ae. albopictus* & DENV",
-    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *Anopheles* spp. & *P. falciparum*",
+    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* & *P. falciparum*",
     system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* & WNV"
-  )) %>% 
+  )) %>%
   filter(KH %in% newKH_vals) %>% 
   filter(variable == "R0") %>%
   select(-variable) %>%
@@ -595,6 +597,7 @@ data.R0_norm <- data.R0 %>%
   # mutate(highHCI_norm = highHCI / max(median)) %>% 
   # mutate(lowHCI_norm = lowHCI / max(median)) %>% 
   arrange(system_ID, sigmaH, KH, Temperature, median_norm)
+
 
 R0_plot <- ggplot(mapping = aes(x = Temperature, group = KH)) +
   # path of mean, normalized R0 as a function of temperature (finite sigmaH):
@@ -718,17 +721,16 @@ Toptalt_df <- data.Topt %>%
 # add many proxy sigmaH points at infinity to make the values easier to see there
 max_sigmaH <- max(filter(Toptalt_df, is.finite(sigmaH))$sigmaH)
 # Value of sigmaH to replace 'Inf' with for plotting
-infinite_skew <- 10^log10(max_sigmaH*1.5) # 1.1*max_sigmaH #10^2 + 80
+infinite_skew <- 10^2.35#10^log10(max_sigmaH*1.5) # 1.1*max_sigmaH #10^2 + 80
 # Used to create a gap dividing finite and infinite sigmaH
-infinite_divide <- 10^log10(max_sigmaH*1)
+infinite_divide <- 10^2.7 #10^log10(max_sigmaH*1)
 
-# infinite_skew <- 10^2 + 150
 Toptalt_df <- inf_skew_func(Toptalt_df, infinite_skew, infinite_divide, 8)
 
 # infinite_divide <- 10^mean(c(2, log10(infinite_skew)))
 
 # Define sigmaH tick breaks and labels
-sigmaH_breaks <- c(10^c(seq(-1, 2, by = 1)), mean(c(infinite_divide, infinite_skew)), max(Toptalt_df$sigmaH_proxy))
+sigmaH_breaks <- c(10^c(seq(-1, 2, by = 1)), 10^2.3125, 10^2.5625)
 sigmaH_labels <- c(paste(c(10^c(seq(-1, 2, by = 1)))), TeX("$\\ldots$"), TeX("$\\infty$"))
 
 min_Topt <- floor(min(min(Toptalt_df$mean),min(Toptalt_df$median)))
@@ -744,13 +746,13 @@ Toptalt_plots <- Toptalt_df %>%
   ggplot(aes(x = KH, y = sigmaH_proxy, z = median)) +
   # Topt for FINITE sigmaH:
   geom_contour_filled(
-    data = filter(Toptalt_df, sigmaH_proxy < infinite_divide**0.99),
+    data = filter(Toptalt_df, sigmaH_proxy < 10^2.2),
     breaks = Topt_breaks
   ) +
   # Topt for INFINITE sigmaH:
   # take mean of mean to hide variation from artifacts of uncertainty 
   geom_contour_filled(
-    data = filter(Toptalt_df, sigmaH_proxy > infinite_divide**1.02) %>% 
+    data = filter(Toptalt_df, sigmaH_proxy > infinite_skew) %>% 
       group_by(system_ID) %>% 
       mutate(mean = mean(mean), .groups = "keep"),
     size = 1,
@@ -781,7 +783,7 @@ Toptalt_plots <- Toptalt_df %>%
   
   # fill:
   scale_fill_manual(
-    name = "Transmission\nthermal optimum (°C)",
+    name = "Transmission thermal optimum (°C)",
     values = met.brewer("Johnson",
                         n = length(Topt_breaks),
                         direction = -1
@@ -875,7 +877,7 @@ CTWidth_heat_plots <- CTwidth_df %>%
   ) +
   # color:
   scale_fill_viridis_d(
-    name = "Median parasite\nthermal tolerance\nrange width (°C)",
+    name = "Parasite thermal tolerance\nrange width (°C)",
     option = "plasma"
   ) +
   # faceting:

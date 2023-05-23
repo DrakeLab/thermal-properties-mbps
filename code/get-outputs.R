@@ -373,6 +373,36 @@ if (exists("Topt_alt.df") & dim(Topt_alt.df)[1] == proper_dim)
 
 
 # 5) Calculate CTmin, CTmax, and CTwidth ----------------------------------
+# Set up new cluster
+# Close old cluster connections
+rm(cluster)
+gc()
+# Start new cluster for doParallel
+cluster_size <- parallel::detectCores()-1
+
+my.cluster <- parallel::makeCluster(
+  cluster_size, 
+  type = "PSOCK"
+)
+# Register cluster for doParallel
+doSNOW::registerDoSNOW(cl = my.cluster)
+
+# Set up iteration grid
+iter_grid <- expand_grid(system_ID = unique(data.Vec$system_ID),
+                         tibble(KH = data.Host$KH,
+                                sigmaH = data.Host$sigmaH))
+# Set up progress bar
+iterations <- dim(iter_grid)[1]
+
+pb <- progress_bar$new(
+  format = ":spin :system progress = :percent [:bar] :elapsed | eta: :eta",
+  total = iterations,
+  width = 120)                                                                                                         
+
+progress <- function(n){
+  pb$tick(tokens = list(system = iter_grid$system_ID[n]))
+}
+opts <- list(progress = progress)
 
 CT.df <- foreach(
   system_name = iter_grid$system_ID,
