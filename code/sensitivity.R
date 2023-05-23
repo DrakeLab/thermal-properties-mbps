@@ -146,7 +146,7 @@ full.R0.HPD <- expand_grid(data.R0HPD,
   mutate(norm_HPD_width = HPD_width / max(HPD_width))
 
 # Save R0 highest posterior density data
-# write_rds(full.R0.HPD, "results/full_R0_HPD.rds")
+write_rds(full.R0.HPD, "results/full_R0_HPD.rds")
 # full.R0.HPD <- read_rds("results/full_R0_HPD.rds")
 
 # R0 HPD diagnostic plot
@@ -294,7 +294,7 @@ for (var_name in temp_vars) {
 }
 
 # Save R0 relative highest posterior density data
-# write_rds(R0.HPD, "results/R0_HPD_sens.rds")
+write_rds(R0.HPD, "results/R0_HPD_sens.rds")
 # R0.HPD <- read_rds("results/R0_HPD_sens.rds")
 
 ## Plot R0 uncertainty 
@@ -367,6 +367,32 @@ R0.uncertainty.plot
 ggsave("figures/results/R0_uncertainty.svg", 
        plot = R0.uncertainty.plot,
        width = 16, height = 9)
+
+# "Relative sensitivity" plot
+plot.R0.rel.sens <- R0.HPD %>% 
+  filter(KH %in% c(1,100) & sigmaH %in% c(50, Inf)) %>% 
+  filter(rel_HPD_width != 0) %>% 
+  # For each KH value, sum up all sensitivity values to get total sensitivity across parameters
+  group_by(system_ID, sigmaH, KH, Temperature) %>% 
+  mutate(sens_total = sum(rel_HPD_width)) %>% 
+  # Divide each sensitivity value by the total sensitivity
+  mutate(sens_rel = rel_HPD_width / sens_total) %>% 
+  arrange(sens_rel) %>% 
+  # Make a stacked plot, colored by parameter
+  ggplot(aes(x = Temperature, y = sens_rel, fill = focal_var)) +
+  geom_area() +
+  scale_x_continuous(
+    # trans = 'log10'
+  ) +
+  # scale_y_continuous(
+  #   limits = c(0,1)
+  # ) +
+  facet_grid(cols = vars(system_ID),
+             rows = vars(KH, sigmaH), 
+             scales = "free") +
+  theme_minimal_hgrid(16)
+
+
 
 # 4) ddT R0 uncertainty -------------------------------------------------------
 
@@ -744,6 +770,30 @@ ggsave("figures/results/Topt_uncertainty.svg",
        plot = Topt.uncertainty.plot,
        width = 16, height = 9)
 
+# "Relative sensitivity" plot
+plot.Topt.rel.sens <- Topt.HPD %>% 
+  filter(!is.na(rel_HPD_width)) %>% 
+  # For each KH value, sum up all sensitivity values to get total sensitivity
+  group_by(system_ID, sigmaH, KH) %>% 
+  mutate(sens_total = sum(rel_HPD_width)) %>% 
+# Divide each sensitivity value by the total sensitivity
+  mutate(sens_rel = rel_HPD_width / sens_total) %>% 
+  arrange(sens_rel) %>% 
+# Make a stacked plot, colored by parameter
+  ggplot(aes(x = KH, y = sens_rel, fill = focal_var)) +
+  geom_area() +
+  scale_x_continuous(
+    trans = 'log10'
+  ) +
+  # scale_y_continuous(
+  #   limits = c(0,1)
+  # ) +
+  facet_grid(rows = vars(sigmaH),
+             cols = vars(system_ID), 
+             scales = "free") +
+  theme_minimal_hgrid(16)
+
+
 # 6) CTmin/max/width uncertainty ------------------------------------------
 
 # Calculate the width of the 95% HPD for the full posterior of Topt across vertebrate host abundance
@@ -1117,7 +1167,6 @@ Topt.density.df <- full_join(Topt.density.df,
                              expand_grid(data.Topt, data.Vec) %>%
                                select(c(Model, system_ID, sample_num, sigmaH,KH)) %>%
                                distinct())
-
 
 plot.Topt.density <- Topt.density.df %>% 
   # dplyr::filter(sigmaH %in% Inf) %>%

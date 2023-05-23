@@ -34,7 +34,7 @@ library(zplyr) # from https://github.com/burchill/zplyr/ # only needed for placi
 # Tell R where the manuscript lives
 # here::i_am("manuscript-figures.Rmd")
 
-data.in.transform <- read_rds(here::here("data/clean/TPC_param_samples.rds"))
+
 
 # Load in necessary functions and files ----------------------------------------
 # Functions for computing equilibrium quantities:
@@ -93,29 +93,9 @@ shift_legend <- function(p) {
 ```
 
 ```{r load-data, include=FALSE}
-# Run analysis scripts to obtain data for plotting -----------------------------
-
-# # Define temperature range of study
-# Temps <- seq(10, 40, length.out = 601) # full: length.out = 601, thin: length.out = 301
-# 
-# # Thin sample size
-# thin_size <- 1000 # full = 1000, thin = 100
-# 
-# plot_bool = FALSE
-# source("code/trait-transform.R", local = TRUE)
-# # Host density vector: Number of values to include to consider for vertebrate host density
-# KH_vec_length <- 300 # full = 300, thin = 20
-# 
-# # Biting tolerance vector: Number of values to consider for biting tolerance
-# sigmaH_vec_length <- 300 # full = 300, thin = 20
-# 
-# # Get data for plotting thermal performance curves (data.Vec)
-# !!! save a specific dataset to use for plotting trait TPCs
-# source("code/trait-variation.R", local = TRUE)
-
-# Load output data -------------------------------------------------------------
-# These data are produced by the code in code/get-outputs.R
-
+# Load results data -------------------------------------------------------------
+# Vector trait TPC data
+data.Vec <- read_rds("results/VecTPC_vals.rds")
 # R0 data # !!! needs to be updated to include 1e-1, 1e0, 1e1
 data.R0 <- read_rds("results/R0_vals.rds")
 # Topt data
