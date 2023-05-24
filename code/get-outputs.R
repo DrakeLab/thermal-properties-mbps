@@ -41,6 +41,8 @@ init.df <- tibble(system_ID = c(), Temperature = c(), Model = c(),
 
 # Thin out the vector data set as necessary
 
+thin_size <- 300
+
 samples <- unique(data.Vec$sample_num)
 num_samples <- length(samples)
 sample_inds <- sample(samples, min(num_samples, thin_size), replace = FALSE)
