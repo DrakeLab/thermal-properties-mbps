@@ -139,11 +139,11 @@ median.Vec <- data.Vec %>%
 ## Compute mosquito thermal tolerance range (minimum and maximum)
 MosqThermRange_df <- mean.Vec %>%
   mutate(system_label = case_when(
-    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* & DENV",
-    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* & ZIKV",
-    system_ID == "Aedes albopictus / DENV" ~ "(c) *Ae. albopictus* & DENV",
-    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *Anopheles* spp. & *P. falciparum*",
-    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* & WNV"
+    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
+    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
+    system_ID == "Aedes albopictus / DENV" ~ "(c\u200b) *Ae. albopictus* and DENV",
+    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
+    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
   )) %>%
   group_by(system_label) %>%
   filter(V0 > 0) %>%
@@ -156,11 +156,11 @@ MosqThermRange_df <- mean.Vec %>%
 data.R0 <- data.R0 %>%
   ungroup() %>% 
   mutate(system_label = case_when(
-    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* & DENV",
-    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* & ZIKV",
-    system_ID == "Aedes albopictus / DENV" ~ "(c) *Ae. albopictus* & DENV",
-    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *Anopheles* spp. & *P. falciparum*",
-    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* & WNV"
+    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
+    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
+    system_ID == "Aedes albopictus / DENV" ~ "(c\u200b) *Ae. albopictus* and DENV",
+    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
+    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
   ))
 
 # ## Add a "point at infinity" for sigmaH
@@ -195,11 +195,11 @@ data.R0 <- data.R0 %>%
 # # Title names for each mosquito+pathogen combination
 # ThermPathChars <- ThermPathChars %>%
 #   mutate(system_label = case_when(
-#     system_ID == "Aedes aegypti+DENV" ~ "(a) *Ae. aegypti* & DENV",
-#     system_ID == "Aedes aegypti+ZIKV" ~ "(b) *Ae. aegypti* & ZIKV",
-#     system_ID == "Aedes albopictus+DENV" ~ "(c) *Ae. albopictus* & DENV",
-#     system_ID == "Anopheles spp.+P.fal." ~ "(d) *Anopheles* spp. & *P. falciparum*",
-#     system_ID == "Culex quinquefasciatus+WNV" ~ "(e) *Cx. quinquefasciatus* & WNV"
+#     system_ID == "Aedes aegypti+DENV" ~ "(a) *Ae. aegypti* and DENV",
+#     system_ID == "Aedes aegypti+ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
+#     system_ID == "Aedes albopictus+DENV" ~ "(c\u200b) *Ae. albopictus* and DENV",
+#     system_ID == "Anopheles spp.+P.fal." ~ "(d) *An. gambiae* and *P. falciparum*",
+#     system_ID == "Culex quinquefasciatus+WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
 #   ))
 # ## Add a "point at infinity" for sigmaH (NB: to be added to get-analysis-dfs.R)
 # # Value of sigmaH to replace 'Inf' with for plotting
@@ -581,11 +581,11 @@ newKH_vals <- unique(data.R0$KH)[seq(1, length(unique(data.R0$KH)), length.out =
 data.R0_norm <- data.R0 %>% 
   ungroup() %>%
   mutate(system_label = case_when(
-    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* & DENV",
-    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* & ZIKV",
-    system_ID == "Aedes albopictus / DENV" ~ "(c) *Ae. albopictus* & DENV",
-    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* & *P. falciparum*",
-    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* & WNV"
+    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
+    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
+    system_ID == "Aedes albopictus / DENV" ~ "(c\u200b) *Ae. albopictus* and DENV",
+    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
+    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
   )) %>%
   filter(KH %in% newKH_vals) %>% 
   filter(variable == "R0") %>%
@@ -707,11 +707,11 @@ R0_plot <- shift_legend(R0_plot)
 Toptalt_df <- data.Topt %>%
   ungroup() %>%
   mutate(system_label = case_when(
-    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* & DENV",
-    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* & ZIKV",
-    system_ID == "Aedes albopictus / DENV" ~ "(c) *Ae. albopictus* & DENV",
-    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *Anopheles* spp. & *P. falciparum*",
-    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* & WNV"
+    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
+    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
+    system_ID == "Aedes albopictus / DENV" ~ "(c\u200b) *Ae. albopictus* and DENV",
+    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
+    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
   )) %>% 
   distinct() %>%
   # Arrange along the plotting variables
@@ -759,7 +759,7 @@ Toptalt_plots <- Toptalt_df %>%
     breaks = Topt_breaks
   ) +
   # # R0 = 1 contour: cheat and use where CTwidth = 0 (i.e. where R0<1 at any temperature)
-  geom_contour(data = filter(data.CT, variable == "CTwidth"),
+  geom_contour(data = filter(data.CT, variable == "CTwidth", sigmaH < infinite_divide),
                aes(y = sigmaH, z = mean, colour = "R0 = 1"), 
                breaks = min(filter(data.CT, variable == "CTwidth", mean > 0)$mean),
                size = 1) +
@@ -841,8 +841,17 @@ Toptalt_plots <- shift_legend(Toptalt_plots)
 # colour = width of parasite thermal niche (CTmax - CTmin)
 # Facets = systems
 
-CTwidth_df <- data.CT %>%
+CTwidth_df <- data.CT %>%  
+  ungroup() %>%
+  mutate(system_label = case_when(
+    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
+    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
+    system_ID == "Aedes albopictus / DENV" ~ "(c\u200b) *Ae. albopictus* and DENV",
+    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
+    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
+  )) %>% 
   filter(variable == "CTwidth") %>% 
+  # filter(sigmaH < 10^2.2) %>% 
   mutate(sigmaH_proxy = sigmaH) %>% 
   # Arrange along the plotting variables
   arrange(system_ID, KH, sigmaH_proxy, median) %>% 
@@ -857,9 +866,11 @@ CTWidth_heat_plots <- CTwidth_df %>%
   # color = width of parasite thermal mean_CTwidth
   ggplot(aes(x = KH, y = sigmaH_proxy, z = mean)) +
   # CTwidth for FINITE sigmaH:
-  geom_contour_filled(data = filter(CTwidth_df, sigmaH_proxy < infinite_divide**0.99)) +
+  geom_contour_filled(data = filter(CTwidth_df, sigmaH_proxy < 10^2.2)) +
   # CTwidth for INFINITE sigmaH:
-  geom_contour_filled(data = filter(CTwidth_df, sigmaH_proxy > infinite_divide**1.01)) +
+  geom_contour_filled(data = filter(CTwidth_df, 
+                                    sigmaH_proxy > 10^2.4, 
+                                    sigmaH_proxy < infinite_divide)) +
   # x-axis: log10-scale with no buffer space
   scale_x_log10(
     name = TeX("Vertebrate host population density (ind/ha)"),
@@ -881,7 +892,7 @@ CTWidth_heat_plots <- CTwidth_df %>%
     option = "plasma"
   ) +
   # faceting:
-  facet_wrap(~system_ID, scales = "free", nrow = 2, labeller = labeller()) +
+  facet_wrap(~system_label, scales = "free", nrow = 2, labeller = labeller()) +
   # legend:
   guides(fill = guide_coloursteps(
     title.position = "top", title.hjust = 0.5,
