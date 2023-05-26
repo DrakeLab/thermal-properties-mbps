@@ -1822,75 +1822,91 @@ CTWidth_heat_plots <- shift_legend(CTWidth_heat_plots)
 <!-- shift_legend(CHRange_plots) -->
 <!-- ``` -->
 
-<!-- ```{r table-2_Toptdiffbound, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Toptdiffbound} Calculating how large the difference between the Ross-Macdonald and Chitnis Topt estimates can be.'} -->
+```{r table-2_Toptdiffbound, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Toptdiffbound} Calculating how large the difference between the Ross-Macdonald and Chitnis Topt estimates can be.'}
 
-<!-- # Estimating the difference between Topt and Topt_RM numerically using our previous data -->
-<!-- Toptdiff_df1 <- ThermPathChars %>% -->
-<!--   select(system_ID, sigmaH, KH, Topt) %>% -->
-<!--   filter(is.finite(sigmaH)) %>% -->
-<!--   distinct() -->
+# Estimating the difference between Topt and Topt_RM numerically using our previous data
+Toptdiff_CCH <- data.Topt %>%
+  ungroup() %>% 
+  select(system_ID, sigmaH, KH, median) %>%
+  rename(Topt = median) %>%
+  filter(is.finite(sigmaH)) %>%
+  distinct()
 
-<!-- Toptdiff_df2 <- ThermPathChars %>% -->
-<!--   filter(is.infinite(sigmaH)) %>% -->
-<!--   select(system_ID, KH, Topt) %>% -->
-<!--   rename(Topt_RM = Topt) %>% -->
-<!--   distinct() -->
+Toptdiff_RM <- data.Topt %>%
+  ungroup() %>% 
+  filter(is.infinite(sigmaH)) %>%
+  select(system_ID, KH, median) %>%
+  rename(Topt_RM = median) %>%
+  distinct()
 
-<!-- Toptdiff_df <- left_join(Toptdiff_df1, Toptdiff_df2) %>% -->
-<!--   mutate(Toptdiff = Topt_RM - Topt) %>% -->
-<!--   mutate(absToptdiff = abs(Toptdiff)) %>% -->
-<!--   mutate(propToptdiff = (Topt_RM - Topt) / Topt_RM) %>% -->
-<!--   mutate(sigmaHKH = sigmaH * KH) %>% -->
-<!--   group_by(system_ID) %>% -->
-<!--   filter(absToptdiff == max(absToptdiff)) %>% -->
-<!--   select(-sigmaH, -KH, -sigmaHKH, -absToptdiff) %>% -->
-<!--   distinct() -->
-
-
-<!-- # Calculating Topt0 using the "simplified" equation -->
-<!-- Topt0_df <- VecParms %>% -->
-<!--   mutate(P_EIP = exp(-muV / etaV)) %>% -->
-<!--   mutate(proxy_0 = betaV * P_EIP / (muV * V0)) %>% -->
-<!--   filter(is.finite(proxy_0)) %>% -->
-<!--   select(system_ID, Temperature, proxy_0) %>% -->
-<!--   group_by(system_ID) -->
-
-<!-- Topt0_base_estimates <- Topt0_df %>% -->
-<!--   group_by(system_ID) %>% -->
-<!--   # Calculate Topt_0 -->
-<!--   filter(proxy_0 == proxy_0[which.max(proxy_0)]) %>% -->
-<!--   rename(Topt_0 = Temperature) -->
-<!-- # check with above: Topt_0 matches with Topt when sigmaH*KH is minimized -->
-<!-- # also shows that these estimates are independent of KL (and thus ABSOLUTE adult mosquito density) -->
-
-<!-- # Calculating Topt0 using the "simplified" equation -->
-<!-- ToptRM_df <- VecParms %>% -->
-<!--   mutate(P_EIP = exp(-muV / etaV)) %>% -->
-<!--   mutate(proxy_RM = sigmaV^2 * V0 * betaV * P_EIP / muV) %>% -->
-<!--   select(system_ID, Temperature, proxy_RM) %>% -->
-<!--   group_by(system_ID) -->
-
-<!-- ToptRM_base_estimates <- ToptRM_df %>% -->
-<!--   group_by(system_ID) %>% -->
-<!--   # Calculate Topt_RM -->
-<!--   filter(proxy_RM == proxy_RM[which.max(proxy_RM)]) %>% -->
-<!--   rename(Topt_RM = Temperature) -->
-<!-- # check with above: Topt_RM matches with Topt when sigmaH*KH is maximized -->
-<!-- # also shows that these estimates are independent of KL (and thus ABSOLUTE adult mosquito density) -->
-
-<!-- Topt_estimates <- left_join(ToptRM_base_estimates, Topt0_base_estimates) %>% -->
-<!--   select(system_ID, Topt_RM, Topt_0) %>% -->
-<!--   mutate(Topt_diff = Topt_RM - Topt_0) %>% -->
-<!--   mutate(prop_Topt_diff = abs(Topt_diff) / Topt_RM) -->
+Toptdiff_df <- left_join(Toptdiff_CCH, Toptdiff_RM) %>%
+  mutate(Toptdiff = Topt_RM - Topt) %>%
+  mutate(absToptdiff = abs(Toptdiff)) %>%
+  mutate(propToptdiff = (Topt_RM - Topt) / Topt_RM) %>%
+  mutate(sigmaHKH = sigmaH * KH) %>%
+  group_by(system_ID) %>%
+  filter(absToptdiff == max(absToptdiff)) %>%
+  select(-sigmaH, -KH, -sigmaHKH, -absToptdiff) %>%
+  distinct()
 
 
-<!-- # Investigating Topt_RM and Topt_0 further -->
+# Calculating Topt0 using the "simplified" equation
+Topt0_df <- median.Vec %>%
+  filter(V0 > 1) %>% 
+  mutate(muV = 1/(lf + eps)) %>% 
+  mutate(P_EIP = exp(-muV / etaV)) %>%
+  mutate(proxy_0 = lf * betaV * P_EIP / (KL * rhoL * (lf - 1 / (sigmaV_f * deltaL)))) %>%
+  select(system_ID, Temperature, proxy_0) %>%
+  group_by(system_ID)
 
-<!-- test_df <- VecParms %>% -->
-<!--   mutate(P_EIP = exp(-muV / etaV)) %>% -->
-<!--   mutate(sigmaVV0 = sigmaV * V0) %>% -->
-<!--   mutate(proxy_0 = betaV * P_EIP / (muV * V0)) %>% -->
-<!--   mutate(proxy_RM = sigmaV^2 * V0 * betaV * P_EIP / muV) %>% # = sigmaVV0^2*proxy_0 -->
-<!--   filter(is.finite(proxy_0)) %>% -->
-<!--   select(system_ID, Temperature, proxy_RM, proxy_0, sigmaVV0) -->
-<!-- ``` -->
+test_plot <- Topt0_df %>% 
+  ggplot(aes(x = Temperature, y = proxy_0)) +
+  geom_point() +
+  facet_wrap(~system_ID, scales = "free")
+test_plot
+
+Topt0_base_estimates <- Topt0_df %>%
+  group_by(system_ID) %>%
+  # Calculate Topt_0
+  filter(proxy_0 == proxy_0[which.max(proxy_0)]) %>%
+  rename(Topt_0 = Temperature)
+# check with above: Topt_0 matches with Topt when sigmaH*KH is minimized
+# also shows that these estimates are independent of KL (and thus ABSOLUTE adult mosquito density)
+
+# Calculating Topt0 using the "simplified" equation
+ToptRM_df <- median.Vec %>%
+  mutate(muV = 1/(lf + eps)) %>% 
+  mutate(P_EIP = exp(-muV / etaV)) %>%
+  mutate(proxy_RM = sigmaV^2 * V0 * betaV * P_EIP / muV) %>%
+  select(system_ID, Temperature, proxy_RM) %>%
+  group_by(system_ID)
+
+ToptRM_base_estimates <- data.Topt %>%
+  group_by(system_ID) %>%
+  filter(is.infinite(sigmaH)) %>% 
+  select(system_ID, median) %>% 
+  rename(Topt_RM = median) %>% 
+  distinct()
+  # Calculate Topt_RM
+  # filter(proxy_RM == proxy_RM[which.max(proxy_RM)]) %>%
+  # rename(Topt_RM = Temperature)
+# check with above: Topt_RM matches with Topt when sigmaH*KH is maximized
+# also shows that these estimates are independent of KL (and thus ABSOLUTE adult mosquito density)
+
+Topt_estimates_median <- left_join(ToptRM_base_estimates, Topt0_base_estimates) %>%
+  select(system_ID, Topt_RM, Topt_0) %>%
+  mutate(Topt_diff = Topt_RM - Topt_0) %>%
+  mutate(prop_Topt_diff = abs(Topt_diff) / Topt_RM)
+
+
+# Investigating Topt_RM and Topt_0 further
+
+test_df <- median.Vec %>%
+  mutate(muV = 1/(lf + eps)) %>% 
+  mutate(P_EIP = exp(-muV / etaV)) %>%
+  mutate(sigmaVV0 = sigmaV * V0) %>%
+  mutate(proxy_0 = betaV * P_EIP / (muV * V0)) %>%
+  mutate(proxy_RM = sigmaV^2 * V0 * betaV * P_EIP / muV) %>% # = sigmaVV0^2*proxy_0
+  filter(is.finite(proxy_0)) %>%
+  select(system_ID, Temperature, proxy_RM, proxy_0, sigmaVV0)
+```
