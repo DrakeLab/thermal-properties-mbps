@@ -233,8 +233,8 @@ data.Anga_fecundity <- read.csv("data/raw/Anopheles_fecundity.csv", header = TRU
   mutate(pathogen = NA) %>% 
   dplyr::select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year) 
 
-### * Villena 2021 ----
-data.Villena2021 <- read.csv("data/raw/Villena_2021/traits.csv", header = TRUE) %>%
+### * Villena 2022 ----
+data.Villena2022 <- read.csv("data/raw/Villena_2022/traits.csv", header = TRUE) %>%
   # make mosquito names consistent with other data
   mutate(mosquito_species = case_when(
     specie %in% c("An. stephensi") ~ "Anopheles stephensi",
@@ -268,18 +268,18 @@ data.Villena2021 <- read.csv("data/raw/Villena_2021/traits.csv", header = TRUE) 
   mutate(trait = ifelse(trait.name == "bc", trait/100, trait)) %>% 
   # Add lead author and year of publication
   mutate(lead_author = "Villena") %>%
-  mutate(year = "2021") %>%
+  mutate(year = "2022") %>%
   # Restrict to relevant columns
   dplyr::select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year) 
 
-# Following Villena 2021, use An. arabiensis and An. Pseudopunctipennis data for Anopheles gambiae biting rate
+# Following Villena 2022, use An. arabiensis and An. Pseudopunctipennis data for Anopheles gambiae biting rate
 data.Villena2021 <- data.Villena2021 %>% 
   rbind(filter(data.Villena2021, 
                mosquito_species %in% c("Anopheles arabiensis", "Anopheles pseudopunctipennis"),
                trait.name == "a") %>% 
           mutate(mosquito_species = "Anopheles gambiae"))
 
-# Following Villena 2021, use Plasmodium berghei data for Anopheles gambiae / Plasmodium falciparum competence  
+# Following Villena 2022, use Plasmodium berghei data for Anopheles gambiae / Plasmodium falciparum competence  
 data.Villena2021 <- data.Villena2021 %>% 
   rbind(filter(data.Villena2021, 
                pathogen == "Plasmodium berghei",
@@ -291,7 +291,7 @@ data.Villena2021 <- data.Villena2021 %>%
 # Combine all data frames
 data.All <- rbind(data.Mordecai2013, data.Mordecai2017, data.Shocket2018, 
                   data.Tesla2018, data.Shocket2020, data.Anga_fecundity, 
-                  data.Villena2021)
+                  data.Villena2022)
 
 # 3) Rename non-focal systems and combine synonymous traits -----------------
 
