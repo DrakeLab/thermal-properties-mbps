@@ -300,8 +300,9 @@ for (var_name in temp_vars) {
 R0.HPD <- read_rds("results/R0_HPD_sens.rds")
 
 ## Plot R0 uncertainty 
-Temp_range_for_plot <- R0.HPD %>% ungroup() %>%
-  dplyr::filter(HPD_width > eps) %>%
+Temp_range_for_plot <- R0.HPD %>% 
+  ungroup() %>%
+  dplyr::filter(rel_HPD_width > eps) %>%
   # dplyr::filter(KH == KH_select) %>%
   select(Temperature) %>% range()
 
@@ -359,12 +360,18 @@ ggsave("figures/results/R0_uncertainty.svg",
        plot = R0.uncertainty.plot,
        width = 16, height = 9)
 
-# !!! [] reduce cases to just show contrasts
-# !!! [] make the "case" labels more descriptive
-# !!! [] Fix the limits for temperature
 # "Relative sensitivity" plot
 plot.R0.rel.sens <- R0.HPD %>% 
+  ungroup() %>% 
+  mutate(system_label = case_when(
+    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
+    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
+    system_ID == "Aedes albopictus / DENV" ~ "(c\u200b) *Ae. albopictus* and DENV",
+    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
+    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
+  )) %>%
   filter(KH %in% c(1,100) & sigmaH %in% c(50, Inf)) %>% 
+  filter(!(KH == 100 & sigmaH == Inf)) %>% 
   filter(rel_HPD_width != 0) %>% 
   # For each KH value, sum up all sensitivity values to get total sensitivity across parameters
   group_by(system_ID, sigmaH, KH, Temperature) %>% 
@@ -375,16 +382,30 @@ plot.R0.rel.sens <- R0.HPD %>%
   # Make a stacked plot, colored by parameter
   ggplot(aes(x = Temperature, y = sens_rel, fill = focal_var)) +
   geom_area() +
-  scale_x_continuous(
-    # trans = 'log10'
+  scale_fill_discrete(
+    name = "Focal parameter",
+    breaks = c("betaV", "deltaL", "etaV", "muV", "rhoL", "sigmaV", "sigmaV_f"),
+    labels =  c("Vector competence", "Pr(larval survival)", 
+                "Parasite development rate", "Mortality rate", 
+                "Immature development rate", "Max. biting rate", 
+                "Eggs per female per day")
   ) +
-  # scale_y_continuous(
-  #   limits = c(0,1)
-  # ) +
-  facet_grid(cols = vars(system_ID),
+  scale_x_continuous(
+    limits = Temp_range_for_plot,
+    expand = c(0,0)
+  ) +
+  scale_y_continuous(
+    name = unname(TeX("Relative contribution to $R_0$ HPD width"))
+  ) +
+  facet_grid(cols = vars(system_label),
              rows = vars(KH, sigmaH), 
+             labeller = labeller(sigmaH = as_labeller(appender_sigmaH, default = label_parsed),
+                                 KH = as_labeller(appender_KH, default = label_parsed)),
              scales = "free") +
-  theme_minimal_hgrid(16)
+  theme_minimal_hgrid(16) +
+  theme(
+    strip.text.x = element_text(size = 10)
+  )
 plot.R0.rel.sens
 
 
@@ -523,7 +544,7 @@ var_name_table <- list(
   sigmaV_f = c(TeX("$\\sigma_v f$"))
 )
 
-# !!! [] create relative sensitivity plot, like for R0 HPDs
+# !!! [x] create relative sensitivity plot, like for R0 HPDs
 ddTR0.uncertainty.plot <- ddTR0.HPD %>% 
   ungroup() %>% 
   # dplyr::filter(focal_var %in% c("sigmaV_f")) %>%
@@ -565,6 +586,54 @@ ddTR0.uncertainty.plot
 ggsave("figures/results/ddTR0_uncertainty.svg", 
        plot = ddTR0.uncertainty.plot,
        width = 16, height = 9)
+
+# "Relative sensitivity" plot
+plot.ddTR0.rel.sens <- ddTR0.HPD %>% 
+  ungroup() %>% 
+  mutate(system_label = case_when(
+    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
+    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
+    system_ID == "Aedes albopictus / DENV" ~ "(c\u200b) *Ae. albopictus* and DENV",
+    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
+    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
+  )) %>%
+  filter(KH %in% c(1,100) & sigmaH %in% c(50, Inf)) %>% 
+  filter(!(KH == 100 & sigmaH == Inf)) %>% 
+  filter(rel_HPD_width != 0) %>% 
+  # For each KH value, sum up all sensitivity values to get total sensitivity across parameters
+  group_by(system_ID, sigmaH, KH, Temperature) %>% 
+  mutate(sens_total = sum(rel_HPD_width)) %>% 
+  # Divide each sensitivity value by the total sensitivity
+  mutate(sens_rel = rel_HPD_width / sens_total) %>% 
+  arrange(sens_rel) %>% 
+  # Make a stacked plot, colored by parameter
+  ggplot(aes(x = Temperature, y = sens_rel, fill = focal_var)) +
+  geom_area() +
+  scale_fill_discrete(
+    name = "Focal parameter",
+    breaks = c("betaV", "deltaL", "etaV", "muV", "rhoL", "sigmaV", "sigmaV_f"),
+    labels =  c("Vector competence", "Pr(larval survival)", 
+                "Parasite development rate", "Mortality rate", 
+                "Immature development rate", "Max. biting rate", 
+                "Eggs per female per day")
+  ) +
+  scale_x_continuous(
+    limits = Temp_range_for_plot,
+    expand = c(0,0)
+  ) +
+  scale_y_continuous(
+    name = unname(TeX("Relative contribution to $\\frac{dR_0}{dT}$ HPD width"))
+  ) +
+  facet_grid(cols = vars(system_label),
+             rows = vars(KH, sigmaH), 
+             labeller = labeller(sigmaH = as_labeller(appender_sigmaH, default = label_parsed),
+                                 KH = as_labeller(appender_KH, default = label_parsed)),
+             scales = "free") +
+  theme_minimal_hgrid(16) +
+  theme(
+    strip.text.x = element_text(size = 10)
+  )
+plot.ddTR0.rel.sens
 
 # 5) Topt uncertainty -------------------------------------------------------
 
@@ -764,13 +833,22 @@ ggsave("figures/results/Topt_uncertainty.svg",
        plot = Topt.uncertainty.plot,
        width = 16, height = 9)
 
-# !!! [] use facet_wrap instead
-# !!! [] make plot "vertical"
-# !!! [] make x and y axis labels descriptive
-# !!! [] make system labels nice
-# !!! [] make focal variable names nice
+# !!! [x] use facet_wrap instead
+# !!! [x] make plot "vertical"
+# !!! [x] make x and y axis labels descriptive
+# !!! [x] make x ticks nice
+# !!! [x] make system labels nice
+# !!! [x] make focal variable names nice
 # "Relative sensitivity" plot
-plot.Topt.rel.sens <- Topt.HPD %>% 
+plot.Topt.rel.sens <- Topt.HPD %>%
+  ungroup() %>% 
+  mutate(system_label = case_when(
+    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
+    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
+    system_ID == "Aedes albopictus / DENV" ~ "(c\u200b) *Ae. albopictus* and DENV",
+    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
+    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
+  )) %>%
   filter(!is.na(rel_HPD_width)) %>% 
   # For each KH value, sum up all sensitivity values to get total sensitivity
   group_by(system_ID, sigmaH, KH) %>% 
@@ -781,16 +859,32 @@ plot.Topt.rel.sens <- Topt.HPD %>%
   # Make a stacked plot, colored by parameter
   ggplot(aes(x = KH, y = sens_rel, fill = focal_var)) +
   geom_area() +
-  scale_x_continuous(
-    trans = 'log10'
+  scale_fill_discrete(
+    name = "Focal parameter",
+    breaks = c("betaV", "deltaL", "etaV", "muV", "rhoL", "sigmaV", "sigmaV_f"),
+    labels =  c("Vector competence", "Pr(larval survival)", 
+                "Parasite development rate", "Mortality rate", 
+                "Immature development rate", "Max. biting rate", 
+                "Eggs per female per day")
+  )  +
+  scale_x_log10(
+    name = TeX("Vertebrate host population density (ind/ha)"),
+    expand = c(0, 0),
+    # limits = c(0.05, 2E3),
+    breaks = 10^seq(-1, 3, 1),
+    labels = TeX(c("$0.1$", "$1$", "$10", "$100$", "$10^3$"))
+  ) +
+  scale_y_continuous(
+    name = unname(TeX("Relative contribution to $T_{opt}$ HPD width"))
   ) +
   # scale_y_continuous(
   #   limits = c(0,1)
   # ) +
-  facet_grid(rows = vars(sigmaH),
-             cols = vars(system_ID), 
-             scales = "free") +
-  theme_minimal_hgrid(16)
+  facet_grid(cols = vars(system_label), scales = "free") +
+  theme_minimal_hgrid(16) +
+  theme(
+    strip.text.x = element_text(size = 14)
+  )
 plot.Topt.rel.sens
 
 # 6) CTmin/max/width uncertainty ------------------------------------------
@@ -968,6 +1062,7 @@ for (var_name in temp_vars) {
       mutate(rel_HPD_width = ifelse(full_HPD_width %in% c(0,eps), 0, HPD_width / full_HPD_width)) %>% 
       rbind(CT.HPD)
   }
+  pb$terminate()
 }
 
 
@@ -986,7 +1081,8 @@ var_name_table <- list(
   sigmaV_f = c(TeX("$\\sigma_v f$"))
 )
 
-# !!! [] re-run analysis since CTwidth is coming up as NA
+# !!! [x] re-run analysis since CTwidth is coming up as NA
+# !!! [x] make relative sensitivity plot like was done for R0
 # CTwidth
 CTwidth.uncertainty.plot <- CT.HPD %>%   
   ungroup() %>% 
@@ -1036,7 +1132,59 @@ ggsave("figures/results/CTwidth_uncertainty.svg",
        plot = CTwidth.uncertainty.plot,
        width = 16, height = 9)
 
+plot.CTwidth.rel.sens <- CT.HPD %>%
+  ungroup() %>% 
+  filter(variable == "CTwidth") %>% 
+  mutate(system_label = case_when(
+    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
+    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
+    system_ID == "Aedes albopictus / DENV" ~ "(c\u200b) *Ae. albopictus* and DENV",
+    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
+    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
+  )) %>%
+  filter(!is.na(rel_HPD_width)) %>% 
+  # For each KH value, sum up all sensitivity values to get total sensitivity
+  group_by(system_ID, sigmaH, KH) %>% 
+  mutate(sens_total = sum(rel_HPD_width)) %>% 
+  # Divide each sensitivity value by the total sensitivity
+  mutate(sens_rel = rel_HPD_width / sens_total) %>% 
+  arrange(sens_rel) %>% 
+  # Make a stacked plot, colored by parameter
+  ggplot(aes(x = KH, y = sens_rel, fill = focal_var)) +
+  geom_area() +
+  scale_fill_discrete(
+    name = "Focal parameter",
+    breaks = c("betaV", "deltaL", "etaV", "muV", "rhoL", "sigmaV", "sigmaV_f"),
+    labels =  c("Vector competence", "Pr(larval survival)", 
+                "Parasite development rate", "Mortality rate", 
+                "Immature development rate", "Max. biting rate", 
+                "Eggs per female per day")
+  )  +
+  scale_x_log10(
+    name = TeX("Vertebrate host population density (ind/ha)"),
+    expand = c(0, 0),
+    # limits = c(0.9, 1.1E3),
+    breaks = 10^seq(-2, 3, 1),
+    labels = TeX(c("$0.01","$0.1$", "$1$", "$10", "$100$", "$10^3$"))
+  ) +
+  scale_y_continuous(
+    name = unname(TeX("Relative contribution to $CT_{width}$ HPD width"))
+  ) +
+  # scale_y_continuous(
+  #   limits = c(0,1)
+  # ) +
+  facet_grid(cols = vars(system_label),
+             rows = vars(sigmaH), 
+             labeller = labeller(sigmaH = as_labeller(appender_sigmaH,
+                                                      default = label_parsed)),
+             scales = "free") +
+  theme_minimal_hgrid(16) +
+  theme(
+    strip.text.x = element_text(size = 10)
+  )
+plot.CTwidth.rel.sens
 
+# !!! [x] make relative sensitivity plot like was done for R0
 # CTmin
 CTmin.uncertainty.plot <- CT.HPD %>% 
   filter(variable == "CTmin") %>% 
@@ -1086,7 +1234,60 @@ ggsave("figures/results/CTmin_uncertainty.svg",
        plot = CTmin.uncertainty.plot,
        width = 16, height = 9)
 
+plot.CTmin.rel.sens <- CT.HPD %>%
+  ungroup() %>% 
+  filter(variable == "CTmin") %>% 
+  mutate(system_label = case_when(
+    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
+    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
+    system_ID == "Aedes albopictus / DENV" ~ "(c\u200b) *Ae. albopictus* and DENV",
+    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
+    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
+  )) %>%
+  filter(!is.na(rel_HPD_width)) %>% 
+  # For each KH value, sum up all sensitivity values to get total sensitivity
+  group_by(system_ID, sigmaH, KH) %>% 
+  mutate(sens_total = sum(rel_HPD_width)) %>% 
+  # Divide each sensitivity value by the total sensitivity
+  mutate(sens_rel = rel_HPD_width / sens_total) %>% 
+  arrange(sens_rel) %>% 
+  # Make a stacked plot, colored by parameter
+  ggplot(aes(x = KH, y = sens_rel, fill = focal_var)) +
+  geom_area() +
+  scale_fill_discrete(
+    name = "Focal parameter",
+    breaks = c("betaV", "deltaL", "etaV", "muV", "rhoL", "sigmaV", "sigmaV_f"),
+    labels =  c("Vector competence", "Pr(larval survival)", 
+                "Parasite development rate", "Mortality rate", 
+                "Immature development rate", "Max. biting rate", 
+                "Eggs per female per day")
+  )  +
+  scale_x_log10(
+    name = TeX("Vertebrate host population density (ind/ha)"),
+    expand = c(0, 0),
+    # limits = c(0.9, 1.1E3),
+    breaks = 10^seq(-2, 3, 1),
+    labels = TeX(c("$0.01","$0.1$", "$1$", "$10", "$100$", "$10^3$"))
+  ) +
+  scale_y_continuous(
+    name = unname(TeX("Relative contribution to $CT_{min}$ HPD width"))
+  ) +
+  # scale_y_continuous(
+  #   limits = c(0,1)
+  # ) +
+  facet_grid(cols = vars(system_label),
+             rows = vars(sigmaH), 
+             labeller = labeller(sigmaH = as_labeller(appender_sigmaH,
+                                                      default = label_parsed)),
+             scales = "free") +
+  theme_minimal_hgrid(16) +
+  theme(
+    strip.text.x = element_text(size = 10)
+  )
+plot.CTmin.rel.sens
 
+
+# !!! [x] make relative sensitivity plot like was done for R0
 # CTmax
 CTmax.uncertainty.plot <- CT.HPD %>% 
   filter(variable == "CTmax") %>% 
@@ -1136,11 +1337,62 @@ ggsave("figures/results/CTmax_uncertainty.svg",
        plot = CTmax.uncertainty.plot,
        width = 16, height = 9)
 
+plot.CTmax.rel.sens <- CT.HPD %>%
+  ungroup() %>% 
+  filter(variable == "CTmax") %>% 
+  mutate(system_label = case_when(
+    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
+    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
+    system_ID == "Aedes albopictus / DENV" ~ "(c\u200b) *Ae. albopictus* and DENV",
+    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
+    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
+  )) %>%
+  filter(!is.na(rel_HPD_width)) %>% 
+  # For each KH value, sum up all sensitivity values to get total sensitivity
+  group_by(system_ID, sigmaH, KH) %>% 
+  mutate(sens_total = sum(rel_HPD_width)) %>% 
+  # Divide each sensitivity value by the total sensitivity
+  mutate(sens_rel = rel_HPD_width / sens_total) %>% 
+  arrange(sens_rel) %>% 
+  # Make a stacked plot, colored by parameter
+  ggplot(aes(x = KH, y = sens_rel, fill = focal_var)) +
+  geom_area() +
+  scale_fill_discrete(
+    name = "Focal parameter",
+    breaks = c("betaV", "deltaL", "etaV", "muV", "rhoL", "sigmaV", "sigmaV_f"),
+    labels =  c("Vector competence", "Pr(larval survival)", 
+                "Parasite development rate", "Mortality rate", 
+                "Immature development rate", "Max. biting rate", 
+                "Eggs per female per day")
+  )  +
+  scale_x_log10(
+    name = TeX("Vertebrate host population density (ind/ha)"),
+    expand = c(0, 0),
+    # limits = c(0.9, 1.1E3),
+    breaks = 10^seq(-2, 3, 1),
+    labels = TeX(c("$0.01","$0.1$", "$1$", "$10", "$100$", "$10^3$"))
+  ) +
+  scale_y_continuous(
+    name = unname(TeX("Relative contribution to $CT_{max}$ HPD width"))
+  ) +
+  # scale_y_continuous(
+  #   limits = c(0,1)
+  # ) +
+  facet_grid(cols = vars(system_label),
+             rows = vars(sigmaH), 
+             labeller = labeller(sigmaH = as_labeller(appender_sigmaH,
+                                                      default = label_parsed)),
+             scales = "free") +
+  theme_minimal_hgrid(16) +
+  theme(
+    strip.text.x = element_text(size = 10)
+  )
+plot.CTmax.rel.sens
 
-# 3) Topt local, global sensitivity, uncertainty --------------------------
+
+# 4) Densities of Topt, CT min, max, and width ----------------------------
 
 ###* Density of Topt ----
-
 data.Topt <- data.Host %>%
   dplyr::filter(sigmaH %in% c(100, Inf)) %>%
   dplyr::filter(KH %in% 10^seq(-2,4))
@@ -1166,48 +1418,31 @@ Topt.density.df <- expand_grid(data.Topt, data.Vec) %>%
   distinct() %>% 
   # Get temperature at which R0 is maximized
   rename(Topt = Temperature) %>%
-  dplyr::select(system_ID, sample_num, Model, sigmaH, KH, Topt) #%>%
-#distinct() 
-
+  dplyr::select(system_ID, sample_num, Model, sigmaH, KH, Topt)
 
 Topt.density.df <- full_join(Topt.density.df,
                              expand_grid(data.Topt, data.Vec) %>%
                                select(c(Model, system_ID, sample_num, sigmaH,KH)) %>%
                                distinct())
 
-plot.Topt.density <- Topt.density.df %>% 
-  # dplyr::filter(sigmaH %in% Inf) %>%
-  # dplyr::filter(KH < 1E3) %>%
+plot.Topt.density <- Topt.density.df %>%
+  filter(is.infinite(sigmaH)) %>% 
   ggplot(aes(x = Topt)) +
   geom_density(aes(color = as.factor(KH), linetype = as.factor(sigmaH)),
                lwd = 1, adjust = 1) +
-  # geom_density(data = dplyr::filter(Topt.density.df, sigmaH == Inf),
-  #              linetype = 1,
-  #              lwd = 2) +
-  # color: scaled log10, color-blind friendly
   scale_color_viridis_d(
     name = "Vertebrate host population\ndensity (ind/ha)",
     breaks = 10^seq(-2, 5),
     labels = unname(c(0.01, 0.1, 1, 10, 100, TeX("$10^3$"), TeX("$10^4$"), TeX("$10^5$"))),
     option = "plasma"
   ) +
-  facet_wrap(~system_ID, scales = "free") +
+  facet_wrap(~system_ID, ncol = 1, scales = "free") +
   theme_minimal_grid()
 
-plot.Topt.density
+###* Densities of CTmin,max,width ----
 
-###* Global sensitivity (following Johnson 2015) ----
-# 
-
-
-# 4) CTmin local, global sensitivity, uncertainty -------------------------
-
-###* Density of CTmin,max,width ----
-
-# Initialize R0 data frame
+# Initialize data frame
 CT.density.df <- init.df
-
-gc()
 
 data.CT <- data.Host %>%
   dplyr::filter(sigmaH %in% c(100, Inf)) %>%
@@ -1230,7 +1465,7 @@ CT.density.df <- expand_grid(data.CT, data.Vec) %>%
                      bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>%
   # Basic reproduction number
   mutate(R0 = sqrt(RV*RH)) %>%
-  # dplyr::filter to maximum value of R0
+  # filter to temperatures where R0 exceeds one
   group_by(system_ID, sample_num, sigmaH, KH) %>%
   dplyr::filter(R0 > 1) %>%
   # Get lowest temperature at which R0 exceeds one
@@ -1244,50 +1479,153 @@ CT.density.df <- expand_grid(data.CT, data.Vec) %>%
 
 # Add back values removed from dplyr::filtering R0>1 above
 CT.density.df <- full_join(CT.density.df,
-                           expand_grid(data.CT, data.Vec) %>% 
-                             select(c(Model, system_ID, sample_num, sigmaH,KH)) %>% 
-                             distinct()) %>% 
+                           expand_grid(data.CT, data.Vec) %>%
+                             select(c(Model, system_ID, sample_num, sigmaH,KH)) %>%
+                             distinct()) %>%
   replace_na(list(CTmin = Inf,
                   CTmax = -Inf,
                   CTwidth = 0))
 
-
-# 5) CTmax local, global sensitivity, uncertainty -------------------------
-
-
-# 6) CTwidth local, global sensitivity, uncertainty -----------------------
-
-
-
-# *) Diagnostics & visualizations -----------------------------------------
-
-
-###* Density plots of CTmin, Topt, CTmax ----
+# Density plots of CTmin, Topt, CTmax
 
 # Combine data frames
 all.density.df <- right_join(Topt.density.df, CT.density.df) %>% 
   select(-CTwidth) %>% 
   pivot_longer(cols = c(CTmin, Topt, CTmax), names_to = "variable", values_to = "value") %>% 
-  mutate(system_ID = case_when(
-    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "An. gamb. / P. falciparum",
-    system_ID == "Aedes aegypti / DENV" ~ "Ae. aegypti / DENV",
-    system_ID == "Aedes albopictus / DENV" ~ "Ae. albopictus / DENV",
-    system_ID == "Aedes aegypti / ZIKV" ~ "Ae. aegypti / ZIKV",
-    system_ID == "Culex quinquefasciatus / WNV" ~ "Cx. quin. / WNV"
-  )) %>% 
+  mutate(system_label = case_when(
+    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
+    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
+    system_ID == "Aedes albopictus / DENV" ~ "(c\u200b) *Ae. albopictus* and DENV",
+    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
+    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
+  )) %>%
   mutate(variable = case_when(
     variable == "CTmin" ~ "Critical thermal minimum",
     variable == "Topt" ~ "Thermal optimum",
     variable == "CTmax" ~ "Critical thermal maximum"
-  ))
+  )) %>% 
+  filter(KH < 1e3) %>% 
+  mutate(KH_factor = factor(KH, levels = c("0.01", "0.1", "1", "10", "100")))
 
 all.density.df$variable <- factor(all.density.df$variable, 
                                   levels = c("Critical thermal minimum", "Thermal optimum","Critical thermal maximum"))
+all.density.df$sigmaH <- factor(all.density.df$sigmaH, 
+                                levels = c(100, Inf))
+
+# !!! [] clean up code
+# !!! [] make y label nice
+# !!! [] make system labels nice (decrease font size)
+# !!! [x] make single box and whisker plot? x = Temperature, y = pop. density, show distributions with box&whisker
+
+### Option 1: inline violin plots ----
+plot.densities_violin_inline <- ggplot() +
+  # geom_boxplot(data = all.density.df,
+  #             aes(x = value, y = KH_factor, fill = variable, linetype = sigmaH)) +
+  geom_violin(data = filter(all.density.df, variable == "Thermal optimum"),
+              aes(x = value, y = KH_factor, linetype = sigmaH, fill = "Topt")
+  ) +
+  geom_violin(data = filter(all.density.df, variable == "Critical thermal minimum"),
+              aes(x = value, y = KH_factor, linetype = sigmaH, fill = "CTmin"),
+  ) +
+  geom_violin(data = filter(all.density.df, variable == "Critical thermal maximum"),
+              aes(x = value, y = KH_factor, linetype = sigmaH, fill = "CTmax"),
+  ) +
+  scale_x_continuous(
+    name = "Temperature (°C)",
+    expand = c(0,0)
+  ) +
+  scale_y_discrete(
+    name = "Vertebrate host population density (ind/ha)"
+  ) +
+  scale_linetype(
+    name = "Biting tolerance\n(bites per host per day)"
+  ) +
+  scale_fill_discrete(
+    name = "",
+    breaks = c("CTmin", "Topt", "CTmax"),
+    labels = c("Critical thermal minimum", "Thermal optimum", "Critical thermal maximum")
+  ) +
+  facet_grid(cols = vars(system_label)) +
+  theme_minimal_grid()
+plot.densities_violin_inline
+
+### Option 2: inline box and whisker plots ----
+plot.densities_boxwhisker_inline <- ggplot() +
+  # geom_boxplot(data = all.density.df,
+  #             aes(x = value, y = KH_factor, fill = variable, linetype = sigmaH)) +
+  geom_boxplot(data = filter(all.density.df, variable == "Thermal optimum"),
+               aes(x = value, y = KH_factor, linetype = sigmaH, fill = "Topt")
+  ) +
+  geom_boxplot(data = filter(all.density.df, variable == "Critical thermal minimum"),
+               aes(x = value, y = KH_factor, linetype = sigmaH, fill = "CTmin"),
+  ) +
+  geom_boxplot(data = filter(all.density.df, variable == "Critical thermal maximum"),
+               aes(x = value, y = KH_factor, linetype = sigmaH, fill = "CTmax"),
+  ) +
+  scale_x_continuous(
+    name = "Temperature (°C)",
+    expand = c(0,0)
+  ) +
+  scale_y_discrete(
+    name = "Vertebrate host population density (ind/ha)"
+  ) +
+  scale_linetype(
+    name = "Biting tolerance\n(bites per host per day)"
+  ) +
+  scale_fill_discrete(
+    name = "",
+    breaks = c("CTmin", "Topt", "CTmax"),
+    labels = c("Critical thermal minimum", "Thermal optimum", "Critical thermal maximum")
+  ) +
+  facet_grid(cols = vars(system_label)) +
+  theme_minimal_grid()
+plot.densities_boxwhisker_inline
+
+### Option 3: stacked violin plots ----
+plot.densities_violin_stacked <- ggplot() +
+  geom_violin(data = all.density.df,
+              aes(x = value, y = KH_factor, fill = variable, linetype = sigmaH)) +
+  scale_x_continuous(
+    name = "Temperature (°C)",
+    expand = c(0,0)
+  ) +
+  scale_y_discrete(
+    name = "Vertebrate host population density (ind/ha)"
+  ) +
+  scale_linetype(
+    name = "Biting tolerance\n(bites per host per day)"
+  ) +
+  scale_fill_discrete(
+    name = ""
+  ) +
+  facet_grid(cols = vars(system_label)) +
+  theme_minimal_grid()
+plot.densities_violin_stacked
+
+### Option 4: stacked box and whisker plots ----
+plot.densities_boxwhisker_stacked <- ggplot() +
+  geom_boxplot(data = all.density.df,
+              aes(x = value, y = KH_factor, fill = variable, linetype = sigmaH)) +
+  scale_x_continuous(
+    name = "Temperature (°C)",
+    expand = c(0,0)
+  ) +
+  scale_y_discrete(
+    name = "Vertebrate host population density (ind/ha)"
+  ) +
+  scale_linetype(
+    name = "Biting tolerance\n(bites per host per day)"
+  ) +
+  scale_fill_discrete(
+    name = ""
+  ) +
+  facet_grid(cols = vars(system_label)) +
+  theme_minimal_grid()
+plot.densities_boxwhisker_stacked
 
 # Dynamic: sigmaH = 100
 plot.densities_dynamic <- all.density.df  %>% 
   dplyr::filter(sigmaH %in% 100) %>%
-  # dplyr::filter(KH < 1E3) %>%
   ggplot(aes(x = value)) +
   geom_density(aes(color = as.factor(KH)),
                lwd = 1.5) +
@@ -1352,12 +1690,11 @@ plot.CTwidth.density <- CT.density.df %>%
   ) +
   facet_wrap(~system_ID, scales = "free", ncol = 1) +
   theme_minimal_grid()
-
 plot.CTwidth.density
 
 plot.R0.density <- data.R0 %>% 
   dplyr::filter(Temperature == 10) %>% 
-  ggplot(aes(x = R0)) +
+  ggplot(aes(x = median)) +
   geom_density(aes(color = as.factor(KH), linetype = as.factor(sigmaH)),
                lwd = 1, adjust = 1) +
   # geom_density(data = dplyr::filter(Topt.density.df, sigmaH == Inf),
@@ -1372,7 +1709,7 @@ plot.R0.density <- data.R0 %>%
   ) +
   facet_wrap(~system_ID, scales = "free", ncol = 1) +
   theme_minimal_grid()
-
+plot.R0.density
 
 
 
