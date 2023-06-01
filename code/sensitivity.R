@@ -148,8 +148,8 @@ full.R0.HPD <- expand_grid(data.R0HPD,
   mutate(norm_HPD_width = HPD_width / max(HPD_width))
 
 # Save R0 highest posterior density data
-write_rds(full.R0.HPD, "results/full_R0_HPD.rds")
-# full.R0.HPD <- read_rds("results/full_R0_HPD.rds")
+# write_rds(full.R0.HPD, "results/full_R0_HPD.rds")
+full.R0.HPD <- read_rds("results/full_R0_HPD.rds")
 
 # R0 HPD diagnostic plot
 R0.HPD.plot <- full.R0.HPD %>%
@@ -300,20 +300,10 @@ for (var_name in temp_vars) {
 R0.HPD <- read_rds("results/R0_HPD_sens.rds")
 
 ## Plot R0 uncertainty 
-plot_Temp_range <- R0.HPD %>% ungroup() %>%
+Temp_range_for_plot <- R0.HPD %>% ungroup() %>%
   dplyr::filter(HPD_width > eps) %>%
   # dplyr::filter(KH == KH_select) %>%
   select(Temperature) %>% range()
-
-# var_name_table <- list(
-#   betaV = c(TeX("$\\beta_V$")),
-#   deltaL = c(TeX("$\\delta_L$")),
-#   etaV = c(TeX("$\\eta_V$")),
-#   muV = c(TeX("$\\mu_V$")),
-#   rhoL = c(TeX("$\\rho_L$")),
-#   sigmaV = c(TeX("$\\sigma_V$")),
-#   sigmaV_f = c(TeX("$\\sigma_v f$"))
-# )
 
 var_name_table <- list(
   betaV = "Vector competence",
@@ -325,8 +315,7 @@ var_name_table <- list(
   sigmaV_f = "Eggs per female per day"
 )
 
-
-
+# !!! replace this with "relative contributions to sensitivity" plot
 R0.uncertainty.plot <- R0.HPD %>% 
   ungroup() %>% 
   # dplyr::filter(focal_var %in% c("sigmaV_f")) %>%
@@ -352,7 +341,7 @@ R0.uncertainty.plot <- R0.HPD %>%
                 "Eggs per female per day")
   ) +
   scale_x_continuous(
-    limits = plot_Temp_range
+    limits = Temp_range_for_plot
   ) +
   scale_y_continuous(
     name = "Relative HPD width",
@@ -370,6 +359,9 @@ ggsave("figures/results/R0_uncertainty.svg",
        plot = R0.uncertainty.plot,
        width = 16, height = 9)
 
+# !!! [] reduce cases to just show contrasts
+# !!! [] make the "case" labels more descriptive
+# !!! [] Fix the limits for temperature
 # "Relative sensitivity" plot
 plot.R0.rel.sens <- R0.HPD %>% 
   filter(KH %in% c(1,100) & sigmaH %in% c(50, Inf)) %>% 
@@ -393,7 +385,7 @@ plot.R0.rel.sens <- R0.HPD %>%
              rows = vars(KH, sigmaH), 
              scales = "free") +
   theme_minimal_hgrid(16)
-
+plot.R0.rel.sens
 
 
 # 4) ddT R0 uncertainty -------------------------------------------------------
@@ -437,8 +429,8 @@ full.ddTR0.HPD <- expand_grid(data.ddTR0HPD,
   )
 
 # Save R0 highest posterior density data
-write_rds(full.ddTR0.HPD, "results/full_ddTR0_HPD.rds")
-# full.R0.HPD <- read_rds("results/full_R0_HPD.rds")
+# write_rds(full.ddTR0.HPD, "results/full_ddTR0_HPD.rds")
+full.R0.HPD <- read_rds("results/full_R0_HPD.rds")
 
 # # Diagnostic plot
 # test.plot <- full.ddTR0.HPD %>%
@@ -512,11 +504,11 @@ for (var_name in temp_vars) {
 }
 
 # Save R0 relative highest posterior density data
-write_rds(ddTR0.HPD, "results/ddTR0_HPD_sens.rds")
-# R0.HPD <- read_rds("results/R0_HPD_sens.rds")
+# write_rds(ddTR0.HPD, "results/ddTR0_HPD_sens.rds")
+ddTR0.HPD <- read_rds("results/ddTR0_HPD_sens.rds")
 
 ## Plot R0 uncertainty 
-plot_Temp_range <- ddTR0.HPD %>% ungroup() %>% 
+Temp_range_for_plot <- ddTR0.HPD %>% ungroup() %>% 
   dplyr::filter(HPD_width > eps) %>% 
   dplyr::filter(KH == KH_select) %>% 
   select(Temperature) %>%  range()
@@ -531,7 +523,7 @@ var_name_table <- list(
   sigmaV_f = c(TeX("$\\sigma_v f$"))
 )
 
-
+# !!! [] create relative sensitivity plot, like for R0 HPDs
 ddTR0.uncertainty.plot <- ddTR0.HPD %>% 
   ungroup() %>% 
   # dplyr::filter(focal_var %in% c("sigmaV_f")) %>%
@@ -556,7 +548,7 @@ ddTR0.uncertainty.plot <- ddTR0.HPD %>%
                            "$\\sigma_v f$")))
   ) +
   scale_x_continuous(
-    limits = plot_Temp_range
+    limits = Temp_range_for_plot
   ) +
   scale_y_continuous(
     name = "Relative HPD width",
@@ -772,16 +764,21 @@ ggsave("figures/results/Topt_uncertainty.svg",
        plot = Topt.uncertainty.plot,
        width = 16, height = 9)
 
+# !!! [] use facet_wrap instead
+# !!! [] make plot "vertical"
+# !!! [] make x and y axis labels descriptive
+# !!! [] make system labels nice
+# !!! [] make focal variable names nice
 # "Relative sensitivity" plot
 plot.Topt.rel.sens <- Topt.HPD %>% 
   filter(!is.na(rel_HPD_width)) %>% 
   # For each KH value, sum up all sensitivity values to get total sensitivity
   group_by(system_ID, sigmaH, KH) %>% 
   mutate(sens_total = sum(rel_HPD_width)) %>% 
-# Divide each sensitivity value by the total sensitivity
+  # Divide each sensitivity value by the total sensitivity
   mutate(sens_rel = rel_HPD_width / sens_total) %>% 
   arrange(sens_rel) %>% 
-# Make a stacked plot, colored by parameter
+  # Make a stacked plot, colored by parameter
   ggplot(aes(x = KH, y = sens_rel, fill = focal_var)) +
   geom_area() +
   scale_x_continuous(
@@ -794,7 +791,7 @@ plot.Topt.rel.sens <- Topt.HPD %>%
              cols = vars(system_ID), 
              scales = "free") +
   theme_minimal_hgrid(16)
-
+plot.Topt.rel.sens
 
 # 6) CTmin/max/width uncertainty ------------------------------------------
 
@@ -806,59 +803,57 @@ KH_vec <- 10^seq(-2,5)
 data.CTHPD <- dplyr::filter(data.Host, 
                             sigmaH %in% sigmaH_vec,
                             KH < 1e3) #%>% 
-  #dplyr::filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 11)])
+#dplyr::filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 11)])
 
 full.CT.HPD <- tibble(system_ID = c(), Temperature = c(), Model = c(),
                       sigmaH = c(), KH = c(), variable = c(),
                       HPD_low = c(), HPD_high = c(), HPD_width = c())
 
 
-  for (index_KH in unique(data.CTHPD$KH)) {
-    full.CT.HPD <- expand_grid(dplyr::filter(data.CTHPD, KH == index_KH), 
-                               data.Vec) %>%
-      data.table::data.table() %>%
-      mutate(RV = ifelse(is.infinite(sigmaH),
-                         sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
-                         sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>%
-      mutate(bV = ifelse(is.infinite(sigmaH),
-                         sigmaV, # Ross-Macdonald model
-                         sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>%
-      mutate(RH = ifelse(V0 == 0,
-                         0,
-                         bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>%
-      # Basic reproduction number
-      mutate(R0 = sqrt(RV*RH)) %>%
-      # dplyr::filter to maximum value of R0
-      group_by(system_ID, sample_num, sigmaH, KH) %>%
-      dplyr::filter(R0 > 1) %>%
-      # Get lowest temperature at which R0 exceeds one
-      mutate(CTmin = min(Temperature)) %>%
-      # Get highest temperature at which R0 exceeds one
-      mutate(CTmax = max(Temperature)) %>%
-      # Get width of critical thermal interval
-      mutate(CTwidth = CTmax - CTmin) %>% 
-      # Add back values removed from dplyr::filtering R0>1 above
-      # and assign the right NA values
-      full_join(expand_grid(dplyr::filter(data.CTHPD, KH == index_KH), 
-                            data.Vec) %>% 
-                  select(c(Model, system_ID, sample_num, sigmaH,KH)) %>% 
-                  distinct()) %>% 
-      replace_na(list(CTmin = Inf,
-                      CTmax = -Inf,
-                      CTwidth = 0)) %>% 
-      pivot_longer(cols = c(CTmin, CTmax, CTwidth), names_to = "variable", values_to = "value") %>% 
-      select(system_ID, sample_num, sigmaH, KH, variable, value) %>%
-      group_by(system_ID, sigmaH, KH, variable) %>% 
-      summarise(
-        HPD_low = hdi(value, credMass = 0.95)[1],
-        HPD_high = hdi(value, credMass = 0.95)[2],
-        HPD_width = max(eps, HPD_high-HPD_low),
-        .groups = "keep"
-      ) %>% 
-      rbind(full.CT.HPD)
-  }
-
-
+for (index_KH in unique(data.CTHPD$KH)) {
+  full.CT.HPD <- expand_grid(dplyr::filter(data.CTHPD, KH == index_KH), 
+                             data.Vec) %>%
+    data.table::data.table() %>%
+    mutate(RV = ifelse(is.infinite(sigmaH),
+                       sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
+                       sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>%
+    mutate(bV = ifelse(is.infinite(sigmaH),
+                       sigmaV, # Ross-Macdonald model
+                       sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>%
+    mutate(RH = ifelse(V0 == 0,
+                       0,
+                       bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>%
+    # Basic reproduction number
+    mutate(R0 = sqrt(RV*RH)) %>%
+    # dplyr::filter to maximum value of R0
+    group_by(system_ID, sample_num, sigmaH, KH) %>%
+    dplyr::filter(R0 > 1) %>%
+    # Get lowest temperature at which R0 exceeds one
+    mutate(CTmin = min(Temperature)) %>%
+    # Get highest temperature at which R0 exceeds one
+    mutate(CTmax = max(Temperature)) %>%
+    # Get width of critical thermal interval
+    mutate(CTwidth = CTmax - CTmin) %>% 
+    # Add back values removed from dplyr::filtering R0>1 above
+    # and assign the right NA values
+    full_join(expand_grid(dplyr::filter(data.CTHPD, KH == index_KH), 
+                          data.Vec) %>% 
+                select(c(Model, system_ID, sample_num, sigmaH,KH)) %>% 
+                distinct()) %>% 
+    replace_na(list(CTmin = Inf,
+                    CTmax = -Inf,
+                    CTwidth = 0)) %>% 
+    pivot_longer(cols = c(CTmin, CTmax, CTwidth), names_to = "variable", values_to = "value") %>% 
+    select(system_ID, sample_num, sigmaH, KH, variable, value) %>%
+    group_by(system_ID, sigmaH, KH, variable) %>% 
+    summarise(
+      HPD_low = hdi(value, credMass = 0.95)[1],
+      HPD_high = hdi(value, credMass = 0.95)[2],
+      HPD_width = max(eps, HPD_high-HPD_low),
+      .groups = "keep"
+    ) %>% 
+    rbind(full.CT.HPD)
+}
 
 # Save Topt highest posterior density data
 # write_rds(full.CT.HPD, "results/full_CT_HPD.rds")
@@ -889,11 +884,14 @@ temp_vars <- data.Vec %>%
 
 # Initialize data frame
 CT.HPD <- tibble(system_ID = c(), Temperature = c(), focal_var = c(),
-                   sigmaH = c(), KH = c(), variable = c(),
-                   HPD_width = c(), full_HPD_width = c(), rel_HPD_width = c())
+                 sigmaH = c(), KH = c(), variable = c(),
+                 HPD_width = c(), full_HPD_width = c(), rel_HPD_width = c())
+
+
 
 # For each focal parameter, calculate relative HPD width
 for (var_name in temp_vars) {
+  print(paste0("Focal variable: ", var_name))
   # a) Set all but focal parameter to its posterior mean
   data.HPD.Vec <- data.Vec %>% 
     mutate(muV = 1/lf) %>% 
@@ -901,17 +899,22 @@ for (var_name in temp_vars) {
     full_join(mean.Vec %>% 
                 mutate(muV = 1/lf) %>% 
                 select(-all_of(var_name))%>% 
-                distinct()) %>% 
+                distinct(),
+              by = c("system_ID", "Temperature")) %>% 
     mutate(lf = 1/muV) %>%
     mutate(V0 = ifelse(sigmaV_f * deltaL < (1 / lf),
                        0,
                        KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL)))) %>%
     select(-lf)
-  
+  pb <- progress_bar$new(
+    format = ":spin :system progress = :percent [:bar] :elapsed | eta: :eta",
+    total = length(unique(data.CTHPD$KH)),
+    width = 120)    
   for (index_KH in unique(data.CTHPD$KH)) {
+    pb$tick()
     # b) Get posterior samples of R0 (as a function of temperature)
     CT.HPD <- expand_grid(dplyr::filter(data.CTHPD, KH == index_KH), 
-                            data.HPD.Vec) %>%
+                          data.HPD.Vec) %>%
       mutate(lf = 1/muV) %>% 
       data.table::data.table() %>%
       mutate(RV = ifelse(is.infinite(sigmaH),
@@ -957,7 +960,8 @@ for (var_name in temp_vars) {
       right_join(full.CT.HPD %>% 
                    select(-c(HPD_low, HPD_high)) %>% 
                    rename(full_HPD_width = HPD_width) %>% 
-                   filter(KH == index_KH)) %>% 
+                   filter(KH == index_KH),
+                 by = c("system_ID", "sigmaH", "KH", "variable")) %>% 
       mutate(focal_var = var_name) %>% 
       group_by(system_ID, sigmaH, KH, focal_var) %>% 
       # d) Normalize HPD width by the full HPD width when all parameters are allowed to vary
@@ -969,7 +973,7 @@ for (var_name in temp_vars) {
 
 # Save CT relative highest posterior density data
 # write_rds(CT.HPD, "results/CT_HPD_sens.rds", compress = 'gz')
-# CT.HPD <- read_rds("results/CT_HPD_sens.rds")
+CT.HPD <- read_rds("results/CT_HPD_sens.rds")
 
 ## Plot Topt uncertainty 
 var_name_table <- list(
@@ -982,11 +986,12 @@ var_name_table <- list(
   sigmaV_f = c(TeX("$\\sigma_v f$"))
 )
 
+# !!! [] re-run analysis since CTwidth is coming up as NA
 # CTwidth
-CTwidth.uncertainty.plot <- CT.HPD %>% 
+CTwidth.uncertainty.plot <- CT.HPD %>%   
+  ungroup() %>% 
   filter(variable == "CTwidth") %>% 
   filter(!is.na(HPD_width)) %>% 
-  ungroup() %>% 
   # dplyr::filter(focal_var %in% c("sigmaV_f")) %>%
   mutate(system_ID = case_when(
     system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "An. gamb. / P. falciparum",
