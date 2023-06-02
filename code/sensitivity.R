@@ -1512,6 +1512,8 @@ all.density.df$variable <- factor(all.density.df$variable,
 all.density.df$sigmaH <- factor(all.density.df$sigmaH, 
                                 levels = c(100, Inf))
 
+write_rds(all.density.df, "results/CTminmaxTopt_densities.rds")
+
 # !!! [] clean up code
 # !!! [] make y label nice
 # !!! [] make system labels nice (decrease font size)
