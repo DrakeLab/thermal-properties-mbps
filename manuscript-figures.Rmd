@@ -21,226 +21,151 @@ knitr::opts_chunk$set(
 )
 # Load Libraries----------------------------------------------------------------
 library(tidyverse)
-library(latex2exp) #nec
-library(reshape2) #nec
-library(cowplot) #nec
-library(viridis) #nec
-library(RColorBrewer) #nec
-library(MetBrewer) #nec
+library(latex2exp)
+library(reshape2)
+library(cowplot)
+library(viridis)
+library(RColorBrewer)
+library(MetBrewer)
 library(here)
-library(lemon)  #nec
+library(lemon)
 library(zplyr) # from https://github.com/burchill/zplyr/ # only needed for placing text using absolute coordinates in contact comparison figure
 
-# Tell R where the manuscript lives
-# here::i_am("manuscript-figures.Rmd")
-
-
-
-# Load in necessary functions and files ----------------------------------------
-# Functions for computing equilibrium quantities:
-#  mosquito abundance (compute.V0), basic reproduction number (compute.R0)
-# source("code/output-functions.R")
-
-# Helper function: add a "point at infinity" for plotting when sigmaH is infinite
-inf_skew_func <- function(df, skew, divide, n_rows_to_add) {
-  # Get the largest value of log10(sigmaH)
-  max_log10sigmaH <- filter(df, is.finite(sigmaH)) %>%
-    select(sigmaH) %>%
-    max() %>%
-    log10()
-  
-  # Used to create a gap dividing finite and infinite sigmaH
-  infinite_divide <- 10^mean(log10(c(divide, skew)))
-  
-  # Create a proxy sigmaH variable that replaces Inf with skew
-  df <- mutate(df, sigmaH_proxy = ifelse(is.finite(sigmaH),
-                                         sigmaH, skew
-  ))
-  
-  added_sigma_vals <- seq(divide, skew, length.out = n_rows_to_add)
-  
-  for (i in 1:n_rows_to_add) {
-    bump_val <- 1+0.05*(i-1)
-    temp <- filter(df, is.infinite(sigmaH)) %>%
-      mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH,
-                                   added_sigma_vals[i]))
-    
-    df <- add_row(df, temp) %>% distinct()
-  }
-  
-  return(df)
-  
-}
-
 # Plot settings ----
+
+# !!! [] make sure all plots have font size set at 11 max, unless necessary
 
 # Set theme
 theme_set(theme_minimal(11))
 
-# Helper function to place legends in empty facets of plot grids
+# Helper function: adds a "point at infinity" for plots with infinite sigmaH
+inf_skew_func <- function(df, skew, divide, n_rows_to_add) {
+  # Get the largest value of log10(sigmaH) in the data frame
+  max_log10sigmaH <- filter(df, is.finite(sigmaH)) %>%
+    select(sigmaH) %>%
+    max() %>%
+    log10()
+
+  # Define the gap dividing finite and infinite sigmaH
+  infinite_divide <- 10^mean(log10(c(divide, skew)))
+
+  # Create a proxy sigmaH variable that replaces Inf with the value of "skew"
+  df <- mutate(df, sigmaH_proxy = ifelse(is.finite(sigmaH),
+    sigmaH, skew
+  ))
+
+  # add more proxy sigmaH values to make a "spread" at Inf
+  added_sigma_vals <- seq(divide, skew, length.out = n_rows_to_add)
+  for (i in 1:n_rows_to_add) {
+    bump_val <- 1 + 0.05 * (i - 1)
+    temp <- filter(df, is.infinite(sigmaH)) %>%
+      mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH,
+        added_sigma_vals[i]
+      ))
+    df <- add_row(df, temp) %>% distinct()
+  }
+  return(df)
+}
+
+# Helper function: place legends in empty facets of plot grids
 # Code by: Artem Sokolov, found here: https://stackoverflow.com/questions/54438495/shift-legend-into-empty-facets-of-a-faceted-plot-in-ggplot2
 shift_legend <- function(p) {
   pnls <- cowplot::plot_to_gtable(p) %>%
     gtable::gtable_filter("panel") %>%
     with(setNames(grobs, layout$name)) %>%
     purrr::keep(~ identical(.x, zeroGrob()))
-  
+
   if (length(pnls) == 0) stop("No empty facets in the plot")
-  
+
   lemon::reposition_legend(p, "center", panel = names(pnls))
 }
 
-```
+# Helper function: apply nice labels for pathosystems
+pathosystem_labeller <- function(df) {
+  df <- df %>%
+    ungroup() %>%
+    mutate(system_label = case_when(
+      system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
+      system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
+      system_ID == "Aedes albopictus / DENV" ~ "(c&#41; *Ae. albopictus* and DENV",
+      system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
+      system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
+    ))
+  return(df)
+}
 
-```{r load-data, include=FALSE}
-# Load results data -------------------------------------------------------------
+# Load required data ----
+
+# !!! [] make sure all data is getting loaded here
+
 eps <- .Machine$double.eps
 
 # Vector trait TPC data
-data.Vec <- read_rds("results/VecTPC_vals.rds")
-# R0 data # !!! needs to be updated to include 1e-1, 1e0, 1e1
-data.R0 <- read_rds("results/R0_vals.rds")
+data.Vec <- read_rds("results/VecTPC_vals.rds") %>%
+  #
+  pathosystem_labeller()
+# R0 data
+# !!! [] needs to be updated to include 1e-1, 1e0, 1e1
+data.R0 <- read_rds("results/R0_vals.rds") %>%
+  pathosystem_labeller()
 # Topt data
-data.Topt <- read_rds("results/Topt_vals.rds")
+data.Topt <- read_rds("results/Topt_vals.rds") %>%
+  pathosystem_labeller()
 # Critical thermal extrema data
-data.CT <- read_rds("results/CT_vals.rds")
+data.CT <- read_rds("results/CT_vals.rds") %>%
+  pathosystem_labeller()
 
-# Configure data sets for plotting ---------------------------------------------
+# Configure data sets for plotting ----
 
-## Get mean values of vector traits across samples
-mean.Vec <- data.Vec %>% 
-  select(-c(mosquito_species, pathogen, muL, etaL)) %>% 
+## Get values of vector traits across samples
+# Mean values
+mean.Vec <- data.Vec %>%
+  select(-c(mosquito_species, pathogen, muL, etaL)) %>%
   pivot_longer(cols = lf:V0, names_to = "variable", values_to = "value") %>%
-  group_by(system_ID, Temperature, variable) %>% 
-  summarise(mean = mean(value), .groups = "keep") %>% 
-  ungroup() %>% 
-  pivot_wider(names_from = "variable", values_from = "mean") %>% 
+  group_by(system_ID, Temperature, variable) %>%
+  summarise(mean = mean(value), .groups = "keep") %>%
+  ungroup() %>%
+  pivot_wider(names_from = "variable", values_from = "mean") %>%
+  mutate(etaL = rhoL / (deltaL + eps)) %>%
+  mutate(muL = etaL - rhoL) %>%
+  mutate(V0 = ifelse(sigmaV_f * deltaL < (1 / lf),
+    0,
+    KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL))
+  ))
+# Median values (this one is used more frequently)
+median.Vec <- data.Vec %>%
+  select(-c(mosquito_species, pathogen, muL, etaL)) %>%
+  pivot_longer(cols = lf:V0, names_to = "variable", values_to = "value") %>%
+  group_by(system_ID, Temperature, variable) %>%
+  summarise(median = median(value), .groups = "keep") %>%
+  ungroup() %>%
+  pivot_wider(names_from = "variable", values_from = "median") %>%
   mutate(etaL = rhoL / (deltaL + eps)) %>%
   # Aquatic-stage mosquito mortality rate. This should be ~infinite if deltaL = 0
   mutate(muL = etaL - rhoL) %>%
-  mutate(V0 = ifelse( sigmaV_f * deltaL < (1 / lf),
-                      0,
-                      KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL))))
+  mutate(V0 = ifelse(sigmaV_f * deltaL < (1 / lf),
+    0,
+    KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL))
+  ))
 
-median.Vec <- data.Vec %>% 
-  select(-c(mosquito_species, pathogen, muL, etaL)) %>% 
-  pivot_longer(cols = lf:V0, names_to = "variable", values_to = "value") %>%
-  group_by(system_ID, Temperature, variable) %>% 
-  summarise(median = median(value), .groups = "keep") %>% 
-  ungroup() %>% 
-  pivot_wider(names_from = "variable", values_from = "median") %>% 
-  mutate(etaL = rhoL / (deltaL + eps)) %>%
-  # Aquatic-stage mosquito mortality rate. This should be ~infinite if deltaL = 0
-  mutate(muL = etaL - rhoL) %>%
-  mutate(V0 = ifelse( sigmaV_f * deltaL < (1 / lf),
-                      0,
-                      KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL))))
-
-## Compute mosquito thermal tolerance range (minimum and maximum)
-MosqThermRange_df <- mean.Vec %>%
-  mutate(system_label = case_when(
-    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
-    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
-    system_ID == "Aedes albopictus / DENV" ~ "(c\u200b) *Ae. albopictus* and DENV",
-    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
-    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
-  )) %>%
+# Compute *mosquito* thermal tolerance range (minimum and maximum)
+MosqThermRange_df <- median.Vec %>%
+  pathosystem_labeller() %>%
   group_by(system_label) %>%
   filter(V0 > 0) %>%
   mutate(CTmin_V0 = min(Temperature)) %>%
   mutate(CTmax_V0 = max(Temperature)) %>%
   select(system_ID, system_label, CTmin_V0, CTmax_V0) %>%
   distinct()
-
-# Title names for each mosquito+pathogen combination (NB: to be added to get-analysis-dfs.R)
-data.R0 <- data.R0 %>%
-  ungroup() %>% 
-  mutate(system_label = case_when(
-    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
-    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
-    system_ID == "Aedes albopictus / DENV" ~ "(c\u200b) *Ae. albopictus* and DENV",
-    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
-    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
-  ))
-
-# ## Add a "point at infinity" for sigmaH
-# # Value of sigmaH to replace 'Inf' with for plotting
-# infinite_skew <- 10^3 + 2500
-# 
-# # Get the largest value of log10(sigmaH)
-# max_log10sigmaH <- filter(AllOutputs, is.finite(sigmaH)) %>%
-#   select(sigmaH) %>%
-#   max() %>%
-#   log10()
-# 
-# # Used to create a gap dividing finite and infinite sigmaH
-# infinite_divide <- 10^mean(c(3, log10(infinite_skew)))
-# 
-# # add a second proxy sigmaH point at infinity to make the values easier to see there
-# temp <- filter(AllOutputs, is.infinite(sigmaH)) %>%
-#   mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH, 1.2 * infinite_divide))
-# # Create a proxy sigmaH variable that replaces Inf with infinite_skew
-# AllOutputs <- mutate(AllOutputs, sigmaH_proxy = ifelse(is.finite(sigmaH),
-#                                                        sigmaH, infinite_skew
-# ))
-# AllOutputs <- add_row(AllOutputs, temp) %>% distinct()
-# 
-# # Define sigmaH tick breaks and labels
-# sigmaH_breaks <- c(10^c(seq(0, 3, by = 1)), infinite_divide, infinite_skew)
-# sigmaH_labels <- c(paste(c(10^c(seq(0, 3, by = 1)))), TeX("$\\ldots$"), TeX("$\\infty$"))
-# 
-# ## Parasite thermal characteristics
-# ThermPathChars <- read_csv("results/ThermalCharacteristics.csv", show_col_types = FALSE)
-# 
-# # Title names for each mosquito+pathogen combination
-# ThermPathChars <- ThermPathChars %>%
-#   mutate(system_label = case_when(
-#     system_ID == "Aedes aegypti+DENV" ~ "(a) *Ae. aegypti* and DENV",
-#     system_ID == "Aedes aegypti+ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
-#     system_ID == "Aedes albopictus+DENV" ~ "(c\u200b) *Ae. albopictus* and DENV",
-#     system_ID == "Anopheles spp.+P.fal." ~ "(d) *An. gambiae* and *P. falciparum*",
-#     system_ID == "Culex quinquefasciatus+WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
-#   ))
-# ## Add a "point at infinity" for sigmaH (NB: to be added to get-analysis-dfs.R)
-# # Value of sigmaH to replace 'Inf' with for plotting
-# infinite_skew <- 10^3 + 2500
-# 
-# # Get the largest value of log10(sigmaH)
-# max_log10sigmaH <- filter(ThermPathChars, is.finite(sigmaH)) %>%
-#   select(sigmaH) %>%
-#   max() %>%
-#   log10()
-# 
-# # Used to create a gap dividing finite and infinite sigmaH
-# infinite_divide <- 10^mean(c(3, log10(infinite_skew)))
-# 
-# # Create a proxy sigmaH variable that replaces Inf with infinite_skew
-# ThermPathChars <- mutate(ThermPathChars, sigmaH_proxy = ifelse(is.finite(sigmaH),
-#                                                                sigmaH, infinite_skew
-# ))
-# # add a second proxy sigmaH point at infinity to make the values easier to see there
-# temp <- filter(ThermPathChars, is.infinite(sigmaH)) %>%
-#   mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH, 1.2 * infinite_divide))
-# 
-# ThermPathChars <- add_row(ThermPathChars, temp) %>%
-#   arrange(sigmaH_proxy) %>%
-#   distinct()
-# 
-# ## Options
-# # Define sigmaH tick breaks and labels
-# sigmaH_breaks <- c(10^c(seq(-1, 3, by = 1)), infinite_divide, infinite_skew)
-# sigmaH_labels <- c(paste(c(10^c(seq(-1, 3, by = 1)))), TeX("$\\ldots$"), TeX("$\\infty$"))
-
 ```
 
 # Figures
 
 ```{r fig-1_contact_comparison, dev = c('pdf','svg', 'png'), out.width='100%', fig.align='center', fig.height=5, fig.width=7, fig.align='center', fig.cap='\\label{fig:contact_comparison} A comparison of the Ross-Macdonald and Chitnis contact rate formulations.'}
-
 # resolution setting
 resolution <- 1E2
 
-## Define different contact models
+## Define the contact models
 # For each model, there is a vector-to-host and host-to-vector term
 
 # Bites per mosquito per day
@@ -271,13 +196,13 @@ host_vector_contact_func <- function(df) {
 host_density_range <- c(1E-1, 1E2)
 host_fixed_value <- 50
 host_density_vec <- sort(c(seq(host_density_range[1], host_density_range[2],
-                               length.out = resolution
+  length.out = resolution
 ), host_fixed_value))
 
 vector_density_range <- c(0, 1E3)
 vector_fixed_value <- 500
 vector_density_vec <- sort(c(seq(vector_density_range[1], vector_density_range[2],
-                                 length.out = resolution
+  length.out = resolution
 ), vector_fixed_value))
 
 ## Set other parameters
@@ -309,7 +234,7 @@ contact_df <- expand.grid(
 ## Put plots together:
 new_df <- contact_df %>%
   filter(`Mosquito population density` == vector_fixed_value |
-           `Host population density` == host_fixed_value) %>%
+    `Host population density` == host_fixed_value) %>%
   filter(`Bites per host per day` < 1E3) %>%
   select(-sigma_V, -sigma_H, -model) %>%
   melt(
@@ -337,16 +262,13 @@ plot_HD_MC <- new_df %>%
   filter(x_vars == "Host population density") %>%
   filter(y_vars == "Bites per mosquito per day") %>%
   ggplot(aes(x = x_vals, y = y_vals, colour = `Transmission model`)) +
-  
   # curves:
   geom_path(size = 1) +
   geom_blank(aes(y = y_max)) +
-  
   # plot labels
   geom_abs_text(aes(xpos = 0.08, ypos = 0.89, label = label),
-                color = "black", show.legend = FALSE
+    color = "black", show.legend = FALSE
   ) +
-  
   # x-axis:
   scale_x_continuous(
     name = "",
@@ -364,16 +286,13 @@ plot_MD_MC <- new_df %>%
   filter(x_vars == "Mosquito population density") %>%
   filter(y_vars == "Bites per mosquito per day") %>%
   ggplot(aes(x = x_vals, y = y_vals, colour = `Transmission model`)) +
-  
   # curves:
   geom_path(size = 1) +
   geom_blank(aes(y = y_max)) +
-  
   # plot labels
   geom_abs_text(aes(xpos = 0.08, ypos = 0.89, label = label),
-                color = "black", show.legend = FALSE
+    color = "black", show.legend = FALSE
   ) +
-  
   # x-axis:
   scale_x_continuous(
     name = "",
@@ -394,16 +313,13 @@ plot_MD_HC <- new_df %>%
   filter(y_vars == "Bites per host per day") %>%
   # x = density variables, y = contact rates
   ggplot(aes(x = x_vals, y = y_vals, colour = `Transmission model`)) +
-  
   # curves:
   geom_path(size = 1) +
   geom_blank(aes(y = y_max)) +
-  
   # plot labels
   geom_abs_text(aes(xpos = 0.08, ypos = 0.89, label = label),
-                color = "black", show.legend = FALSE
+    color = "black", show.legend = FALSE
   ) +
-  
   # x-axis:
   scale_x_continuous(
     name = "Mosquito population density",
@@ -422,16 +338,13 @@ plot_HD_HC <- new_df %>%
   filter(y_vars == "Bites per host per day") %>%
   # x = density variables, y = contact rates
   ggplot(aes(x = x_vals, y = y_vals, colour = `Transmission model`)) +
-  
   # curves:
   geom_path(size = 1) +
   geom_blank(aes(y = y_max)) +
-  
   # plot labels
   geom_abs_text(aes(xpos = 0.08, ypos = 0.89, label = label),
-                color = "black", show.legend = FALSE
+    color = "black", show.legend = FALSE
   ) +
-  
   # x-axis:
   scale_x_continuous(
     name = "Host population density",
@@ -446,7 +359,7 @@ plot_HD_HC <- new_df %>%
   # hide legend
   guides(color = FALSE)
 
-
+# Combine plots into a grid and remove legends
 contact_plot <- plot_grid(
   plot_HD_MC + theme(legend.position = "none"),
   plot_MD_MC + theme(legend.position = "none"),
@@ -454,54 +367,66 @@ contact_plot <- plot_grid(
   plot_MD_HC + theme(legend.position = "none")
 )
 
+# Set legend to bottom of grid
 legend <- get_legend(
   plot_HD_MC +
     guides(color = guide_legend(nrow = 1)) +
     theme(legend.position = "bottom")
 )
 
+# Put together grid and legend
 contact_plot <- plot_grid(contact_plot, legend, ncol = 1, rel_heights = c(1, .05))
 
+# Plot
 contact_plot
 ```
 
-```{r fig-3_MosquitoThermalTraits, dev = c('pdf','svg', 'png'),  out.width='100%', fig.height=6, fig.width=9, fig.align='center', fig.cap='\\label{fig:MosquitoThermalTraits} Thermal performance curves for the mosquito and parasite traits used in our model. '}
-
+```{r fig-3_MosquitoThermalTraits, dev = c('pdf','svg', 'png'),  out.width='100%', fig.height=6, fig.width=9, fig.align='center', fig.cap='\\label{fig:MosquitoThermalTraits} Thermal performance curves for the mosquito and parasite traits used in our model. The range of temperatures is restricted to values where the immature development rate is positive. For traits that do not involve a parasite, *Aedes aegypti* with DENV and *Ae. aegypti* with ZIKV curves overlap.'}
 ## Set up plot dataframe
 MosqThermTraits_df <- median.Vec %>%
-  ## Set up plot dataframe
   # Mortality rate
-  mutate(muV = 1/lf) %>% 
+  mutate(muV = 1 / lf) %>%
   # Recruitment rate
   mutate(lambdaV = V0 * muV) %>%
   # Prob. of surviving EIP
   mutate(P_EIP = exp(-muV / etaV)) %>%
+  # Prob. of larval survival
   # Select relevant traits and parameters
-  select(
-    Temperature, system_ID, lambdaV, sigmaV, betaV, lf, P_EIP
-  ) %>%
-  # Turn all columns except Temperature and system_ID (Mosquito sp. + parasite sp.) into
-  # 'variables'
+  select(Temperature, system_ID, sigmaV, sigmaV_f, rhoL, lf, deltaL, P_EIP, betaV) %>%
+  # select(Temperature, system_ID, lambdaV, sigmaV, betaV, lf, P_EIP) %>%
+  # Turn all columns except Temperature and system_ID into variables
   melt(id = c("Temperature", "system_ID")) %>%
+  mutate(variable = factor(variable,
+    levels = c("lf", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "P_EIP", "betaV"),
+    labels = c(
+      TeX("(a) Adult lifespan: $1/\\mu_V$ (days)"),
+      TeX("(b) Biting frequency: $\\sigma_V$ (day$^{-1}$)"),
+      TeX("(c) Eggs per female per day: $\\sigma_V f$"),
+      TeX("(d) Immature development rate: $\\rho_L$"),
+      TeX("(e) Prob. of immature survival: $\\delta_L$"),
+      TeX("(f) Prob. of surviving EIP: $\\theta_V$"),
+      TeX("(g) Vector competence: $\\beta_V$")
+    )
+  )) %>%
   group_by(Temperature, system_ID)
 
-# Assign nice labels for each variable
-levels(MosqThermTraits_df$variable) <- c(
-  lambdaV = TeX("(a) Recruitment rate: $\\lambda_V$ (ind. day$^{-1}$)"),
-  sigmaV = TeX("(b) Maximum biting frequency: $\\sigma_V$ (day$^{-1}$)"),
-  betaV = TeX("(c) Vector competence: $\\beta_V$"),
-  lf = TeX("(d) Average adult lifespan: $1/\\mu_V$ (days)"),
-  P_EIP = TeX("(e) Prob. of surviving EIP: $\\theta_V$")
-)
+# !!! [] be sure to use a consistent order for mosquito life history traits
+# !!! [] be sure to use a consistent list of mosquito life history traits:
+#         - adult lifespan (1/mu_V)
+#         - biting frequency (sigma_V)
+#         - eggs per female per day (sigma_V * f)
+#         - immature development rate
+#         - Pr(larval survival) (deltaL)
+#         - Pr(surviving EIP) (theta_V)
+#         - vector competence (beta_V)
+
 
 MosqThermTraits_plot <- MosqThermTraits_df %>%
   # Set up plotting variables and theme
   # x = Temperature, y = trait value
   ggplot(mapping = aes(x = Temperature, y = value, group = system_ID)) +
-  
   # Plot trait values:
   geom_line(aes(colour = system_ID), size = 1) +
-  
   # x-axis:
   scale_x_continuous(
     name = "Temperature (°C)",
@@ -509,10 +434,8 @@ MosqThermTraits_plot <- MosqThermTraits_df %>%
     limits = c(10, 35),
     breaks = seq(10, 36, 2)
   ) +
-  
   # y-axis:
   scale_y_continuous(expand = c(0.05, 0)) +
-  
   # color:
   scale_color_manual(
     name = "System:",
@@ -527,13 +450,13 @@ MosqThermTraits_plot <- MosqThermTraits_df %>%
       )
     }
   ) +
-  
   # faceting:
-  facet_wrap(~variable, nrow = 3, scales = "free", labeller = labeller(variable = label_parsed)) +
-  
+  facet_wrap(~variable,
+    nrow = 3, scales = "free",
+    labeller = labeller(variable = label_parsed)
+  ) +
   # legend:
   guides(color = guide_legend(override.aes = list(size = 4))) +
-  
   # theme options:
   theme_minimal_vgrid(11) +
   theme(
@@ -554,7 +477,6 @@ shift_legend(MosqThermTraits_plot)
 ```
 
 ```{r fig-4_R0_TPCs, dev = c('pdf','svg', 'png'),  message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:R0_plots} ${R}_0$ as a function of temperature has the properties of a thermal performance curve (TPC): it is positive on a single bounded interval and has a unique maximum value.'}
-
 # Plot R0 vs. temperature curves. One plot for each mosquito+pathogen pair.
 # One curve for Ross-Macdonald, a few for Chitnis
 
@@ -578,7 +500,7 @@ shift_legend(MosqThermTraits_plot)
 #   - colour = value of KH. place it on a color scale in the bottom right corner
 newKH_vals <- unique(data.R0$KH)[seq(1, length(unique(data.R0$KH)), length.out = 21)]
 
-data.R0_norm <- data.R0 %>% 
+data.R0_norm <- data.R0 %>%
   ungroup() %>%
   mutate(system_label = case_when(
     system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
@@ -587,15 +509,15 @@ data.R0_norm <- data.R0 %>%
     system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
     system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
   )) %>%
-  filter(KH %in% newKH_vals) %>% 
+  filter(KH %in% newKH_vals) %>%
   filter(variable == "R0") %>%
   select(-variable) %>%
   # normalize variables to have a maximum of 1
-  group_by(system_ID, Model, sigmaH, KH) %>% 
-  # mutate(mean_norm = mean / max(mean)) %>% 
+  group_by(system_ID, Model, sigmaH, KH) %>%
+  # mutate(mean_norm = mean / max(mean)) %>%
   mutate(median_norm = median / max(median)) %>%
-  # mutate(highHCI_norm = highHCI / max(median)) %>% 
-  # mutate(lowHCI_norm = lowHCI / max(median)) %>% 
+  # mutate(highHCI_norm = highHCI / max(median)) %>%
+  # mutate(lowHCI_norm = lowHCI / max(median)) %>%
   arrange(system_ID, sigmaH, KH, Temperature, median_norm)
 
 
@@ -693,7 +615,6 @@ R0_plot <- ggplot(mapping = aes(x = Temperature, group = KH)) +
 
 # Plot
 R0_plot <- shift_legend(R0_plot)
-
 ```
 
 ```{r fig-5_Topt, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt} The thermal optimum for transmission, $T_{opt}$, may be sensitive to vertebrate host population density and biting tolerance.'}
@@ -712,18 +633,18 @@ Toptalt_df <- data.Topt %>%
     system_ID == "Aedes albopictus / DENV" ~ "(c\u200b) *Ae. albopictus* and DENV",
     system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
     system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
-  )) %>% 
+  )) %>%
   distinct() %>%
   # Arrange along the plotting variables
-  arrange(system_ID, sigmaH, KH, mean) %>% 
+  arrange(system_ID, sigmaH, KH, mean) %>%
   mutate(sigmaH_proxy = sigmaH)
 
 # add many proxy sigmaH points at infinity to make the values easier to see there
 max_sigmaH <- max(filter(Toptalt_df, is.finite(sigmaH))$sigmaH)
 # Value of sigmaH to replace 'Inf' with for plotting
-infinite_skew <- 10^2.35#10^log10(max_sigmaH*1.5) # 1.1*max_sigmaH #10^2 + 80
+infinite_skew <- 10^2.35 # 10^log10(max_sigmaH*1.5) # 1.1*max_sigmaH #10^2 + 80
 # Used to create a gap dividing finite and infinite sigmaH
-infinite_divide <- 10^2.7 #10^log10(max_sigmaH*1)
+infinite_divide <- 10^2.7 # 10^log10(max_sigmaH*1)
 
 Toptalt_df <- inf_skew_func(Toptalt_df, infinite_skew, infinite_divide, 8)
 
@@ -733,8 +654,8 @@ Toptalt_df <- inf_skew_func(Toptalt_df, infinite_skew, infinite_divide, 8)
 sigmaH_breaks <- c(10^c(seq(-1, 2, by = 1)), 10^2.3125, 10^2.5625)
 sigmaH_labels <- c(paste(c(10^c(seq(-1, 2, by = 1)))), TeX("$\\ldots$"), TeX("$\\infty$"))
 
-min_Topt <- floor(min(min(Toptalt_df$mean),min(Toptalt_df$median)))
-max_Topt <- ceiling(max(max(Toptalt_df$mean),max(Toptalt_df$median)))
+min_Topt <- floor(min(min(Toptalt_df$mean), min(Toptalt_df$median)))
+max_Topt <- ceiling(max(max(Toptalt_df$mean), max(Toptalt_df$median)))
 Topt_breaks <- seq(min_Topt, max_Topt, by = 1)
 
 # Plot mean of Topt heat map
@@ -750,19 +671,21 @@ Toptalt_plots <- Toptalt_df %>%
     breaks = Topt_breaks
   ) +
   # Topt for INFINITE sigmaH:
-  # take mean of mean to hide variation from artifacts of uncertainty 
+  # take mean of mean to hide variation from artifacts of uncertainty
   geom_contour_filled(
-    data = filter(Toptalt_df, sigmaH_proxy > infinite_skew) %>% 
-      group_by(system_ID) %>% 
+    data = filter(Toptalt_df, sigmaH_proxy > infinite_skew) %>%
+      group_by(system_ID) %>%
       mutate(mean = mean(mean), .groups = "keep"),
     size = 1,
     breaks = Topt_breaks
   ) +
   # # R0 = 1 contour: cheat and use where CTwidth = 0 (i.e. where R0<1 at any temperature)
-  geom_contour(data = filter(data.CT, variable == "CTwidth", sigmaH < infinite_divide),
-               aes(y = sigmaH, z = mean, colour = "R0 = 1"), 
-               breaks = min(filter(data.CT, variable == "CTwidth", mean > 0)$mean),
-               size = 1) +
+  geom_contour(
+    data = filter(data.CT, variable == "CTwidth", sigmaH < infinite_divide),
+    aes(y = sigmaH, z = mean, colour = "R0 = 1"),
+    breaks = min(filter(data.CT, variable == "CTwidth", mean > 0)$mean),
+    size = 1
+  ) +
   # geom_contour(data = data.R0_norm,
   #              aes(y = sigmaH, z = mean, colour = "R0=1"), breaks = c(1), size = 1) +
   # x-axis: log10-scale with no buffer space
@@ -780,13 +703,13 @@ Toptalt_plots <- Toptalt_df %>%
     breaks = sigmaH_breaks,
     labels = sigmaH_labels
   ) +
-  
+
   # fill:
   scale_fill_manual(
     name = "Transmission thermal optimum (°C)",
     values = met.brewer("Johnson",
-                        n = length(Topt_breaks),
-                        direction = -1
+      n = length(Topt_breaks),
+      direction = -1
     )
   ) +
   # color:
@@ -828,11 +751,10 @@ Toptalt_plots <- Toptalt_df %>%
 
 # Plot
 Toptalt_plots <- shift_legend(Toptalt_plots)
-
 ```
 
 ```{r fig-6_CT_Width, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CT_Width} The parasite population thermal tolerance range, the range of temperatures at which parasite transmission is expected to persist, is widest when biting tolerance is high and vertebrate host population density is low.'}
-# Shows how the parasite thermal niche (temperatures between CT_min and CT_max) 
+# Shows how the parasite thermal niche (temperatures between CT_min and CT_max)
 # depends on vertebrate host availability (density and biting tolerance) in each
 # of the focal systems.
 
@@ -841,7 +763,7 @@ Toptalt_plots <- shift_legend(Toptalt_plots)
 # colour = width of parasite thermal niche (CTmax - CTmin)
 # Facets = systems
 
-CTwidth_df <- data.CT %>%  
+CTwidth_df <- data.CT %>%
   ungroup() %>%
   mutate(system_label = case_when(
     system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
@@ -849,12 +771,12 @@ CTwidth_df <- data.CT %>%
     system_ID == "Aedes albopictus / DENV" ~ "(c\u200b) *Ae. albopictus* and DENV",
     system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
     system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
-  )) %>% 
-  filter(variable == "CTwidth") %>% 
-  # filter(sigmaH < 10^2.2) %>% 
-  mutate(sigmaH_proxy = sigmaH) %>% 
+  )) %>%
+  filter(variable == "CTwidth") %>%
+  # filter(sigmaH < 10^2.2) %>%
+  mutate(sigmaH_proxy = sigmaH) %>%
   # Arrange along the plotting variables
-  arrange(system_ID, KH, sigmaH_proxy, median) %>% 
+  arrange(system_ID, KH, sigmaH_proxy, median) %>%
   ungroup()
 
 CTwidth_df <- inf_skew_func(CTwidth_df, infinite_skew, infinite_divide, 8)
@@ -868,9 +790,11 @@ CTWidth_heat_plots <- CTwidth_df %>%
   # CTwidth for FINITE sigmaH:
   geom_contour_filled(data = filter(CTwidth_df, sigmaH_proxy < 10^2.2)) +
   # CTwidth for INFINITE sigmaH:
-  geom_contour_filled(data = filter(CTwidth_df, 
-                                    sigmaH_proxy > 10^2.4, 
-                                    sigmaH_proxy < infinite_divide)) +
+  geom_contour_filled(data = filter(
+    CTwidth_df,
+    sigmaH_proxy > 10^2.4,
+    sigmaH_proxy < infinite_divide
+  )) +
   # x-axis: log10-scale with no buffer space
   scale_x_log10(
     name = TeX("Vertebrate host population density (ind/ha)"),
@@ -919,7 +843,6 @@ CTWidth_heat_plots <- CTwidth_df %>%
 
 # Plot
 CTWidth_heat_plots <- shift_legend(CTWidth_heat_plots)
-
 ```
 
 <!-- # Supplementary Figures -->
@@ -1823,17 +1746,16 @@ CTWidth_heat_plots <- shift_legend(CTWidth_heat_plots)
 <!-- ``` -->
 
 ```{r table-2_Toptdiffbound, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Toptdiffbound} Calculating how large the difference between the Ross-Macdonald and Chitnis Topt estimates can be.'}
-
 # Estimating the difference between Topt and Topt_RM numerically using our previous data
 Toptdiff_CCH <- data.Topt %>%
-  ungroup() %>% 
+  ungroup() %>%
   select(system_ID, sigmaH, KH, median) %>%
   rename(Topt = median) %>%
   filter(is.finite(sigmaH)) %>%
   distinct()
 
 Toptdiff_RM <- data.Topt %>%
-  ungroup() %>% 
+  ungroup() %>%
   filter(is.infinite(sigmaH)) %>%
   select(system_ID, KH, median) %>%
   rename(Topt_RM = median) %>%
@@ -1852,14 +1774,14 @@ Toptdiff_df <- left_join(Toptdiff_CCH, Toptdiff_RM) %>%
 
 # Calculating Topt0 using the "simplified" equation
 Topt0_df <- median.Vec %>%
-  filter(V0 > 1) %>% 
-  mutate(muV = 1/(lf + eps)) %>% 
+  filter(V0 > 1) %>%
+  mutate(muV = 1 / (lf + eps)) %>%
   mutate(P_EIP = exp(-muV / etaV)) %>%
   mutate(proxy_0 = lf * betaV * P_EIP / (KL * rhoL * (lf - 1 / (sigmaV_f * deltaL)))) %>%
   select(system_ID, Temperature, proxy_0) %>%
   group_by(system_ID)
 
-test_plot <- Topt0_df %>% 
+test_plot <- Topt0_df %>%
   ggplot(aes(x = Temperature, y = proxy_0)) +
   geom_point() +
   facet_wrap(~system_ID, scales = "free")
@@ -1875,7 +1797,7 @@ Topt0_base_estimates <- Topt0_df %>%
 
 # Calculating Topt0 using the "simplified" equation
 ToptRM_df <- median.Vec %>%
-  mutate(muV = 1/(lf + eps)) %>% 
+  mutate(muV = 1 / (lf + eps)) %>%
   mutate(P_EIP = exp(-muV / etaV)) %>%
   mutate(proxy_RM = sigmaV^2 * V0 * betaV * P_EIP / muV) %>%
   select(system_ID, Temperature, proxy_RM) %>%
@@ -1883,13 +1805,13 @@ ToptRM_df <- median.Vec %>%
 
 ToptRM_base_estimates <- data.Topt %>%
   group_by(system_ID) %>%
-  filter(is.infinite(sigmaH)) %>% 
-  select(system_ID, median) %>% 
-  rename(Topt_RM = median) %>% 
+  filter(is.infinite(sigmaH)) %>%
+  select(system_ID, median) %>%
+  rename(Topt_RM = median) %>%
   distinct()
-  # Calculate Topt_RM
-  # filter(proxy_RM == proxy_RM[which.max(proxy_RM)]) %>%
-  # rename(Topt_RM = Temperature)
+# Calculate Topt_RM
+# filter(proxy_RM == proxy_RM[which.max(proxy_RM)]) %>%
+# rename(Topt_RM = Temperature)
 # check with above: Topt_RM matches with Topt when sigmaH*KH is maximized
 # also shows that these estimates are independent of KL (and thus ABSOLUTE adult mosquito density)
 
@@ -1902,7 +1824,7 @@ Topt_estimates_median <- left_join(ToptRM_base_estimates, Topt0_base_estimates) 
 # Investigating Topt_RM and Topt_0 further
 
 test_df <- median.Vec %>%
-  mutate(muV = 1/(lf + eps)) %>% 
+  mutate(muV = 1 / (lf + eps)) %>%
   mutate(P_EIP = exp(-muV / etaV)) %>%
   mutate(sigmaVV0 = sigmaV * V0) %>%
   mutate(proxy_0 = betaV * P_EIP / (muV * V0)) %>%
@@ -1912,8 +1834,8 @@ test_df <- median.Vec %>%
 ```
 
 ```{r fig-SX_CT_distributions, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CT_dists} The distributions of the critical thermal minimum, critical thermal maximum, and thermal optimum vary with vertebrate host availability.'}
-all.density.df <- read_rds("results/CTminmaxTopt_densities.rds") %>%  
-  ungroup() %>% 
+all.density.df <- read_rds("results/CTminmaxTopt_densities.rds") %>%
+  ungroup() %>%
   mutate(system_label = case_when(
     system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
     system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
@@ -1924,18 +1846,21 @@ all.density.df <- read_rds("results/CTminmaxTopt_densities.rds") %>%
 
 ### Option 1: inline violin plots ----
 plot.densities_violin_inline <- ggplot() +
-  geom_violin(data = filter(all.density.df, variable == "Thermal optimum"),
-              aes(x = value, y = KH_factor, linetype = sigmaH, fill = "Topt")
+  geom_violin(
+    data = filter(all.density.df, variable == "Thermal optimum"),
+    aes(x = value, y = KH_factor, linetype = sigmaH, fill = "Topt")
   ) +
-  geom_violin(data = filter(all.density.df, variable == "Critical thermal minimum"),
-              aes(x = value, y = KH_factor, linetype = sigmaH, fill = "CTmin"),
+  geom_violin(
+    data = filter(all.density.df, variable == "Critical thermal minimum"),
+    aes(x = value, y = KH_factor, linetype = sigmaH, fill = "CTmin"),
   ) +
-  geom_violin(data = filter(all.density.df, variable == "Critical thermal maximum"),
-              aes(x = value, y = KH_factor, linetype = sigmaH, fill = "CTmax"),
+  geom_violin(
+    data = filter(all.density.df, variable == "Critical thermal maximum"),
+    aes(x = value, y = KH_factor, linetype = sigmaH, fill = "CTmax"),
   ) +
   scale_x_continuous(
     name = "Temperature (°C)",
-    expand = c(0,0)
+    expand = c(0, 0)
   ) +
   scale_y_discrete(
     name = "Vertebrate host population density (ind/ha)"
@@ -1950,7 +1875,7 @@ plot.densities_violin_inline <- ggplot() +
   ) +
   facet_wrap(~system_label, labeller = labeller()) +
   theme_minimal_grid(16) +
-    theme(
+  theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
     axis.title.x = element_text(hjust = 0.5),
@@ -1965,18 +1890,21 @@ shift_legend(plot.densities_violin_inline)
 
 ### Option 2: inline box and whisker plots ----
 plot.densities_boxwhisker_inline <- ggplot() +
-  geom_boxplot(data = filter(all.density.df, variable == "Thermal optimum"),
-               aes(x = value, y = KH_factor, linetype = sigmaH, fill = "Topt")
+  geom_boxplot(
+    data = filter(all.density.df, variable == "Thermal optimum"),
+    aes(x = value, y = KH_factor, linetype = sigmaH, fill = "Topt")
   ) +
-  geom_boxplot(data = filter(all.density.df, variable == "Critical thermal minimum"),
-               aes(x = value, y = KH_factor, linetype = sigmaH, fill = "CTmin"),
+  geom_boxplot(
+    data = filter(all.density.df, variable == "Critical thermal minimum"),
+    aes(x = value, y = KH_factor, linetype = sigmaH, fill = "CTmin"),
   ) +
-  geom_boxplot(data = filter(all.density.df, variable == "Critical thermal maximum"),
-               aes(x = value, y = KH_factor, linetype = sigmaH, fill = "CTmax"),
+  geom_boxplot(
+    data = filter(all.density.df, variable == "Critical thermal maximum"),
+    aes(x = value, y = KH_factor, linetype = sigmaH, fill = "CTmax"),
   ) +
   scale_x_continuous(
     name = "Temperature (°C)",
-    expand = c(0,0)
+    expand = c(0, 0)
   ) +
   scale_y_discrete(
     name = "Vertebrate host population density (ind/ha)"
@@ -1991,7 +1919,7 @@ plot.densities_boxwhisker_inline <- ggplot() +
   ) +
   facet_wrap(~system_label, labeller = labeller()) +
   theme_minimal_grid(16) +
-    theme(
+  theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
     axis.title.x = element_text(hjust = 0.5),
@@ -2006,11 +1934,13 @@ shift_legend(plot.densities_boxwhisker_inline)
 
 ### Option 3: stacked violin plots ----
 plot.densities_violin_stacked <- ggplot() +
-  geom_violin(data = all.density.df,
-              aes(x = value, y = KH_factor, fill = variable, linetype = sigmaH)) +
+  geom_violin(
+    data = all.density.df,
+    aes(x = value, y = KH_factor, fill = variable, linetype = sigmaH)
+  ) +
   scale_x_continuous(
     name = "Temperature (°C)",
-    expand = c(0,0)
+    expand = c(0, 0)
   ) +
   scale_y_discrete(
     name = "Vertebrate host population density (ind/ha)"
@@ -2023,7 +1953,7 @@ plot.densities_violin_stacked <- ggplot() +
   ) +
   facet_wrap(~system_label, labeller = labeller()) +
   theme_minimal_grid(16) +
-    theme(
+  theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
     axis.title.x = element_text(hjust = 0.5),
@@ -2038,11 +1968,13 @@ shift_legend(plot.densities_violin_stacked)
 
 ### Option 4: stacked box and whisker plots ----
 plot.densities_boxwhisker_stacked <- ggplot() +
-  geom_boxplot(data = all.density.df,
-              aes(x = value, y = KH_factor, fill = variable, linetype = sigmaH)) +
+  geom_boxplot(
+    data = all.density.df,
+    aes(x = value, y = KH_factor, fill = variable, linetype = sigmaH)
+  ) +
   scale_x_continuous(
     name = "Temperature (°C)",
-    expand = c(0,0)
+    expand = c(0, 0)
   ) +
   scale_y_discrete(
     name = "Vertebrate host population density (ind/ha)"
@@ -2052,10 +1984,10 @@ plot.densities_boxwhisker_stacked <- ggplot() +
   ) +
   scale_fill_discrete(
     name = ""
-  ) +  
+  ) +
   facet_wrap(~system_label, labeller = labeller()) +
   theme_minimal_grid(16) +
-    theme(
+  theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
     axis.title.x = element_text(hjust = 0.5),
@@ -2067,13 +1999,11 @@ plot.densities_boxwhisker_stacked <- ggplot() +
     )
   )
 shift_legend(plot.densities_boxwhisker_stacked)
-
 ```
 
 ```{r fig-SX_R0_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:R0_sens} The sensitivity of the distribution of $\\mathcal{R}_0$ to mosquito life history traits.'}
-
-R0.HPD <- read_rds("results/R0_HPD_sens.rds") %>%  
-  ungroup() %>% 
+R0.HPD <- read_rds("results/R0_HPD_sens.rds") %>%
+  ungroup() %>%
   mutate(system_label = case_when(
     system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
     system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
@@ -2082,54 +2012,62 @@ R0.HPD <- read_rds("results/R0_HPD_sens.rds") %>%
     system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
   ))
 
-# Label functions: 
+# Label functions:
 appender_sigmaH <- function(string) {
-  unname(TeX(paste("$\\sigma_H = $", string)))}
+  unname(TeX(paste("$\\sigma_H = $", string)))
+}
 appender_KH <- function(string) {
-  unname(TeX(paste("$K_H = $", string)))}
+  unname(TeX(paste("$K_H = $", string)))
+}
 
-Temp_range_for_plot <- R0.HPD %>% 
+Temp_range_for_plot <- R0.HPD %>%
   ungroup() %>%
   dplyr::filter(rel_HPD_width > eps) %>%
-  select(Temperature) %>% range()
+  select(Temperature) %>%
+  range()
 
-plot.R0.rel.sens <- R0.HPD %>% 
-  filter(KH %in% c(1,100) & sigmaH %in% c(50, Inf)) %>% 
-  filter(!(KH == 100 & sigmaH == Inf)) %>% 
-  filter(rel_HPD_width != 0) %>% 
+plot.R0.rel.sens <- R0.HPD %>%
+  filter(KH %in% c(1, 100) & sigmaH %in% c(50, Inf)) %>%
+  filter(!(KH == 100 & sigmaH == Inf)) %>%
+  filter(rel_HPD_width != 0) %>%
   # For each KH value, sum up all sensitivity values to get total sensitivity across parameters
-  group_by(system_ID, sigmaH, KH, Temperature) %>% 
-  mutate(sens_total = sum(rel_HPD_width)) %>% 
+  group_by(system_ID, sigmaH, KH, Temperature) %>%
+  mutate(sens_total = sum(rel_HPD_width)) %>%
   # Divide each sensitivity value by the total sensitivity
-  mutate(sens_rel = rel_HPD_width / sens_total) %>% 
-  arrange(sens_rel) %>% 
+  mutate(sens_rel = rel_HPD_width / sens_total) %>%
+  arrange(sens_rel) %>%
   # Make a stacked plot, colored by parameter
   ggplot(aes(x = Temperature, y = sens_rel, fill = focal_var)) +
   geom_area() +
   scale_fill_discrete(
     name = "Focal parameter",
     breaks = c("betaV", "deltaL", "etaV", "muV", "rhoL", "sigmaV", "sigmaV_f"),
-    labels =  c("Vector competence", "Pr(larval survival)", 
-                "Parasite development rate", "Mortality rate", 
-                "Immature development rate", "Max. biting rate", 
-                "Eggs per female per day")
+    labels = c(
+      "Vector competence", "Pr(larval survival)",
+      "Parasite development rate", "Mortality rate",
+      "Immature development rate", "Max. biting rate",
+      "Eggs per female per day"
+    )
   ) +
   scale_x_continuous(
     limits = Temp_range_for_plot,
-    expand = c(0,0)
+    expand = c(0, 0)
   ) +
   scale_y_continuous(
     name = unname(TeX("Relative contribution to $R_0$ HPD width"))
   ) +
-  facet_grid(cols = vars(system_label),
-             rows = vars(KH, sigmaH), 
-             labeller = labeller(
-               system_label = label_wrap_gen(width = 10),
-               sigmaH = as_labeller(appender_sigmaH, default = label_parsed),
-               KH = as_labeller(appender_KH, default = label_parsed)),
-             scales = "free_y") +
+  facet_grid(
+    cols = vars(system_label),
+    rows = vars(KH, sigmaH),
+    labeller = labeller(
+      system_label = label_wrap_gen(width = 10),
+      sigmaH = as_labeller(appender_sigmaH, default = label_parsed),
+      KH = as_labeller(appender_KH, default = label_parsed)
+    ),
+    scales = "free_y"
+  ) +
   theme_minimal_hgrid(16) +
-    theme(
+  theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
     legend.text = element_text(size = 10),
@@ -2143,13 +2081,11 @@ plot.R0.rel.sens <- R0.HPD %>%
   )
 plot.R0.rel.sens
 # shift_legend(plot.R0.rel.sens)
-
 ```
 
 ```{r fig-SX_ddTR0_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:ddTR0_sens} The sensitivity of the distribution of the derivative of $\\mathcal{R}_0$ with respect to temperature to mosquito life history traits.'}
-
-ddTR0.HPD <- read_rds("results/ddTR0_HPD_sens.rds") %>%  
-  ungroup() %>% 
+ddTR0.HPD <- read_rds("results/ddTR0_HPD_sens.rds") %>%
+  ungroup() %>%
   mutate(system_label = case_when(
     system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
     system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
@@ -2158,10 +2094,12 @@ ddTR0.HPD <- read_rds("results/ddTR0_HPD_sens.rds") %>%
     system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
   ))
 
-## Plot R0 uncertainty 
-Temp_range_for_plot <- ddTR0.HPD %>% ungroup() %>% 
-  dplyr::filter(HPD_width > eps) %>% 
-  select(Temperature) %>%  range()
+## Plot R0 uncertainty
+Temp_range_for_plot <- ddTR0.HPD %>%
+  ungroup() %>%
+  dplyr::filter(HPD_width > eps) %>%
+  select(Temperature) %>%
+  range()
 
 var_name_table <- list(
   betaV = c(TeX("$\\beta_V$")),
@@ -2173,43 +2111,48 @@ var_name_table <- list(
   sigmaV_f = c(TeX("$\\sigma_v f$"))
 )
 
-plot.ddTR0.rel.sens <- ddTR0.HPD %>% 
-  filter(KH %in% c(1,100) & sigmaH %in% c(50, Inf)) %>% 
-  filter(!(KH == 100 & sigmaH == Inf)) %>% 
-  filter(rel_HPD_width != 0) %>% 
+plot.ddTR0.rel.sens <- ddTR0.HPD %>%
+  filter(KH %in% c(1, 100) & sigmaH %in% c(50, Inf)) %>%
+  filter(!(KH == 100 & sigmaH == Inf)) %>%
+  filter(rel_HPD_width != 0) %>%
   # For each KH value, sum up all sensitivity values to get total sensitivity across parameters
-  group_by(system_ID, sigmaH, KH, Temperature) %>% 
-  mutate(sens_total = sum(rel_HPD_width)) %>% 
+  group_by(system_ID, sigmaH, KH, Temperature) %>%
+  mutate(sens_total = sum(rel_HPD_width)) %>%
   # Divide each sensitivity value by the total sensitivity
-  mutate(sens_rel = rel_HPD_width / sens_total) %>% 
-  arrange(sens_rel) %>% 
+  mutate(sens_rel = rel_HPD_width / sens_total) %>%
+  arrange(sens_rel) %>%
   # Make a stacked plot, colored by parameter
   ggplot(aes(x = Temperature, y = sens_rel, fill = focal_var)) +
   geom_area() +
   scale_fill_discrete(
     name = "Focal parameter",
     breaks = c("betaV", "deltaL", "etaV", "muV", "rhoL", "sigmaV", "sigmaV_f"),
-    labels =  c("Vector competence", "Pr(larval survival)", 
-                "Parasite development rate", "Mortality rate", 
-                "Immature development rate", "Max. biting rate", 
-                "Eggs per female per day")
+    labels = c(
+      "Vector competence", "Pr(larval survival)",
+      "Parasite development rate", "Mortality rate",
+      "Immature development rate", "Max. biting rate",
+      "Eggs per female per day"
+    )
   ) +
   scale_x_continuous(
     limits = Temp_range_for_plot,
-    expand = c(0,0)
+    expand = c(0, 0)
   ) +
   scale_y_continuous(
-    name = unname(TeX("Relative contribution to $\\frac{d}{dT}R_0$ HPD width"))
+    name = unname(TeX("Relative contribution to $dR_0/dT$ HPD width"))
   ) +
-  facet_grid(cols = vars(system_label),
-             rows = vars(KH, sigmaH), 
-             labeller = labeller(
-               system_label = label_wrap_gen(width = 10),
-               sigmaH = as_labeller(appender_sigmaH, default = label_parsed),
-               KH = as_labeller(appender_KH, default = label_parsed)),
-             scales = "free_y") +
+  facet_grid(
+    cols = vars(system_label),
+    rows = vars(KH, sigmaH),
+    labeller = labeller(
+      system_label = label_wrap_gen(width = 10),
+      sigmaH = as_labeller(appender_sigmaH, default = label_parsed),
+      KH = as_labeller(appender_KH, default = label_parsed)
+    ),
+    scales = "free_y"
+  ) +
   theme_minimal_hgrid(16) +
-    theme(
+  theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
     legend.text = element_text(size = 10),
@@ -2222,11 +2165,10 @@ plot.ddTR0.rel.sens <- ddTR0.HPD %>%
     )
   )
 plot.ddTR0.rel.sens
-
 ```
 ```{r fig-SX_Topt_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt_sens} The sensitivity of the thermal optimmum to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$.'}
-Topt.HPD <- read_rds("results/Topt_HPD_sens.rds") %>%  
-  ungroup() %>% 
+Topt.HPD <- read_rds("results/Topt_HPD_sens.rds") %>%
+  ungroup() %>%
   mutate(system_label = case_when(
     system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
     system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
@@ -2236,26 +2178,28 @@ Topt.HPD <- read_rds("results/Topt_HPD_sens.rds") %>%
   )) %>%
   filter(!is.na(rel_HPD_width)) %>%
   # For each KH value, sum up all sensitivity values to get total sensitivity
-  group_by(system_ID, sigmaH, KH) %>% 
-  mutate(sens_total = sum(rel_HPD_width)) %>% 
+  group_by(system_ID, sigmaH, KH) %>%
+  mutate(sens_total = sum(rel_HPD_width)) %>%
   # Divide each sensitivity value by the total sensitivity
-  mutate(sens_rel = rel_HPD_width / sens_total) #%>% 
-  # arrange(sens_rel) 
+  mutate(sens_rel = rel_HPD_width / sens_total) # %>%
+# arrange(sens_rel)
 
 # !!! mention the value of sigmaH
 
-plot.Topt.rel.sens <- Topt.HPD %>% 
+plot.Topt.rel.sens <- Topt.HPD %>%
   # Make a stacked plot, colored by parameter
   ggplot(aes(x = KH, y = sens_rel, fill = focal_var)) +
   geom_area() +
   scale_fill_discrete(
     name = "Focal parameter",
     breaks = c("betaV", "deltaL", "etaV", "muV", "rhoL", "sigmaV", "sigmaV_f"),
-    labels =  c("Vector competence", "Pr(larval survival)", 
-                "Parasite development rate", "Mortality rate", 
-                "Immature development rate", "Max. biting rate", 
-                "Eggs per female per day")
-  )  +
+    labels = c(
+      "Vector competence", "Pr(larval survival)",
+      "Parasite development rate", "Mortality rate",
+      "Immature development rate", "Max. biting rate",
+      "Eggs per female per day"
+    )
+  ) +
   scale_x_log10(
     name = TeX("Vertebrate host population density (ind/ha)"),
     expand = c(0, 0),
@@ -2271,7 +2215,7 @@ plot.Topt.rel.sens <- Topt.HPD %>%
   # ) +
   facet_wrap(~system_label, scales = "free") +
   theme_minimal_hgrid(16) +
-    theme(
+  theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
     legend.text = element_text(size = 10),
@@ -2284,9 +2228,4 @@ plot.Topt.rel.sens <- Topt.HPD %>%
     )
   )
 shift_legend(plot.Topt.rel.sens)
-
 ```
-
-
-
-
