@@ -410,17 +410,6 @@ MosqThermTraits_df <- median.Vec %>%
   )) %>%
   group_by(Temperature, system_ID)
 
-# !!! [] be sure to use a consistent order for mosquito life history traits
-# !!! [] be sure to use a consistent list of mosquito life history traits:
-#         - adult lifespan (1/mu_V)
-#         - biting frequency (sigma_V)
-#         - eggs per female per day (sigma_V * f)
-#         - immature development rate
-#         - Pr(larval survival) (deltaL)
-#         - Pr(surviving EIP) (theta_V)
-#         - vector competence (beta_V)
-
-
 MosqThermTraits_plot <- MosqThermTraits_df %>%
   # Set up plotting variables and theme
   # x = Temperature, y = trait value
@@ -431,8 +420,8 @@ MosqThermTraits_plot <- MosqThermTraits_df %>%
   scale_x_continuous(
     name = "Temperature (°C)",
     expand = c(0, 0),
-    limits = c(10, 35),
-    breaks = seq(10, 36, 2)
+    limits = c(10, 40),
+    breaks = seq(10, 40, 2)
   ) +
   # y-axis:
   scale_y_continuous(expand = c(0.05, 0)) +
@@ -477,8 +466,8 @@ shift_legend(MosqThermTraits_plot)
 ```
 
 ```{r fig-4_R0_TPCs, dev = c('pdf','svg', 'png'),  message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:R0_plots} ${R}_0$ as a function of temperature has the properties of a thermal performance curve (TPC): it is positive on a single bounded interval and has a unique maximum value.'}
-# Plot R0 vs. temperature curves. One plot for each mosquito+pathogen pair.
-# One curve for Ross-Macdonald, a few for Chitnis
+# Plot R0 vs. temperature curves. One plot for each pathosysten
+# One curve for Ross-Macdonald and a few illustrative examples for Chitnis
 
 # x-axes = temperature
 # y-axes = R0 (normalized so that max(R0) = 1)
@@ -502,13 +491,7 @@ newKH_vals <- unique(data.R0$KH)[seq(1, length(unique(data.R0$KH)), length.out =
 
 data.R0_norm <- data.R0 %>%
   ungroup() %>%
-  mutate(system_label = case_when(
-    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
-    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
-    system_ID == "Aedes albopictus / DENV" ~ "(c\u200b) *Ae. albopictus* and DENV",
-    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
-    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
-  )) %>%
+  pathosystem_labeller() %>% 
   filter(KH %in% newKH_vals) %>%
   filter(variable == "R0") %>%
   select(-variable) %>%
@@ -543,7 +526,7 @@ R0_plot <- ggplot(mapping = aes(x = Temperature, group = KH)) +
   # ) +
   # x-axis:
   scale_x_continuous(
-    name = "Temperature (°C)",
+    name = "Temperature (C)",
     expand = c(0, 0),
     limits = c(14, 34)
   ) +
@@ -614,7 +597,7 @@ R0_plot <- ggplot(mapping = aes(x = Temperature, group = KH)) +
   )
 
 # Plot
-R0_plot <- shift_legend(R0_plot)
+shift_legend(R0_plot)
 ```
 
 ```{r fig-5_Topt, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt} The thermal optimum for transmission, $T_{opt}$, may be sensitive to vertebrate host population density and biting tolerance.'}
@@ -2002,6 +1985,16 @@ shift_legend(plot.densities_boxwhisker_stacked)
 ```
 
 ```{r fig-SX_R0_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:R0_sens} The sensitivity of the distribution of $\\mathcal{R}_0$ to mosquito life history traits.'}
+
+# !!! [x] be sure to use a consistent list of mosquito life history traits:
+#         - adult lifespan (1/mu_V)
+#         - biting frequency (sigma_V)
+#         - eggs per female per day (sigma_V * f)
+#         - immature development rate
+#         - Pr(larval survival) (deltaL)
+#         - Pr(surviving EIP) (theta_V)
+#         - vector competence (beta_V)
+
 R0.HPD <- read_rds("results/R0_HPD_sens.rds") %>%
   ungroup() %>%
   mutate(system_label = case_when(
@@ -2084,6 +2077,16 @@ plot.R0.rel.sens
 ```
 
 ```{r fig-SX_ddTR0_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:ddTR0_sens} The sensitivity of the distribution of the derivative of $\\mathcal{R}_0$ with respect to temperature to mosquito life history traits.'}
+
+# !!! [x] be sure to use a consistent list of mosquito life history traits:
+#         - adult lifespan (1/mu_V)
+#         - biting frequency (sigma_V)
+#         - eggs per female per day (sigma_V * f)
+#         - immature development rate
+#         - Pr(larval survival) (deltaL)
+#         - Pr(surviving EIP) (theta_V)
+#         - vector competence (beta_V)
+
 ddTR0.HPD <- read_rds("results/ddTR0_HPD_sens.rds") %>%
   ungroup() %>%
   mutate(system_label = case_when(
@@ -2166,7 +2169,19 @@ plot.ddTR0.rel.sens <- ddTR0.HPD %>%
   )
 plot.ddTR0.rel.sens
 ```
+
+
 ```{r fig-SX_Topt_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt_sens} The sensitivity of the thermal optimmum to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$.'}
+
+# !!! [x] be sure to use a consistent list of mosquito life history traits:
+#         - adult lifespan (1/mu_V)
+#         - biting frequency (sigma_V)
+#         - eggs per female per day (sigma_V * f)
+#         - immature development rate
+#         - Pr(larval survival) (deltaL)
+#         - Pr(surviving EIP) (theta_V)
+#         - vector competence (beta_V)
+
 Topt.HPD <- read_rds("results/Topt_HPD_sens.rds") %>%
   ungroup() %>%
   mutate(system_label = case_when(
