@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.10) (preloaded format=pdflatex 2022.11.3)  2 JUN 2023 15:08
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.10) (preloaded format=pdflatex 2022.11.3)  5 JUN 2023 15:30
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -777,125 +777,204 @@ ut line 139.
 [4 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-fi
 gures_files/figure-latex/fig-5_Topt-1.pdf>]
 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
-es_files/figure-latex/table-2_Toptdiffbound-1.pdf, id=65, 650.43pt x 433.62pt>
+es_files/figure-latex/fig-S1_R0_heatmap_plots_all-1.pdf, id=65, 650.43pt x 794.
+97pt>
+File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
+figures_files/figure-latex/fig-S1_R0_heatmap_plots_all-1.pdf Graphic file (type
+ pdf)
+<use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
+igures_files/figure-latex/fig-S1_R0_heatmap_plots_all-1.pdf>
+Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
+bps/doc/manuscript-figures_files/figure-latex/fig-S1_R0_heatmap_plots_all-1.pdf
+  used on input line 151.
+(pdftex.def)             Requested size: 469.76817pt x 574.16112pt.
+[5 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-fi
+gures_files/figure-latex/fig-6_CT_Width-1.pdf>]
+<C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
+es_files/figure-latex/fig-S2_Topt_plots_varyKH-1.pdf, id=78, 650.43pt x 433.62p
+t>
+File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
+figures_files/figure-latex/fig-S2_Topt_plots_varyKH-1.pdf Graphic file (type pd
+f)
+<use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
+igures_files/figure-latex/fig-S2_Topt_plots_varyKH-1.pdf>
+Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
+bps/doc/manuscript-figures_files/figure-latex/fig-S2_Topt_plots_varyKH-1.pdf  u
+sed on input line 160.
+(pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
+[6 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-fi
+gures_files/figure-latex/fig-S1_R0_heatmap_plots_all-1.pdf>]
+<C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
+es_files/figure-latex/fig-S3_Topt_plots_varysigmaH-1.pdf, id=92, 650.43pt x 578
+.16pt>
+File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
+figures_files/figure-latex/fig-S3_Topt_plots_varysigmaH-1.pdf Graphic file (typ
+e pdf)
+<use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
+igures_files/figure-latex/fig-S3_Topt_plots_varysigmaH-1.pdf>
+Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
+bps/doc/manuscript-figures_files/figure-latex/fig-S3_Topt_plots_varysigmaH-1.pd
+f  used on input line 169.
+(pdftex.def)             Requested size: 469.76817pt x 417.57172pt.
+[7 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-fi
+gures_files/figure-latex/fig-S2_Topt_plots_varyKH-1.pdf>]
+<C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
+es_files/figure-latex/fig-S4_CTmin-1.pdf, id=106, 650.43pt x 433.62pt>
+File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
+figures_files/figure-latex/fig-S4_CTmin-1.pdf Graphic file (type pdf)
+<use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
+igures_files/figure-latex/fig-S4_CTmin-1.pdf>
+Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
+bps/doc/manuscript-figures_files/figure-latex/fig-S4_CTmin-1.pdf  used on input
+ line 178.
+(pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
+[8 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-fi
+gures_files/figure-latex/fig-S3_Topt_plots_varysigmaH-1.pdf>]
+<C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
+es_files/figure-latex/fig-S5_CTmax-1.pdf, id=119, 650.43pt x 433.62pt>
+File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
+figures_files/figure-latex/fig-S5_CTmax-1.pdf Graphic file (type pdf)
+<use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
+igures_files/figure-latex/fig-S5_CTmax-1.pdf>
+Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
+bps/doc/manuscript-figures_files/figure-latex/fig-S5_CTmax-1.pdf  used on input
+ line 187.
+(pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
+[9 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-fi
+gures_files/figure-latex/fig-S4_CTmin-1.pdf>]
+<C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
+es_files/figure-latex/fig-S6_CT_Range-1.pdf, id=145, 650.43pt x 433.62pt>
+File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
+figures_files/figure-latex/fig-S6_CT_Range-1.pdf Graphic file (type pdf)
+<use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
+igures_files/figure-latex/fig-S6_CT_Range-1.pdf>
+Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
+bps/doc/manuscript-figures_files/figure-latex/fig-S6_CT_Range-1.pdf  used on in
+put line 196.
+(pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
+[10 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
+igures_files/figure-latex/fig-S5_CTmax-1.pdf>]
+<C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
+es_files/figure-latex/table-2_Toptdiffbound-1.pdf, id=171, 650.43pt x 433.62pt>
+
 File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
 figures_files/figure-latex/table-2_Toptdiffbound-1.pdf Graphic file (type pdf)
 <use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
 igures_files/figure-latex/table-2_Toptdiffbound-1.pdf>
 Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
 bps/doc/manuscript-figures_files/figure-latex/table-2_Toptdiffbound-1.pdf  used
- on input line 148.
-(pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
-[5 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-fi
-gures_files/figure-latex/fig-6_CT_Width-1.pdf>]
-<C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
-es_files/figure-latex/fig-SX_CT_distributions-1.pdf, id=78, 650.43pt x 433.62pt
->
-File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
-figures_files/figure-latex/fig-SX_CT_distributions-1.pdf Graphic file (type pdf
-)
-<use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
-igures_files/figure-latex/fig-SX_CT_distributions-1.pdf>
-Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
-bps/doc/manuscript-figures_files/figure-latex/fig-SX_CT_distributions-1.pdf  us
-ed on input line 157.
-(pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
-<C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
-es_files/figure-latex/fig-SX_CT_distributions-2.pdf, id=79, 650.43pt x 433.62pt
->
-File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
-figures_files/figure-latex/fig-SX_CT_distributions-2.pdf Graphic file (type pdf
-)
-<use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
-igures_files/figure-latex/fig-SX_CT_distributions-2.pdf>
-Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
-bps/doc/manuscript-figures_files/figure-latex/fig-SX_CT_distributions-2.pdf  us
-ed on input line 165.
-(pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
-[6 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-fi
-gures_files/figure-latex/table-2_Toptdiffbound-1.pdf>]
-<C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
-es_files/figure-latex/fig-SX_CT_distributions-3.pdf, id=90, 650.43pt x 433.62pt
->
-File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
-figures_files/figure-latex/fig-SX_CT_distributions-3.pdf Graphic file (type pdf
-)
-<use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
-igures_files/figure-latex/fig-SX_CT_distributions-3.pdf>
-Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
-bps/doc/manuscript-figures_files/figure-latex/fig-SX_CT_distributions-3.pdf  us
-ed on input line 173.
-(pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
-[7 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-fi
-gures_files/figure-latex/fig-SX_CT_distributions-1.pdf>]
-<C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
-es_files/figure-latex/fig-SX_CT_distributions-4.pdf, id=103, 650.43pt x 433.62p
-t>
-File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
-figures_files/figure-latex/fig-SX_CT_distributions-4.pdf Graphic file (type pdf
-)
-<use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
-igures_files/figure-latex/fig-SX_CT_distributions-4.pdf>
-Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
-bps/doc/manuscript-figures_files/figure-latex/fig-SX_CT_distributions-4.pdf  us
-ed on input line 181.
-(pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
-[8 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-fi
-gures_files/figure-latex/fig-SX_CT_distributions-2.pdf>] [9 <C:/Users/kd99491/D
-ocuments/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-lat
-ex/fig-SX_CT_distributions-3.pdf>]
-<C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
-es_files/figure-latex/fig-SX_R0_sensitivity-1.pdf, id=126, 650.43pt x 433.62pt>
-
-File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
-figures_files/figure-latex/fig-SX_R0_sensitivity-1.pdf Graphic file (type pdf)
-<use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
-igures_files/figure-latex/fig-SX_R0_sensitivity-1.pdf>
-Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
-bps/doc/manuscript-figures_files/figure-latex/fig-SX_R0_sensitivity-1.pdf  used
- on input line 190.
-(pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
-[10 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
-igures_files/figure-latex/fig-SX_CT_distributions-4.pdf>]
-<C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
-es_files/figure-latex/fig-SX_ddTR0_sensitivity-1.pdf, id=138, 650.43pt x 433.62
-pt>
-File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
-figures_files/figure-latex/fig-SX_ddTR0_sensitivity-1.pdf Graphic file (type pd
-f)
-<use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
-igures_files/figure-latex/fig-SX_ddTR0_sensitivity-1.pdf>
-Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
-bps/doc/manuscript-figures_files/figure-latex/fig-SX_ddTR0_sensitivity-1.pdf  u
-sed on input line 199.
-(pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
-<C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
-es_files/figure-latex/fig-SX_Topt_sensitivity-1.pdf, id=139, 650.43pt x 433.62p
-t>
-File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
-figures_files/figure-latex/fig-SX_Topt_sensitivity-1.pdf Graphic file (type pdf
-)
-<use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
-igures_files/figure-latex/fig-SX_Topt_sensitivity-1.pdf>
-Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
-bps/doc/manuscript-figures_files/figure-latex/fig-SX_Topt_sensitivity-1.pdf  us
-ed on input line 207.
+ on input line 205.
 (pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
 [11 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
-igures_files/figure-latex/fig-SX_R0_sensitivity-1.pdf>] [12 <C:/Users/kd99491/D
+igures_files/figure-latex/fig-S6_CT_Range-1.pdf>]
+<C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
+es_files/figure-latex/fig-S7_CT_distributions-1.pdf, id=184, 650.43pt x 433.62p
+t>
+File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
+figures_files/figure-latex/fig-S7_CT_distributions-1.pdf Graphic file (type pdf
+)
+<use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
+igures_files/figure-latex/fig-S7_CT_distributions-1.pdf>
+Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
+bps/doc/manuscript-figures_files/figure-latex/fig-S7_CT_distributions-1.pdf  us
+ed on input line 214.
+(pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
+<C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
+es_files/figure-latex/fig-S7_CT_distributions-2.pdf, id=185, 650.43pt x 433.62p
+t>
+File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
+figures_files/figure-latex/fig-S7_CT_distributions-2.pdf Graphic file (type pdf
+)
+<use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
+igures_files/figure-latex/fig-S7_CT_distributions-2.pdf>
+Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
+bps/doc/manuscript-figures_files/figure-latex/fig-S7_CT_distributions-2.pdf  us
+ed on input line 222.
+(pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
+[12 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
+igures_files/figure-latex/table-2_Toptdiffbound-1.pdf>]
+<C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
+es_files/figure-latex/fig-S7_CT_distributions-3.pdf, id=196, 650.43pt x 433.62p
+t>
+File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
+figures_files/figure-latex/fig-S7_CT_distributions-3.pdf Graphic file (type pdf
+)
+<use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
+igures_files/figure-latex/fig-S7_CT_distributions-3.pdf>
+Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
+bps/doc/manuscript-figures_files/figure-latex/fig-S7_CT_distributions-3.pdf  us
+ed on input line 230.
+(pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
+[13 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
+igures_files/figure-latex/fig-S7_CT_distributions-1.pdf>]
+<C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
+es_files/figure-latex/fig-S7_CT_distributions-4.pdf, id=209, 650.43pt x 433.62p
+t>
+File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
+figures_files/figure-latex/fig-S7_CT_distributions-4.pdf Graphic file (type pdf
+)
+<use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
+igures_files/figure-latex/fig-S7_CT_distributions-4.pdf>
+Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
+bps/doc/manuscript-figures_files/figure-latex/fig-S7_CT_distributions-4.pdf  us
+ed on input line 238.
+(pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
+[14 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
+igures_files/figure-latex/fig-S7_CT_distributions-2.pdf>] [15 <C:/Users/kd99491
+/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-l
+atex/fig-S7_CT_distributions-3.pdf>]
+<C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
+es_files/figure-latex/fig-S8_R0_sensitivity-1.pdf, id=232, 650.43pt x 433.62pt>
+
+File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
+figures_files/figure-latex/fig-S8_R0_sensitivity-1.pdf Graphic file (type pdf)
+<use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
+igures_files/figure-latex/fig-S8_R0_sensitivity-1.pdf>
+Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
+bps/doc/manuscript-figures_files/figure-latex/fig-S8_R0_sensitivity-1.pdf  used
+ on input line 247.
+(pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
+[16 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
+igures_files/figure-latex/fig-S7_CT_distributions-4.pdf>]
+<C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
+es_files/figure-latex/fig-S9_ddTR0_sensitivity-1.pdf, id=244, 650.43pt x 433.62
+pt>
+File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
+figures_files/figure-latex/fig-S9_ddTR0_sensitivity-1.pdf Graphic file (type pd
+f)
+<use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
+igures_files/figure-latex/fig-S9_ddTR0_sensitivity-1.pdf>
+Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
+bps/doc/manuscript-figures_files/figure-latex/fig-S9_ddTR0_sensitivity-1.pdf  u
+sed on input line 256.
+(pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
+<C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
+es_files/figure-latex/fig-S10_Topt_sensitivity-1.pdf, id=245, 650.43pt x 433.62
+pt>
+File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
+figures_files/figure-latex/fig-S10_Topt_sensitivity-1.pdf Graphic file (type pd
+f)
+<use C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
+igures_files/figure-latex/fig-S10_Topt_sensitivity-1.pdf>
+Package pdftex.def Info: C:/Users/kd99491/Documents/GitHub/thermal-properties-m
+bps/doc/manuscript-figures_files/figure-latex/fig-S10_Topt_sensitivity-1.pdf  u
+sed on input line 264.
+(pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
+[17 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
+igures_files/figure-latex/fig-S8_R0_sensitivity-1.pdf>] [18 <C:/Users/kd99491/D
 ocuments/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-lat
-ex/fig-SX_ddTR0_sensitivity-1.pdf>] [13 <C:/Users/kd99491/Documents/GitHub/ther
-mal-properties-mbps/doc/manuscript-figures_files/figure-latex/fig-SX_Topt_sensi
-tivity-1.pdf>] (manuscript-figures.aux)
+ex/fig-S9_ddTR0_sensitivity-1.pdf>] [19 <C:/Users/kd99491/Documents/GitHub/ther
+mal-properties-mbps/doc/manuscript-figures_files/figure-latex/fig-S10_Topt_sens
+itivity-1.pdf>] (manuscript-figures.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 17291 strings out of 475454
- 280674 string characters out of 2787526
- 694384 words of memory out of 3000000
- 38188 multiletter control sequences out of 15000+600000
+ 17373 strings out of 475454
+ 287632 string characters out of 2787526
+ 696175 words of memory out of 3000000
+ 38250 multiletter control sequences out of 15000+600000
  513104 words of font info for 104 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  74i,6n,81p,3310b,474s stack positions out of 10000i,1000n,20000p,200000b,80000s
@@ -908,11 +987,11 @@ pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C:/Program Files/
 MiKTeX/fonts/type1/public/lm/lmr12.pfb><C:/Program Files/MiKTeX/fonts/type1/pub
 lic/lm/lmr17.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmr7.pfb><C:/Pr
 ogram Files/MiKTeX/fonts/type1/public/lm/lmsy10.pfb>
-Output written on manuscript-figures.pdf (13 pages, 3313959 bytes).
+Output written on manuscript-figures.pdf (19 pages, 3741619 bytes).
 PDF statistics:
- 229 PDF objects out of 1000 (max. 8388607)
- 29 named destinations out of 1000 (max. 500000)
- 22602 words of extra memory for PDF output out of 24883 (max. 10000000)
+ 343 PDF objects out of 1000 (max. 8388607)
+ 43 named destinations out of 1000 (max. 500000)
+ 22640 words of extra memory for PDF output out of 24883 (max. 10000000)
 
 
 ! pdflatex: major issue: User/administrator updates are out-of-sync.
