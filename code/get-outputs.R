@@ -47,7 +47,8 @@ samples <- unique(data.Vec$sample_num)
 num_samples <- length(samples)
 sample_inds <- sample(samples, min(num_samples, thin_size), replace = FALSE)
 
-data.Vec <- filter(data.Vec, sample_num %in% sample_inds)
+data.Vec <- read_rds("results/VecTPC_vals.rds") %>% 
+  filter(sample_num %in% sample_inds)
 
 
 # 1) Define accessory functions -------------------------------------------
@@ -239,8 +240,10 @@ if (!exists("cluster")) {
 }
 
 # Set up host trait data frame (for future visualization)
-data.R0 <- data.Host %>%
-  filter(sigmaH %in% c(1e-1, 1, 10, 100, Inf)) %>% 
+data.R0 <- as.data.frame(data.Host) %>%
+  # filter(sigmaH %in% c(1e-1, 1, 10, 100, Inf)) %>%
+  filter(sigmaH %in% c(1e-1, 1, 10, 100, Inf,
+                       unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 21)])) %>% 
   filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 21)])
 
 # Slice host trait data
@@ -261,11 +264,12 @@ for (system_name in unique(data.Vec$system_ID)) {
     sigmaHslice_num <- 1
     for (index_sigmaH in sigmaH_slices) {
       print(paste0("sigmaH slice number ", sigmaHslice_num, " out of ", length(sigmaH_slices)))
-      R0.df <- data.R0 %>%
+      temp_df <- data.R0 %>%
         filter(sigmaH %in% index_sigmaH,
                KH %in% index_KH) %>%
-        R0_TPC_func(., system_name) %>%
-        rbind(R0.df)
+        R0_TPC_func(., system_name)
+        
+      R0.df <- rbind(temp_df, R0.df)
       sigmaHslice_num <- sigmaHslice_num  + 1
     }
     KHslice_num <- KHslice_num +1
