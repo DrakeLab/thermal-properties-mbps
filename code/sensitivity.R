@@ -950,8 +950,8 @@ for (index_KH in unique(data.CTHPD$KH)) {
 }
 
 # Save Topt highest posterior density data
-# write_rds(full.CT.HPD, "results/full_CT_HPD.rds")
-full.CT.HPD <- read_rds("results/full_CT_HPD.rds")
+write_rds(full.CT.HPD, "results/full_CT_HPD.rds")
+# full.CT.HPD <- read_rds("results/full_CT_HPD.rds")
 
 # # Diagnostic plot
 # test.plot <- full.CT.HPD %>%
@@ -1067,8 +1067,8 @@ for (var_name in temp_vars) {
 
 
 # Save CT relative highest posterior density data
-# write_rds(CT.HPD, "results/CT_HPD_sens.rds", compress = 'gz')
-CT.HPD <- read_rds("results/CT_HPD_sens.rds")
+write_rds(CT.HPD, "results/CT_HPD_sens.rds", compress = 'gz')
+# CT.HPD <- read_rds("results/CT_HPD_sens.rds")
 
 ## Plot Topt uncertainty 
 var_name_table <- list(
