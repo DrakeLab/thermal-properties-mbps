@@ -243,8 +243,9 @@ if (!exists("cluster")) {
 data.R0 <- as.data.frame(data.Host) %>%
   # filter(sigmaH %in% c(1e-1, 1, 10, 100, Inf)) %>%
   filter(sigmaH %in% c(1e-1, 1, 10, 100, Inf,
-                       unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 21)])) %>% 
-  filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 21)])
+                       unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 21)])) %>%
+  filter(KH %in% c(10^seq(-2,5) ,
+                   unique(KH)[seq(1, length(unique(KH)), length.out = 21)]))
 
 # Slice host trait data
 sigmaH_slices <- slice(unique(data.R0$sigmaH), 2)
@@ -279,6 +280,8 @@ for (system_name in unique(data.Vec$system_ID)) {
 
 # Save data
 proper_dim <- dim(data.R0)[1] * length(unique(data.Vec$system_ID)) * length(unique(data.Vec$Temperature))
+
+(dim(R0.df)[1] == proper_dim)
 
 if (exists("R0.df") & dim(R0.df)[1] == proper_dim)
 {write_rds(R0.df, "results/R0_vals.rds", compress = "gz")

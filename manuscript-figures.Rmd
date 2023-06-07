@@ -822,7 +822,7 @@ R0_df <- data.R0 %>%
   select(system_ID, system_label, Temperature, sigmaH, KH, median) %>%
   rename(R0 = median) %>%
   # Consider only 3 values of KH (on a log10-scale)
-  filter(KH %in% c(1E-1, unique(data.R0$KH)[7], unique(data.R0$KH)[10])) %>% # !!! temporary. recalculate R0 with 1e-1, 1e0, 1e1
+  # filter(KH %in% c(1E-1, unique(data.R0$KH)[7], unique(data.R0$KH)[10])) %>% # !!! temporary. recalculate R0 with 1e-1, 1e0, 1e1
   # Choose a limited range of sigmaH values
   filter(sigmaH > 10^0.5) %>%
   # Group by plotting variables
