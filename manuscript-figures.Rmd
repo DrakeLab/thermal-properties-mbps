@@ -67,6 +67,14 @@ inf_skew_func <- function(df, skew, divide, n_rows_to_add) {
   return(df)
 }
 
+# Label functions:
+appender_sigmaH <- function(string) {
+  unname(TeX(paste("$\\sigma_H = $", string)))
+}
+appender_KH <- function(string) {
+  unname(TeX(paste("$K_H = $", string)))
+}
+
 # Helper function: place legends in empty facets of plot grids
 # Code by: Artem Sokolov, found here: https://stackoverflow.com/questions/54438495/shift-legend-into-empty-facets-of-a-faceted-plot-in-ggplot2
 shift_legend <- function(p) {
@@ -113,6 +121,16 @@ data.Topt <- read_rds("results/Topt_vals.rds") %>%
   pathosystem_labeller()
 # Critical thermal extrema data
 data.CT <- read_rds("results/CT_vals.rds") %>%
+  pathosystem_labeller()
+
+# Sensitivity data for R0
+R0.HPD <- read_rds("results/R0_HPD_sens.rds") %>% 
+  ungroup() %>%
+  pathosystem_labeller()
+
+# Sensitivity data for Topt
+Topt.HPD <- read_rds("results/Topt_HPD_sens.rds") %>% 
+  ungroup() %>%
   pathosystem_labeller()
 
 # Sensitivity data for critical thermal extrema
@@ -1776,18 +1794,9 @@ shift_legend(plot.densities_boxwhisker_stacked)
 
 # !!! [] just compare "low host availability (sigmaH = 50, KH = 1 or 10)" and 
 #        "high host availability (sigmaH = Inf, KH = 100)" scenarios
-
-R0.HPD <- read_rds("results/R0_HPD_sens.rds") %>%
-  ungroup() %>%
-  pathosystem_labeller()
-
-# Label functions:
-appender_sigmaH <- function(string) {
-  unname(TeX(paste("$\\sigma_H = $", string)))
-}
-appender_KH <- function(string) {
-  unname(TeX(paste("$K_H = $", string)))
-}
+# !!! [] put legend at bottom of plot
+# !!! [] change factor/levels for focal_var so that they show up in the same 
+#        order as in the legend
 
 Temp_range_for_plot <- R0.HPD %>%
   ungroup() %>%
@@ -1809,7 +1818,7 @@ plot.R0.rel.sens <- R0.HPD %>%
   ggplot(aes(x = Temperature, y = sens_rel, fill = focal_var)) +
   geom_area() +
   scale_fill_discrete(
-    name = "Focal trait",
+    name = "Focal trait:",
     breaks = c("muV", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
     labels = c(
       "Adult lifespan", "Biting frequency", "Eggs per female per day",
@@ -1838,6 +1847,7 @@ plot.R0.rel.sens <- R0.HPD %>%
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
     legend.text = element_text(size = 10),
+    legend.position = "bottom",
     axis.title.x = element_text(hjust = 0.5),
     strip.text.x = ggtext::element_markdown(
       size = 11,
@@ -1920,6 +1930,7 @@ plot.ddTR0.rel.sens <- ddTR0.HPD %>%
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
     legend.text = element_text(size = 10),
+    legend.position = "bottom",
     axis.title.x = element_text(hjust = 0.5),
     strip.text.x = ggtext::element_markdown(
       size = 11,
@@ -2027,6 +2038,7 @@ plot.CTmin.rel.sens <- CT.HPD %>%
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
     legend.text = element_text(size = 10),
+    legend.position = "bottom",
     axis.title.x = element_text(hjust = 0.5),
     strip.text.x = ggtext::element_markdown(
       size = 11,
@@ -2079,6 +2091,7 @@ plot.CTmax.rel.sens <- CT.HPD %>%
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
     legend.text = element_text(size = 10),
+    legend.position = "bottom",
     axis.title.x = element_text(hjust = 0.5),
     strip.text.x = ggtext::element_markdown(
       size = 11,
@@ -2134,6 +2147,7 @@ plot.CTwidth.rel.sens <- CT.HPD %>%
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
     legend.text = element_text(size = 10),
+    legend.position = "bottom",
     axis.title.x = element_text(hjust = 0.5),
     strip.text.x = ggtext::element_markdown(
       size = 11,
