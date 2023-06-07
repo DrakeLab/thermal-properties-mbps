@@ -891,7 +891,7 @@ plot.Topt.rel.sens
 
 # Calculate the width of the 95% HPD for the full posterior of Topt across vertebrate host abundance
 
-sigmaH_vec <- c(50, Inf)
+sigmaH_vec <- c(10, 50, Inf)
 KH_vec <- 10^seq(-2,5)
 
 data.CTHPD <- dplyr::filter(data.Host, 
@@ -1389,6 +1389,57 @@ plot.CTmax.rel.sens <- CT.HPD %>%
   )
 plot.CTmax.rel.sens
 
+plot.CTwidth.rel.sens <- CT.HPD %>%
+  ungroup() %>% 
+  filter(variable == "CTwidth") %>% 
+  mutate(system_label = case_when(
+    system_ID == "Aedes aegypti / DENV" ~ "(a) *Ae. aegypti* and DENV",
+    system_ID == "Aedes aegypti / ZIKV" ~ "(b) *Ae. aegypti* and ZIKV",
+    system_ID == "Aedes albopictus / DENV" ~ "(c\u200b) *Ae. albopictus* and DENV",
+    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
+    system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
+  )) %>%
+  filter(!is.na(rel_HPD_width)) %>% 
+  # For each KH value, sum up all sensitivity values to get total sensitivity
+  group_by(system_ID, sigmaH, KH) %>% 
+  mutate(sens_total = sum(rel_HPD_width)) %>% 
+  # Divide each sensitivity value by the total sensitivity
+  mutate(sens_rel = rel_HPD_width / sens_total) %>% 
+  arrange(sens_rel) %>% 
+  # Make a stacked plot, colored by parameter
+  ggplot(aes(x = KH, y = sens_rel, fill = focal_var)) +
+  geom_area() +
+  scale_fill_discrete(
+    name = "Focal parameter",
+    breaks = c("betaV", "deltaL", "etaV", "muV", "rhoL", "sigmaV", "sigmaV_f"),
+    labels =  c("Vector competence", "Pr(larval survival)", 
+                "Parasite development rate", "Mortality rate", 
+                "Immature development rate", "Max. biting rate", 
+                "Eggs per female per day")
+  )  +
+  scale_x_log10(
+    name = TeX("Vertebrate host population density (ind/ha)"),
+    expand = c(0, 0),
+    # limits = c(0.9, 1.1E3),
+    breaks = 10^seq(-2, 3, 1),
+    labels = TeX(c("$0.01","$0.1$", "$1$", "$10", "$100$", "$10^3$"))
+  ) +
+  scale_y_continuous(
+    name = unname(TeX("Relative contribution to $CT_{width}$ HPD width"))
+  ) +
+  # scale_y_continuous(
+  #   limits = c(0,1)
+  # ) +
+  facet_grid(cols = vars(system_label),
+             rows = vars(sigmaH), 
+             labeller = labeller(sigmaH = as_labeller(appender_sigmaH,
+                                                      default = label_parsed)),
+             scales = "free") +
+  theme_minimal_hgrid(16) +
+  theme(
+    strip.text.x = element_text(size = 10)
+  )
+plot.CTwidth.rel.sens
 
 # 4) Densities of Topt, CT min, max, and width ----------------------------
 
