@@ -600,14 +600,11 @@ plot.ddTR0.rel.sens
 
 # Calculate the width of the 95% HPD for the full posterior of Topt across vertebrate host abundance
 
-sigmaH_vec <- c(50, Inf)
-KH_vec <- 10^seq(-2,5)
-
-vec <- unique(data.Host$KH)
+# !!! [] re-run: make sure KH values have high enough resolution
 
 data.ToptHPD <- dplyr::filter(data.Host, 
-                              sigmaH == 50,
-                              KH < 1e3) #%>% 
+                              sigmaH == 50) #,
+                              # KH < 1e3) #%>% 
 # dplyr::filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 31)])
 
 full.Topt.HPD <- tibble(system_ID = c(), Temperature = c(), Model = c(),
@@ -649,8 +646,6 @@ for (index_KH in unique(data.ToptHPD$KH)) {
   full.Topt.HPD <- rbind(full.Topt.HPD, temp_df)
 }
 
-
-
 # Save Topt highest posterior density data
 write_rds(full.Topt.HPD, "results/full_Topt_HPD.rds")
 # full.Topt.HPD <- read_rds("results/full_Topt_HPD.rds")
@@ -679,6 +674,7 @@ Topt.HPD <- tibble(system_ID = c(), Temperature = c(), focal_var = c(),
 
 # For each focal parameter, calculate relative HPD width
 for (var_name in temp_vars) {
+  print(paste0("Focal variable: ", var_name))
   # a) Set all but focal parameter to its posterior mean
   data.HPD.Vec <- data.Vec %>% 
     mutate(muV = 1/lf) %>% 
@@ -692,8 +688,13 @@ for (var_name in temp_vars) {
                        0,
                        KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL)))) %>%
     select(-lf)
+  pb <- progress_bar$new(
+    format = ":spin :system progress = :percent [:bar] :elapsed | eta: :eta",
+    total = length(unique(data.ToptHPD$KH)),
+    width = 120)   
   
   for (index_KH in unique(data.ToptHPD$KH)) {
+    pb$tick()
     # b) Get posterior samples of R0 (as a function of temperature)
     temp_df <- expand_grid(dplyr::filter(data.ToptHPD, KH == index_KH), 
                            data.HPD.Vec) %>%
@@ -729,7 +730,8 @@ for (var_name in temp_vars) {
       select(system_ID, sigmaH, KH, HPD_width) %>% 
       right_join(full.Topt.HPD %>% 
                    select(-c(HPD_low, HPD_high)) %>% 
-                   rename(full_HPD_width = HPD_width)) %>% 
+                   rename(full_HPD_width = HPD_width),
+                 by = join_by(system_ID, sigmaH, KH)) %>% 
       mutate(focal_var = var_name) %>% 
       group_by(system_ID, sigmaH, KH, focal_var) %>% 
       # d) Normalize HPD width by the full HPD width when all parameters are allowed to vary
@@ -741,9 +743,7 @@ for (var_name in temp_vars) {
 
 Topt.HPD <- Topt.HPD %>% 
   ungroup() %>% 
-  distinct() %>% 
-  filter(!is.na(HPD_width))
-
+  distinct()
 
 # Save Topt relative highest posterior density data
 write_rds(Topt.HPD, "results/Topt_HPD_sens.rds")
@@ -969,6 +969,7 @@ for (var_name in temp_vars) {
                        0,
                        KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL)))) %>%
     select(-lf)
+  
   pb <- progress_bar$new(
     format = ":spin :system progress = :percent [:bar] :elapsed | eta: :eta",
     total = length(unique(data.CTHPD$KH)),
