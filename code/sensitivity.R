@@ -54,6 +54,12 @@ init.df <- tibble(system_ID = c(), Temperature = c(), Model = c(),
                   lowHCI = c(), highHCI = c(), mean = c(), median = c())
 
 # Load needed datasets
+
+# Host trait dataset
+data.Host <- read_rds("results/Host_vals.rds")
+# Vector trait dataset
+data.Vec <- read_rds("results/VecTPC_vals.rds")
+
 # R0 data
 data.R0 <- read_rds("results/R0_vals.rds") # !!! needs to be updated to include 1e-1, 1e0, 1e1
 # Topt data
@@ -89,15 +95,22 @@ appender_KH <- function(string) {
 ###* Mean traits data frame ----
 
 # Get mean values of uncertain traits
-
-data.Vec <- read_rds("results/VecTPC_vals.rds")
-
 mean.Vec <- data.Vec %>% 
   select(-c(KL, mosquito_species, pathogen, muL, etaL)) %>% 
   pivot_longer(cols = lf:V0, names_to = "variable", values_to = "value") %>%
   group_by(system_ID, Temperature, variable) %>% 
   summarise(mean = mean(value)) %>% 
   pivot_wider(names_from = "variable", values_from = "mean") %>% 
+  mutate(etaL = rhoL / (deltaL + eps)) %>%
+  # Aquatic-stage mosquito mortality rate. This should be ~infinite if deltaL = 0
+  mutate(muL = etaL - rhoL)
+
+median.Vec <- data.Vec %>% 
+  select(-c(KL, mosquito_species, pathogen, muL, etaL)) %>% 
+  pivot_longer(cols = lf:V0, names_to = "variable", values_to = "value") %>%
+  group_by(system_ID, Temperature, variable) %>% 
+  summarise(median = median(value)) %>% 
+  pivot_wider(names_from = "variable", values_from = "median") %>% 
   mutate(etaL = rhoL / (deltaL + eps)) %>%
   # Aquatic-stage mosquito mortality rate. This should be ~infinite if deltaL = 0
   mutate(muL = etaL - rhoL)
@@ -148,8 +161,8 @@ full.R0.HPD <- expand_grid(data.R0HPD,
   mutate(norm_HPD_width = HPD_width / max(HPD_width))
 
 # Save R0 highest posterior density data
-# write_rds(full.R0.HPD, "results/full_R0_HPD.rds")
-full.R0.HPD <- read_rds("results/full_R0_HPD.rds")
+write_rds(full.R0.HPD, "results/full_R0_HPD.rds")
+# full.R0.HPD <- read_rds("results/full_R0_HPD.rds")
 
 # R0 HPD diagnostic plot
 R0.HPD.plot <- full.R0.HPD %>%
@@ -191,67 +204,13 @@ R0.HPD <- tibble(system_ID = c(), Temperature = c(), focal_var = c(),
                  sigmaH = c(), KH = c(), 
                  HPD_width = c(), full_HPD_width = c(), rel_HPD_width = c())
 
-
-# # For each focal parameter, calculate relative HPD width
-# R0.HPD <- foreach(var_name = temp_vars,
-#                   .packages = c("tidyverse", "HDInterval"),
-#                   combine = rbind) %dopar% {
-#   # a) Set all but focal parameter to its posterior mean
-#   data.HPD.Vec <- data.Vec %>% 
-#     mutate(muV = 1/lf) %>% 
-#     select(system_ID, Temperature, sample_num, all_of(var_name), KL) %>% 
-#     full_join(mean.Vec %>% 
-#                 mutate(muV = 1/lf) %>% 
-#                 select(-all_of(var_name))%>% 
-#                 distinct()) %>% 
-#     mutate(lf = 1/muV) %>%
-#     mutate(V0 = ifelse(sigmaV_f * deltaL < (1 / lf),
-#                        0,
-#                        KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL)))) %>%
-#     select(-lf)
-#   # b) Get posterior samples of R0 (as a function of temperature)
-#   R0.HPD <- expand_grid(data.R0HPD, data.HPD.Vec) %>%
-#     mutate(lf = 1/muV) %>% 
-#     data.table::data.table() %>%
-#     mutate(RV = ifelse(is.infinite(sigmaH),
-#                        sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
-#                        sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>%
-#     mutate(bV = ifelse(is.infinite(sigmaH),
-#                        sigmaV, # Ross-Macdonald model
-#                        sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>%
-#     mutate(RH = ifelse(V0 == 0,
-#                        0,
-#                        bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>%
-#     # Basic reproduction number
-#     mutate(R0 = sqrt(RV*RH)) %>%
-#     select(system_ID, sample_num, sigmaH, KH, Temperature, R0) %>% 
-#     # c) Calculate the 95% HPD at each temperature
-#     group_by(system_ID, sigmaH, KH, Temperature) %>% 
-#     summarise(
-#       HPD_low = hdi(R0, credMass = 0.95)[1],
-#       HPD_high = hdi(R0, credMass = 0.95)[2],
-#       HPD_width = max(eps, HPD_high-HPD_low),
-#       .groups = "keep"
-#     ) %>% 
-#     select(system_ID, sigmaH, KH, Temperature, HPD_width) %>% 
-#     right_join(full.R0.HPD %>% 
-#                  select(-c(HPD_low, HPD_high)) %>% 
-#                  rename(full_HPD_width = HPD_width)) %>% 
-#     mutate(focal_var = var_name) %>% 
-#     group_by(system_ID, sigmaH, KH, focal_var, Temperature) %>% 
-#     # d) Normalize HPD width by the full HPD width when all parameters are allowed to vary
-#     mutate(rel_HPD_width = ifelse(full_HPD_width %in% c(0,eps), 0, HPD_width / full_HPD_width))
-#     
-#     R0.HPD
-# }
-
 # For each focal parameter, calculate relative HPD width
 for (var_name in temp_vars) {
   # a) Set all but focal parameter to its posterior mean
   data.HPD.Vec <- data.Vec %>% 
     mutate(muV = 1/lf) %>% 
     select(system_ID, Temperature, sample_num, all_of(var_name), KL) %>% 
-    full_join(mean.Vec %>% 
+    full_join(median.Vec %>% 
                 mutate(muV = 1/lf) %>% 
                 select(-all_of(var_name))%>% 
                 distinct()) %>% 
@@ -261,7 +220,7 @@ for (var_name in temp_vars) {
                        KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL)))) %>%
     select(-lf)
   # b) Get posterior samples of R0 (as a function of temperature)
-  R0.HPD <- expand_grid(data.R0HPD, data.HPD.Vec) %>%
+  temp_df <- expand_grid(data.R0HPD, data.HPD.Vec) %>%
     mutate(lf = 1/muV) %>% 
     data.table::data.table() %>%
     mutate(RV = ifelse(is.infinite(sigmaH),
@@ -291,13 +250,14 @@ for (var_name in temp_vars) {
     mutate(focal_var = var_name) %>% 
     group_by(system_ID, sigmaH, KH, focal_var, Temperature) %>% 
     # d) Normalize HPD width by the full HPD width when all parameters are allowed to vary
-    mutate(rel_HPD_width = ifelse(full_HPD_width %in% c(0,eps), 0, HPD_width / full_HPD_width)) %>% 
-    rbind(R0.HPD)
+    mutate(rel_HPD_width = ifelse(full_HPD_width %in% c(0,eps), 0, HPD_width / full_HPD_width)) 
+  
+  R0.HPD <- rbind(R0.HPD, temp_df)
 }
 
 # Save R0 relative highest posterior density data
-# write_rds(R0.HPD, "results/R0_HPD_sens.rds")
-R0.HPD <- read_rds("results/R0_HPD_sens.rds")
+write_rds(R0.HPD, "results/R0_HPD_sens.rds")
+# R0.HPD <- read_rds("results/R0_HPD_sens.rds")
 
 ## Plot R0 uncertainty 
 Temp_range_for_plot <- R0.HPD %>% 
@@ -450,8 +410,8 @@ full.ddTR0.HPD <- expand_grid(data.ddTR0HPD,
   )
 
 # Save R0 highest posterior density data
-# write_rds(full.ddTR0.HPD, "results/full_ddTR0_HPD.rds")
-full.R0.HPD <- read_rds("results/full_R0_HPD.rds")
+write_rds(full.ddTR0.HPD, "results/full_ddTR0_HPD.rds")
+# full.ddTR0.HPD <- read_rds("results/full_ddTR0_HPD.rds")
 
 # # Diagnostic plot
 # test.plot <- full.ddTR0.HPD %>%
@@ -478,7 +438,7 @@ for (var_name in temp_vars) {
   data.HPD.Vec <- data.Vec %>% 
     mutate(muV = 1/lf) %>% 
     select(system_ID, Temperature, sample_num, all_of(var_name), KL) %>% 
-    full_join(mean.Vec %>% 
+    full_join(median.Vec %>% 
                 mutate(muV = 1/lf) %>% 
                 select(-all_of(var_name))%>% 
                 distinct()) %>% 
@@ -488,7 +448,7 @@ for (var_name in temp_vars) {
                        KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL)))) %>%
     select(-lf)
   # b) Get posterior samples of R0 (as a function of temperature)
-  ddTR0.HPD <- expand_grid(data.R0HPD, data.HPD.Vec) %>%
+  temp_df <- expand_grid(data.R0HPD, data.HPD.Vec) %>%
     mutate(lf = 1/muV) %>% 
     data.table::data.table() %>%
     mutate(RV = ifelse(is.infinite(sigmaH),
@@ -520,18 +480,19 @@ for (var_name in temp_vars) {
     mutate(focal_var = var_name) %>% 
     group_by(system_ID, sigmaH, KH, focal_var, Temperature) %>% 
     # d) Normalize HPD width by the full HPD width when all parameters are allowed to vary
-    mutate(rel_HPD_width = ifelse(full_HPD_width %in% c(0,eps), 0, HPD_width / full_HPD_width)) %>% 
-    rbind(ddTR0.HPD)
+    mutate(rel_HPD_width = ifelse(full_HPD_width %in% c(0,eps), 0, HPD_width / full_HPD_width))
+  
+  ddTR0.HPD <- rbind(ddTR0.HPD, temp_df)
 }
 
 # Save R0 relative highest posterior density data
-# write_rds(ddTR0.HPD, "results/ddTR0_HPD_sens.rds")
-ddTR0.HPD <- read_rds("results/ddTR0_HPD_sens.rds")
+write_rds(ddTR0.HPD, "results/ddTR0_HPD_sens.rds")
+# ddTR0.HPD <- read_rds("results/ddTR0_HPD_sens.rds")
 
 ## Plot R0 uncertainty 
 Temp_range_for_plot <- ddTR0.HPD %>% ungroup() %>% 
   dplyr::filter(HPD_width > eps) %>% 
-  dplyr::filter(KH == KH_select) %>% 
+  # dplyr::filter(KH == KH_select) %>% 
   select(Temperature) %>%  range()
 
 var_name_table <- list(
@@ -654,8 +615,8 @@ full.Topt.HPD <- tibble(system_ID = c(), Temperature = c(), Model = c(),
                         HPD_low = c(), HPD_high = c(), HPD_width = c())
 
 for (index_KH in unique(data.ToptHPD$KH)) {
-  full.Topt.HPD <- expand_grid(dplyr::filter(data.ToptHPD, KH == index_KH), 
-                               data.Vec) %>%
+  temp_df <- expand_grid(dplyr::filter(data.ToptHPD, KH == index_KH), 
+                         data.Vec) %>%
     data.table::data.table() %>%
     mutate(RV = ifelse(is.infinite(sigmaH),
                        sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
@@ -683,15 +644,16 @@ for (index_KH in unique(data.ToptHPD$KH)) {
       HPD_high = hdi(Topt, credMass = 0.95)[2],
       HPD_width = max(eps,HPD_high-HPD_low),
       .groups = "keep"
-    ) %>% 
-    rbind(full.Topt.HPD)
+    ) 
+  
+  full.Topt.HPD <- rbind(full.Topt.HPD, temp_df)
 }
 
 
 
 # Save Topt highest posterior density data
-# write_rds(full.Topt.HPD, "results/full_Topt_HPD.rds")
-full.Topt.HPD <- read_rds("results/full_Topt_HPD.rds")
+write_rds(full.Topt.HPD, "results/full_Topt_HPD.rds")
+# full.Topt.HPD <- read_rds("results/full_Topt_HPD.rds")
 
 # # Diagnostic plot
 # test.plot <- full.Topt.HPD %>%
@@ -721,7 +683,7 @@ for (var_name in temp_vars) {
   data.HPD.Vec <- data.Vec %>% 
     mutate(muV = 1/lf) %>% 
     select(system_ID, Temperature, sample_num, all_of(var_name), KL) %>% 
-    full_join(mean.Vec %>% 
+    full_join(median.Vec %>% 
                 mutate(muV = 1/lf) %>% 
                 select(-all_of(var_name))%>% 
                 distinct()) %>% 
@@ -733,8 +695,8 @@ for (var_name in temp_vars) {
   
   for (index_KH in unique(data.ToptHPD$KH)) {
     # b) Get posterior samples of R0 (as a function of temperature)
-    Topt.HPD <- expand_grid(dplyr::filter(data.ToptHPD, KH == index_KH), 
-                            data.HPD.Vec) %>%
+    temp_df <- expand_grid(dplyr::filter(data.ToptHPD, KH == index_KH), 
+                           data.HPD.Vec) %>%
       mutate(lf = 1/muV) %>% 
       data.table::data.table() %>%
       mutate(RV = ifelse(is.infinite(sigmaH),
@@ -771,14 +733,15 @@ for (var_name in temp_vars) {
       mutate(focal_var = var_name) %>% 
       group_by(system_ID, sigmaH, KH, focal_var) %>% 
       # d) Normalize HPD width by the full HPD width when all parameters are allowed to vary
-      mutate(rel_HPD_width = ifelse(full_HPD_width %in% c(0,eps), 0, HPD_width / full_HPD_width)) %>% 
-      rbind(Topt.HPD)
+      mutate(rel_HPD_width = ifelse(full_HPD_width %in% c(0,eps), 0, HPD_width / full_HPD_width))
+    
+    Topt.HPD <- rbind(Topt.HPD, temp_df)
   }
 }
 
 # Save Topt relative highest posterior density data
-# write_rds(Topt.HPD, "results/Topt_HPD_sens.rds")
-Topt.HPD <- read_rds("results/Topt_HPD_sens.rds")
+write_rds(Topt.HPD, "results/Topt_HPD_sens.rds")
+# Topt.HPD <- read_rds("results/Topt_HPD_sens.rds")
 
 ## Plot Topt uncertainty 
 var_name_table <- list(
@@ -990,7 +953,7 @@ for (var_name in temp_vars) {
   data.HPD.Vec <- data.Vec %>% 
     mutate(muV = 1/lf) %>% 
     select(system_ID, Temperature, sample_num, all_of(var_name), KL) %>% 
-    full_join(mean.Vec %>% 
+    full_join(median.Vec %>% 
                 mutate(muV = 1/lf) %>% 
                 select(-all_of(var_name))%>% 
                 distinct(),
@@ -1007,8 +970,8 @@ for (var_name in temp_vars) {
   for (index_KH in unique(data.CTHPD$KH)) {
     pb$tick()
     # b) Get posterior samples of R0 (as a function of temperature)
-    CT.HPD <- expand_grid(dplyr::filter(data.CTHPD, KH == index_KH), 
-                          data.HPD.Vec) %>%
+    temp_df <- expand_grid(dplyr::filter(data.CTHPD, KH == index_KH), 
+                           data.HPD.Vec) %>%
       mutate(lf = 1/muV) %>% 
       data.table::data.table() %>%
       mutate(RV = ifelse(is.infinite(sigmaH),
@@ -1059,8 +1022,9 @@ for (var_name in temp_vars) {
       mutate(focal_var = var_name) %>% 
       group_by(system_ID, sigmaH, KH, focal_var) %>% 
       # d) Normalize HPD width by the full HPD width when all parameters are allowed to vary
-      mutate(rel_HPD_width = ifelse(full_HPD_width %in% c(0,eps), 0, HPD_width / full_HPD_width)) %>% 
-      rbind(CT.HPD)
+      mutate(rel_HPD_width = ifelse(full_HPD_width %in% c(0,eps), 0, HPD_width / full_HPD_width))
+    
+    CT.HPD <- rbind(CT.HPD, temp_df)
   }
   pb$terminate()
 }
@@ -1084,53 +1048,53 @@ var_name_table <- list(
 # !!! [x] re-run analysis since CTwidth is coming up as NA
 # !!! [x] make relative sensitivity plot like was done for R0
 # CTwidth
-CTwidth.uncertainty.plot <- CT.HPD %>%   
-  ungroup() %>% 
-  filter(variable == "CTwidth") %>% 
-  filter(!is.na(HPD_width)) %>% 
-  # dplyr::filter(focal_var %in% c("sigmaV_f")) %>%
-  mutate(system_ID = case_when(
-    system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "An. gamb. / P. falciparum",
-    system_ID == "Aedes aegypti / DENV" ~ "Ae. aegypti / DENV",
-    system_ID == "Aedes albopictus / DENV" ~ "Ae. albopictus / DENV",
-    system_ID == "Aedes aegypti / ZIKV" ~ "Ae. aegypti / ZIKV",
-    system_ID == "Culex quinquefasciatus / WNV" ~ "Cx. quin. / WNV"
-  )) %>% 
-  arrange(system_ID, sigmaH) %>% 
-  # dplyr::filter(KH %in% c(1, 100)) %>%
-  dplyr::filter(rel_HPD_width < 1.2) %>%
-  arrange(system_ID, sigmaH, KH) %>%
-  ggplot(aes(x = KH, y = rel_HPD_width, color = focal_var, linetype = sigmaH)) +
-  geom_path(linewidth = 1) +
-  scale_linetype_binned() +
-  scale_color_discrete(
-    name = "Focal parameter",
-    breaks = c("betaV", "deltaL", "etaV", "muV", "rhoL", "sigmaV", "sigmaV_f"),
-    labels =  c("Vector competence", "Pr(larval survival)", 
-                "Parasite development rate", "Mortality rate", 
-                "Immature development rate", "Max. biting rate", 
-                "Eggs per female per day")
-  )  +
-  scale_x_continuous(
-    name = "Vertebrate host population density",
-    trans = 'log10'
-  ) +
-  scale_y_continuous(
-    name = "Relative HPD width",
-    breaks = seq(0, 2, by = 0.2)
-  ) +
-  facet_grid(cols = vars(sigmaH), rows = vars(system_ID), scales = "free",
-             labeller = labeller(sigmaH = as_labeller(appender_sigmaH,
-                                                      default = label_parsed),
-                                 KH = as_labeller(appender_KH, 
-                                                  default = label_parsed)),) +
-  ggtitle("Uncertainty analysis of CTwidth") +
-  theme_minimal_grid(12)
-CTwidth.uncertainty.plot
-
-ggsave("figures/results/CTwidth_uncertainty.svg", 
-       plot = CTwidth.uncertainty.plot,
-       width = 16, height = 9)
+# CTwidth.uncertainty.plot <- CT.HPD %>%   
+#   ungroup() %>% 
+#   filter(variable == "CTwidth") %>% 
+#   filter(!is.na(HPD_width)) %>% 
+#   # dplyr::filter(focal_var %in% c("sigmaV_f")) %>%
+#   mutate(system_ID = case_when(
+#     system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "An. gamb. / P. falciparum",
+#     system_ID == "Aedes aegypti / DENV" ~ "Ae. aegypti / DENV",
+#     system_ID == "Aedes albopictus / DENV" ~ "Ae. albopictus / DENV",
+#     system_ID == "Aedes aegypti / ZIKV" ~ "Ae. aegypti / ZIKV",
+#     system_ID == "Culex quinquefasciatus / WNV" ~ "Cx. quin. / WNV"
+#   )) %>% 
+#   arrange(system_ID, sigmaH) %>% 
+#   # dplyr::filter(KH %in% c(1, 100)) %>%
+#   dplyr::filter(rel_HPD_width < 1.2) %>%
+#   arrange(system_ID, sigmaH, KH) %>%
+#   ggplot(aes(x = KH, y = rel_HPD_width, color = focal_var, linetype = sigmaH)) +
+#   geom_path(linewidth = 1) +
+#   scale_linetype_binned() +
+#   scale_color_discrete(
+#     name = "Focal parameter",
+#     breaks = c("betaV", "deltaL", "etaV", "muV", "rhoL", "sigmaV", "sigmaV_f"),
+#     labels =  c("Vector competence", "Pr(larval survival)", 
+#                 "Parasite development rate", "Mortality rate", 
+#                 "Immature development rate", "Max. biting rate", 
+#                 "Eggs per female per day")
+#   )  +
+#   scale_x_continuous(
+#     name = "Vertebrate host population density",
+#     trans = 'log10'
+#   ) +
+#   scale_y_continuous(
+#     name = "Relative HPD width",
+#     breaks = seq(0, 2, by = 0.2)
+#   ) +
+#   facet_grid(cols = vars(sigmaH), rows = vars(system_ID), scales = "free",
+#              labeller = labeller(sigmaH = as_labeller(appender_sigmaH,
+#                                                       default = label_parsed),
+#                                  KH = as_labeller(appender_KH, 
+#                                                   default = label_parsed)),) +
+#   ggtitle("Uncertainty analysis of CTwidth") +
+#   theme_minimal_grid(12)
+# CTwidth.uncertainty.plot
+# 
+# ggsave("figures/results/CTwidth_uncertainty.svg", 
+#        plot = CTwidth.uncertainty.plot,
+#        width = 16, height = 9)
 
 plot.CTwidth.rel.sens <- CT.HPD %>%
   ungroup() %>% 
@@ -1244,7 +1208,7 @@ plot.CTmin.rel.sens <- CT.HPD %>%
     system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
     system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
   )) %>%
-  filter(!is.na(rel_HPD_width)) %>% 
+  # filter(!is.na(rel_HPD_width)) %>% 
   # For each KH value, sum up all sensitivity values to get total sensitivity
   group_by(system_ID, sigmaH, KH) %>% 
   mutate(sens_total = sum(rel_HPD_width)) %>% 
@@ -1658,7 +1622,7 @@ plot.densities_violin_stacked
 ### Option 4: stacked box and whisker plots ----
 plot.densities_boxwhisker_stacked <- ggplot() +
   geom_boxplot(data = all.density.df,
-              aes(x = value, y = KH_factor, fill = variable, linetype = sigmaH)) +
+               aes(x = value, y = KH_factor, fill = variable, linetype = sigmaH)) +
   scale_x_continuous(
     name = "Temperature (°C)",
     expand = c(0,0)

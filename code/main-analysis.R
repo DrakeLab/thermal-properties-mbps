@@ -78,6 +78,7 @@ KH_vec_length <- 300 # full = 300, thin = 20
 # Biting tolerance vector: Number of values to consider for biting tolerance
 sigmaH_vec_length <- 300 # full = 300, thin = 20
 
+data.Host <- read_rds("results/Host_vals.rds")
 
 # data.in.params <- read_rds("data/clean/parameter_TPCs.rds")
 # data.in.params <- read_rds("data/clean/parameter_TPCs_thin.rds") # !!! thin

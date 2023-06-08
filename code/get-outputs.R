@@ -43,11 +43,12 @@ init.df <- tibble(system_ID = c(), Temperature = c(), Model = c(),
 
 thin_size <- 300
 
+data.Vec <- read_rds("results/VecTPC_vals.rds")
 samples <- unique(data.Vec$sample_num)
 num_samples <- length(samples)
 sample_inds <- sample(samples, min(num_samples, thin_size), replace = FALSE)
 
-data.Vec <- read_rds("results/VecTPC_vals.rds") %>% 
+data.Vec <- data.Vec%>% 
   filter(sample_num %in% sample_inds)
 
 
@@ -230,6 +231,62 @@ CT_heat_func <- function(in_df, system_name) {
   return(out_df)
 }
 
+# 1) Set *host* parameters --------------------------------
+
+## Set resolution for host trait variation
+# Host density vector: Number of values to include to consider for vertebrate host density
+KH_vec_length <- 300 # full = 300, thin = 20
+
+# Biting tolerance vector: Number of values to consider for biting tolerance
+sigmaH_vec_length <- 300 # full = 300, thin = 20
+
+
+## Host life history & behavioral traits
+# Host recruitment rate:
+# upper estimate from range for Primate traits: (0.001150685, 0.009624300)
+lambdaH_baseline <- .005
+
+# Host mortality rate:
+# estimate from range for Primate traits: lifespan (8.6, 60) years
+# muH_vec <- 1 / (365 * c(1, 25))
+muH_baseline <- 1 / (365 * 20)
+
+# Host maximum biting tolerance (mosquitoes bites per day)
+sigmaH_vec <- 10^seq(-0.25, 3.25, length.out = sigmaH_vec_length - 7) %>%
+  c(1, 10, 20, 50, 100, 1000, Inf) %>%
+  unique() %>% sort()
+sigmaH_baseline <- 100
+
+# Host carrying capacity
+KH_vec <- 10^seq(-2, 5, length.out = KH_vec_length) %>%
+  c(10^seq(-2,5)) %>%
+  unique() %>% sort()
+
+## Host-related pathogen parameters
+# Probability of becoming infected after bite from infectious mosquito
+# operates as a scaling parameter
+# betaH_vec <- c(.25, .75)
+betaH_baseline <- 1
+
+# Host recovery rate
+# plausible estimate for infectious period = (2-14 days)
+gammaH_vec <- 1 / c(5, 14)
+gammaH_baseline <- 1 / 5
+
+data.Host <- expand_grid(
+  # Life-history parameters
+  lambdaH = lambdaH_baseline,
+  muH = muH_baseline,
+  KH = KH_vec,
+  sigmaH = sigmaH_vec,
+  # Infection-related parameters
+  gammaH = gammaH_baseline,
+  betaH = betaH_baseline
+) %>% as.data.frame() %>%
+  mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model"))
+
+write_rds(data.Host, "results/Host_vals.rds")
+
 # 2) Calculate R0 TPCs -----------------------------------------
 
 # Set up parallel
@@ -260,11 +317,17 @@ gc()
 for (system_name in unique(data.Vec$system_ID)) {
   print(paste0("Topt vals: ", system_name))
   KHslice_num <- 1
+  pb <- progress_bar$new(
+    format = ":spin :system progress = :percent [:bar] :elapsedfull | eta: :eta",
+    total = length(KH_slices) * length(sigmaH_slices),
+    width = 120)  
   for(index_KH in KH_slices) {
-    print(paste0("KH slice number ", KHslice_num, " out of ", length(KH_slices)))
+    pb$tick()
+    # print(paste0("KH slice number ", KHslice_num, " out of ", length(KH_slices)))
     sigmaHslice_num <- 1
     for (index_sigmaH in sigmaH_slices) {
-      print(paste0("sigmaH slice number ", sigmaHslice_num, " out of ", length(sigmaH_slices)))
+      pb$tick()
+      # print(paste0("sigmaH slice number ", sigmaHslice_num, " out of ", length(sigmaH_slices)))
       temp_df <- data.R0 %>%
         filter(sigmaH %in% index_sigmaH,
                KH %in% index_KH) %>%
@@ -277,6 +340,7 @@ for (system_name in unique(data.Vec$system_ID)) {
     gc()
   }
 }
+pb$terminate()
 
 # Save data
 proper_dim <- dim(data.R0)[1] * length(unique(data.Vec$system_ID)) * length(unique(data.Vec$Temperature))

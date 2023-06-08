@@ -114,6 +114,9 @@ data.Vec <- read_rds("results/VecTPC_vals.rds") %>%
   pathosystem_labeller()
 # R0 data
 # !!! [] needs to be updated to include 1e-1, 1e0, 1e1
+data.R0_TPCs <- read_ds("results/R0_TPC_vals.rds") %>%
+  pathosystem_labeller()
+
 data.R0 <- read_rds("results/R0_vals.rds") %>%
   pathosystem_labeller()
 # Topt data
@@ -510,10 +513,10 @@ shift_legend(MosqThermTraits_plot)
 # curve 1 = Ross-Macdonald R0 (shape doesn't depend on KH)
 # curves  = Chitnis dynamic R0,
 #   - colour = value of KH. place it on a color scale in the bottom right corner
-newKH_vals <- unique(data.R0$KH)[seq(1, length(unique(data.R0$KH)), length.out = 21)]
+# newKH_vals <- unique(data.R0$KH)[seq(1, length(unique(data.R0$KH)), length.out = 21)]
 
-data.R0_norm <- data.R0 %>%
-  filter(KH %in% newKH_vals) %>%
+data.R0_norm <- data.R0_TPCs %>%
+  # filter(KH %in% newKH_vals) %>%
   filter(variable == "R0") %>%
   select(-variable) %>%
   # normalize median of R0 distribution to have a maximum of one
