@@ -43,6 +43,7 @@ init.df <- tibble(system_ID = c(), Temperature = c(), Model = c(),
 
 thin_size <- 300
 
+
 data.Vec <- read_rds("results/VecTPC_vals.rds")
 samples <- unique(data.Vec$sample_num)
 num_samples <- length(samples)
@@ -281,11 +282,11 @@ data.Host <- expand_grid(
   sigmaH = sigmaH_vec,
   # Infection-related parameters
   gammaH = gammaH_baseline,
-  betaH = betaH_baseline
-) %>% as.data.frame() %>%
+  betaH = betaH_baseline) %>%
+  as.data.frame() %>%
   mutate(Model = ifelse(is.infinite(sigmaH), "Ross-Macdonald model", "Chitnis model"))
 
-write_rds(data.Host, "results/Host_vals.rds")
+
 
 # 2) Calculate R0 TPCs -----------------------------------------
 
@@ -299,10 +300,10 @@ if (!exists("cluster")) {
 # Set up host trait data frame (for future visualization)
 data.R0 <- as.data.frame(data.Host) %>%
   # filter(sigmaH %in% c(1e-1, 1, 10, 100, Inf)) %>%
-  filter(sigmaH %in% c(1e-1, 1, 10, 100, Inf,
-                       unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 101)])) %>%
+  filter(sigmaH %in% c(10^seq(-1,2), Inf,
+                       unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 51)])) %>%
   filter(KH %in% c(10^seq(-2,5) ,
-                   unique(KH)[seq(1, length(unique(KH)), length.out = 101)]))
+                   unique(KH)[seq(1, length(unique(KH)), length.out = 51)]))
 
 # Slice host trait data
 sigmaH_slices <- slice(unique(data.R0$sigmaH), 2)
@@ -347,13 +348,17 @@ proper_dim <- dim(data.R0)[1] * length(unique(data.Vec$system_ID)) * length(uniq
 
 (dim(R0.df)[1] == proper_dim)
 
-if (exists("R0.df") & dim(R0.df)[1] == proper_dim)
-{write_rds(R0.df, "results/R0_vals.rds", compress = "gz")
-} else {
-  warning("No file written. R0.df either empty or not complete.")
-}
+R0_TPCs.df <- R0.df %>% 
+  ungroup() %>% 
+  filter(sigmaH %in% c(100, Inf))
+write_rds(R0_TPCs.df, "results/R0_TPC_vals.rds", compress = "gz")
 
+R0_heat.df <- R0.df %>% 
+  ungroup() %>% 
+  filter(KH %in% c(0.1, 1, 10, 100))
+write_rds(R0_heat.df, "results/R0_vals.rds", compress = "gz")
 
+# !!! [] filter down R0.df to get it under 100 MB
 
 # 3) Calculate Topt -------------------------------------------------------
 
