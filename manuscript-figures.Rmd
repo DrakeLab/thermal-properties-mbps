@@ -842,12 +842,12 @@ shift_legend(CTWidth_heat_plots)
 
 ## Configure data frame for plotting
 R0_df <- data.R0 %>%
-  select(system_ID, system_label, Temperature, sigmaH, KH, median) %>%
-  rename(R0 = median) %>%
+  select(system_ID, system_label, Temperature, sigmaH, KH, median, mean) %>%
+  rename(R0 = mean) %>%
   # Consider only 3 values of KH (on a log10-scale)
-  # filter(KH %in% c(1E-1, unique(data.R0$KH)[7], unique(data.R0$KH)[10])) %>% # !!! temporary. recalculate R0 with 1e-1, 1e0, 1e1
+  filter(KH %in% c(.1, 1, 10)) %>% 
   # Choose a limited range of sigmaH values
-  filter(sigmaH > 10^0.5) %>%
+  # filter(sigmaH > 10^0.5) %>%
   # Group by plotting variables
   group_by(system_ID, KH, sigmaH) %>%
   # Calculate Topt (which.max requires grouping)
@@ -864,16 +864,6 @@ infinite_divide <- 10^mean(c(3, log10(infinite_skew)))
 
 R0_df <- inf_skew_func(R0_df, infinite_skew, infinite_divide, 3)
 
-# Get the largest value of log10(sigmaH)
-max_log10sigmaH <- filter(R0_df, is.finite(sigmaH)) %>%
-  select(sigmaH) %>%
-  max() %>%
-  log10()
-
-
-## Compute mosquito thermal tolerance range (minimum and maximum)
-temp_MosqThermRange_df <- MosqThermRange_df %>%
-  select(system_label, CTmin_V0, CTmax_V0)
 
 ## PLOTTING ##
 
@@ -901,12 +891,12 @@ R0_plot <- R0_df %>%
   ggplot(mapping = aes(x = sigmaH_proxy, y = Temperature, z = R0)) +
   # Mosquito thermal tolerance range lines
   geom_hline(
-    data = temp_MosqThermRange_df,
+    data = MosqThermRange_df,
     aes(yintercept = CTmin_V0, colour = "VTTR"),
     lwd = 1.275
   ) +
   geom_hline(
-    data = temp_MosqThermRange_df,
+    data = MosqThermRange_df,
     aes(yintercept = CTmax_V0, colour = "VTTR"),
     lwd = 1.275
   ) +
@@ -963,7 +953,7 @@ R0_plot <- R0_df %>%
   scale_y_continuous(
     name = expression("Temperature "(degree * C)),
     expand = c(0, 0),
-    limits = c(14, 36),
+    limits = c(16, 35),
     breaks = seq(10, 36, by = 2)
   ) +
   # color:
@@ -993,10 +983,9 @@ R0_plot <- R0_df %>%
   ) +
   # faceting:
   facet_rep_grid(
-    rows = vars(system_label),
-    cols = vars(KH),
-    scales = "free_y",
-    labeller = labeller(.cols = mylabels),
+    rows = vars(KH),
+    cols = vars(system_label),
+    labeller = labeller(.rows = mylabels),
     repeat.tick.labels = "left"
   ) +
   # theme options:

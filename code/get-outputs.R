@@ -243,9 +243,9 @@ if (!exists("cluster")) {
 data.R0 <- as.data.frame(data.Host) %>%
   # filter(sigmaH %in% c(1e-1, 1, 10, 100, Inf)) %>%
   filter(sigmaH %in% c(1e-1, 1, 10, 100, Inf,
-                       unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 21)])) %>%
+                       unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 101)])) %>%
   filter(KH %in% c(10^seq(-2,5) ,
-                   unique(KH)[seq(1, length(unique(KH)), length.out = 21)]))
+                   unique(KH)[seq(1, length(unique(KH)), length.out = 101)]))
 
 # Slice host trait data
 sigmaH_slices <- slice(unique(data.R0$sigmaH), 2)
