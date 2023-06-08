@@ -114,7 +114,7 @@ data.Vec <- read_rds("results/VecTPC_vals.rds") %>%
   pathosystem_labeller()
 # R0 data
 # !!! [] needs to be updated to include 1e-1, 1e0, 1e1
-data.R0_TPCs <- read_ds("results/R0_TPC_vals.rds") %>%
+data.R0_TPCs <- read_rds("results/R0_TPC_vals.rds") %>%
   pathosystem_labeller()
 
 data.R0 <- read_rds("results/R0_vals.rds") %>%

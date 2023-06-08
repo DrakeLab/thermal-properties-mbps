@@ -739,6 +739,12 @@ for (var_name in temp_vars) {
   }
 }
 
+Topt.HPD <- Topt.HPD %>% 
+  ungroup() %>% 
+  distinct() %>% 
+  filter(!is.na(HPD_width))
+
+
 # Save Topt relative highest posterior density data
 write_rds(Topt.HPD, "results/Topt_HPD_sens.rds")
 # Topt.HPD <- read_rds("results/Topt_HPD_sens.rds")
@@ -1208,7 +1214,7 @@ plot.CTmin.rel.sens <- CT.HPD %>%
     system_ID == "Anopheles gambiae / Plasmodium falciparum" ~ "(d) *An. gambiae* and *P. falciparum*",
     system_ID == "Culex quinquefasciatus / WNV" ~ "(e) *Cx. quinquefasciatus* and WNV"
   )) %>%
-  # filter(!is.na(rel_HPD_width)) %>% 
+  filter(!is.na(rel_HPD_width)) %>% 
   # For each KH value, sum up all sensitivity values to get total sensitivity
   group_by(system_ID, sigmaH, KH) %>% 
   mutate(sens_total = sum(rel_HPD_width)) %>% 
