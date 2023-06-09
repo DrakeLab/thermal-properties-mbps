@@ -175,7 +175,7 @@ median.Vec <- data.Vec %>%
   ))
 
 # Compute *mosquito* thermal tolerance range (minimum and maximum)
-MosqThermRange_df <- median.Vec %>%
+MosqThermRange_df <- mean.Vec %>%
   pathosystem_labeller() %>%
   group_by(system_label) %>%
   filter(V0 > 0) %>%
@@ -867,6 +867,12 @@ infinite_divide <- 10^mean(c(3, log10(infinite_skew)))
 
 R0_df <- inf_skew_func(R0_df, infinite_skew, infinite_divide, 3)
 
+Topt_for_R0_df <- data.Topt %>%
+  # Arrange along the plotting variables
+  arrange(system_ID, sigmaH, KH, median) %>%
+  mutate(sigmaH_proxy = sigmaH)
+Topt_for_R0_df <- inf_skew_func(Topt_for_R0_df, infinite_skew, infinite_divide, 8)
+
 
 ## PLOTTING ##
 
@@ -891,36 +897,38 @@ my.cols <- rev(c(rev(brewer.pal(length(fill_breaks) - 1, "YlOrRd"))))
 
 ## PLOT ##
 R0_plot <- R0_df %>%
-  ggplot(mapping = aes(x = sigmaH_proxy, y = Temperature, z = R0)) +
+  ggplot(mapping = aes(x = sigmaH_proxy, y = Temperature)) +
   # Mosquito thermal tolerance range lines
   geom_hline(
     data = MosqThermRange_df,
-    aes(yintercept = CTmin_V0, colour = "VTTR"),
+    mapping = aes(yintercept = CTmin_V0, colour = "VTTR"),
     lwd = 1.275
   ) +
   geom_hline(
     data = MosqThermRange_df,
-    aes(yintercept = CTmax_V0, colour = "VTTR"),
+    mapping = aes(yintercept = CTmax_V0, colour = "VTTR"),
     lwd = 1.275
   ) +
   # R0 contours for FINITE sigmaH:
   geom_contour_filled(
     data = filter(R0_df, sigmaH_proxy < infinite_divide**0.98),
+    mapping = aes(z = R0),
     breaks = fill_breaks
   ) +
   # R0 contours for INFINITE sigmaH:
   geom_contour_filled(
     data = filter(R0_df, sigmaH_proxy > infinite_divide**1.02),
+    mapping = aes(z = R0),
     breaks = fill_breaks
   ) +
   # R0 = 1 contour:
-  geom_contour(aes(colour = "R0=1"), breaks = c(1), size = 1) +
+  geom_contour(aes(colour = "R0=1", z = R0), breaks = c(1), size = 1) +
   # Topt curve:
-  geom_line(
-    # data = filter(R0_df, R0>1), # uncomment to only display Topt when R0 exceeds one
+  geom_path(
+    data = filter(Topt_for_R0_df, KH %in% c(.1, 1, 10)),
     mapping = aes(
       x = sigmaH_proxy,
-      y = Topt,
+      y = median,
       colour = "Topt"
     ),
     lwd = 1,
@@ -992,7 +1000,7 @@ R0_plot <- R0_df %>%
     repeat.tick.labels = "left"
   ) +
   # theme options:
-  theme_minimal_hgrid() +
+  theme_minimal_hgrid(11) +
   theme(
     axis.line = element_line(),
     panel.spacing = unit(1, "lines"),
