@@ -428,7 +428,7 @@ MosqThermTraits_df <- median.Vec %>%
                              TeX("(a) Adult lifespan: $1/\\mu_V$ (days)"),
                              TeX("(b) Biting frequency: $\\sigma_V$ (day$^{-1}$)"),
                              TeX("(c) Eggs per female per day: $\\sigma_V f$"),
-                             TeX("(d) Immature development rate: $\\rho_L$"),
+                             TeX("(d) Immature development rate: $\\rho_L$ (day$^{-1}$)"),
                              TeX("(e) Prob. of immature survival: $\\delta_L$"),
                              TeX("(f) Prob. of surviving EIP: $\\theta_V$"),
                              TeX("(g) Vector competence: $\\beta_V$")
@@ -447,7 +447,7 @@ MosqThermTraits_plot <- MosqThermTraits_df %>%
     name = "Temperature (°C)",
     expand = c(0, 0),
     limits = c(10, 40),
-    breaks = seq(10, 40, 2)
+    # breaks = seq(10, 40, 2)
   ) +
   # y-axis:
   scale_y_continuous(expand = c(0.05, 0)) +
@@ -516,7 +516,7 @@ shift_legend(MosqThermTraits_plot)
 # newKH_vals <- unique(data.R0$KH)[seq(1, length(unique(data.R0$KH)), length.out = 21)]
 
 data.R0_norm <- data.R0_TPCs %>%
-  # filter(KH %in% newKH_vals) %>%
+  filter(KH %in% unique(data.R0$KH)[seq(1, length(unique(data.R0$KH)), length.out = 21)]) %>%
   filter(variable == "R0") %>%
   select(-variable) %>%
   # normalize median of R0 distribution to have a maximum of one
@@ -712,9 +712,10 @@ Toptalt_plots <- Toptalt_df %>%
   facet_wrap(~system_label, scales = "free", nrow = 2, labeller = labeller()) +
   # legend:
   guides(fill = guide_coloursteps(
-    title.position = "top", title.hjust = 0,
-    barwidth = unit(7, "cm"),
-    show.limits = TRUE
+        title.position = "top", 
+        title.hjust = 0.5,
+        barwidth = 12,
+        show.limits = TRUE
   )) +
   # theme options:
   theme_minimal() +
@@ -795,8 +796,9 @@ CTWidth_heat_plots <- CTwidth_df %>%
   facet_wrap(~system_label, scales = "free", nrow = 2, labeller = labeller()) +
   # legend:
   guides(fill = guide_coloursteps(
-    title.position = "top", title.hjust = 0.5,
-    barwidth = unit(5, "cm"),
+    title.position = "top", 
+    title.hjust = 0.5,
+    barwidth = 12,#unit(5, "cm"),
     show.limits = TRUE
   )) +
   # theme options:
@@ -993,11 +995,11 @@ R0_plot <- R0_df %>%
     )
   ) +
   # faceting:
-  facet_rep_grid(
+  facet_grid(
     rows = vars(KH),
     cols = vars(system_label),
     labeller = labeller(.rows = mylabels),
-    repeat.tick.labels = "left"
+    # repeat.tick.labels = "left"
   ) +
   # theme options:
   theme_minimal_hgrid(11) +
@@ -1197,52 +1199,57 @@ shift_legend(Topt_plot)
 
 
 ```{r fig-S4_CTmin, dev = c('pdf','svg', 'png'), dev="cairo_pdf", message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTmin} Critical thermal minimum as a function of vertebrate host availability.'}
-# Shows how the transmission thermal optimum depends on vertebrate host availability (density and biting tolerance) in each of the systems we consider.
-
-# !!! [] decrease length of color bar
-
 #   x    = biting tolerance (with a point at infinity)
 #   y    = vertebrate host population density
-# colour = CTmin
+# colour = parasite critical thermal minimum (CTmin)
 # Facets = systems
 
-CTmin_df <- data.CT %>%
-  filter(variable == "CTmin") %>%
-  filter(is.finite(median)) %>%
-  mutate(sigmaH_proxy = sigmaH) %>%
-  # Arrange along the plotting variables
-  arrange(system_ID, KH, sigmaH_proxy, median) %>%
-  ungroup()
-
 # add many proxy sigmaH points at infinity to make the values easier to see there
-max_sigmaH <- max(filter(CTmin_df, is.finite(sigmaH))$sigmaH)
+max_sigmaH <- max(filter(data.CT, is.finite(sigmaH))$sigmaH)
 # Value of sigmaH to replace 'Inf' with for plotting
-infinite_skew <- 10^2.35 # 10^log10(max_sigmaH*1.5) # 1.1*max_sigmaH #10^2 + 80
+infinite_skew <- 10^2.35
 # Used to create a gap dividing finite and infinite sigmaH
 infinite_divide <- 10^2.7 # 10^log10(max_sigmaH*1)
-
-CTmin_df <- inf_skew_func(CTmin_df, infinite_skew, infinite_divide, 8)
-
-# infinite_divide <- 10^mean(c(2, log10(infinite_skew)))
 
 # Define sigmaH tick breaks and labels
 sigmaH_breaks <- c(10^c(seq(-1, 2, by = 1)), 10^2.3125, 10^2.5625)
 sigmaH_labels <- c(paste(c(10^c(seq(-1, 2, by = 1)))), TeX("$\\ldots$"), TeX("$\\infty$"))
 
+CTmin_df <- data.CT %>%
+  filter(variable == "CTmin") %>%
+  mutate(sigmaH_proxy = sigmaH) %>%
+  # Arrange along the plotting variables
+  arrange(system_ID, KH, sigmaH_proxy, median) %>%
+  ungroup() %>% 
+  # Assign a value for cases where R0<1 for all temperatures
+  mutate(median_proxy = ifelse(is.finite(median), median, 100))
+
+CTmin_df <- inf_skew_func(CTmin_df, infinite_skew, infinite_divide, 8)
+
+maxCTmin <- ceiling(max(filter(CTmin_df, is.finite(median))$median))
+
+CTmin_breaks <- c(seq(14,35, by = 2), 101)
+
 CTmin_heat_plots <- CTmin_df %>%
+  select(-median) %>% 
   ## Set up plot ##
   # x = biting tolerance (with a point at infinity),
   # y = vertebrate host population density,
-  # color = width of parasite thermal mean_CTwidth
-  ggplot(aes(x = KH, y = sigmaH_proxy, z = median)) +
+  # color = width of parasite thermal median_CTwidth
+  ggplot(aes(x = KH, y = sigmaH_proxy, z = median_proxy)) +
   # CTmin for FINITE sigmaH:
   geom_contour_filled(
-    data = filter(CTmin_df, sigmaH_proxy < 100)
-  ) +
+    data = filter(CTmin_df, 
+                  sigmaH_proxy < 10^2.2),
+    breaks = CTmin_breaks
+    ) +
   # CTmin for INFINITE sigmaH:
   geom_contour_filled(
-    data = filter(CTmin_df, is.infinite(sigmaH))
-  ) +
+    data = filter(CTmin_df,
+                  sigmaH_proxy > 10^2.4,
+                  sigmaH_proxy < infinite_divide),
+    breaks = CTmin_breaks
+    ) +
   # x-axis: log10-scale with no buffer space
   scale_x_log10(
     name = TeX("Vertebrate host population density (ind/ha)"),
@@ -1258,17 +1265,19 @@ CTmin_heat_plots <- CTmin_df %>%
     breaks = sigmaH_breaks,
     labels = sigmaH_labels
   ) +
-  # color:
-  scale_fill_viridis_d(
-    name = "Median critical thermal minimum (°C)",
-    option = "plasma"
+  # fill:
+    scale_fill_manual(
+    name = "Critical thermal minimum (°C)",
+    values = c(viridis(9), "grey", "grey"),
+    labels = ~ ifelse(.x < maxCTmin, .x, 'n/a')
   ) +
   # faceting:
   facet_wrap(~system_label, scales = "free", nrow = 2, labeller = labeller()) +
   # legend:
   guides(fill = guide_coloursteps(
-    title.position = "top", title.hjust = 0.5,
-    barwidth = unit(10, "cm"),
+    title.position = "top",
+    title.hjust = 0.5,
+    barwidth = unit(7, "cm"),
     show.limits = TRUE
   )) +
   # theme options:
@@ -1295,58 +1304,57 @@ shift_legend(CTmin_heat_plots)
 
 ```{r fig-S5_CTmax, dev = c('pdf','svg', 'png'), dev="cairo_pdf", message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTmax} Critical thermal maximum as a function of vertebrate host availability.'}
 
-# !!! [] decrease length of color bar (the length used in Topt plot might be good)
-
-# Shows how the transmission thermal optimum depends on vertebrate host availability (density and biting tolerance) in each of the systems we consider.
-
 #   x    = biting tolerance (with a point at infinity)
 #   y    = vertebrate host population density
-# colour = CTmax
+# colour = parasite critical thermal maximum (CTmax)
 # Facets = systems
 
-CTmax_df <- read_rds("results/CT_vals.rds") %>%
-  pathosystem_labeller() %>%
-  filter(variable == "CTmax") %>%
-  filter(is.finite(median)) %>%
-  mutate(sigmaH_proxy = sigmaH) %>%
-  # Arrange along the plotting variables
-  arrange(system_ID, KH, sigmaH_proxy, median) %>%
-  ungroup()
-
 # add many proxy sigmaH points at infinity to make the values easier to see there
-max_sigmaH <- max(filter(CTmax_df, is.finite(sigmaH))$sigmaH)
+max_sigmaH <- max(filter(data.CT, is.finite(sigmaH))$sigmaH)
 # Value of sigmaH to replace 'Inf' with for plotting
-infinite_skew <- 10^2.35 # 10^log10(max_sigmaH*1.5) # 1.1*max_sigmaH #10^2 + 80
+infinite_skew <- 10^2.35
 # Used to create a gap dividing finite and infinite sigmaH
-infinite_divide <- 10^2.7 # 10^log10(max_sigmaH*1)
-
-CTmax_df <- inf_skew_func(CTmax_df, infinite_skew, infinite_divide, 8)
-
-# infinite_divide <- 10^mean(c(2, log10(infinite_skew)))
+infinite_divide <- 10^2.7
 
 # Define sigmaH tick breaks and labels
 sigmaH_breaks <- c(10^c(seq(-1, 2, by = 1)), 10^2.3125, 10^2.5625)
 sigmaH_labels <- c(paste(c(10^c(seq(-1, 2, by = 1)))), TeX("$\\ldots$"), TeX("$\\infty$"))
 
+CTmax_df <- data.CT %>%
+  filter(variable == "CTmax") %>%
+  mutate(sigmaH_proxy = sigmaH) %>%
+  # Arrange along the plotting variables
+  arrange(system_ID, KH, sigmaH_proxy, median) %>%
+  ungroup() %>% 
+  # Assign a value for cases where R0<1 for all temperatures
+  mutate(median_proxy = ifelse(is.finite(median), median, -100))
 
-min_CTmax <- floor(min(min(CTmax_df$mean),min(CTmax_df$median)))
-max_CTmax <- ceiling(max(max(CTmax_df$mean),max(CTmax_df$median)))
-CTmax_breaks <- seq(min_CTmax, max_CTmax, by = 1)
+CTmax_df <- inf_skew_func(CTmax_df, infinite_skew, infinite_divide, 8)
+
+minCTmax <- floor(min(filter(CTmax_df, is.finite(median))$median))
+
+CTmax_breaks <- c(-101, seq(21,35, by = 2))
 
 CTmax_heat_plots <- CTmax_df %>%
+  select(-median) %>% 
   ## Set up plot ##
   # x = biting tolerance (with a point at infinity),
   # y = vertebrate host population density,
-  # color = CTmax
-  ggplot(aes(x = KH, y = sigmaH_proxy, z = median)) +
-  # CTmax for FINITE sigmaH:
+  # color = width of parasite thermal median_CTwidth
+  ggplot(aes(x = KH, y = sigmaH_proxy, z = median_proxy)) +
+  # CTmin for FINITE sigmaH:
   geom_contour_filled(
-    data = filter(CTmax_df, sigmaH_proxy < 100)
-  ) +
-  # CTmax for INFINITE sigmaH:
+    data = filter(CTmax_df, 
+                  sigmaH_proxy < 10^2.2),
+    breaks = CTmax_breaks
+    ) +
+  # CTmin for INFINITE sigmaH:
   geom_contour_filled(
-    data = filter(CTmax_df, is.infinite(sigmaH))
-  ) +
+    data = filter(CTmax_df,
+                  sigmaH_proxy > 10^2.4,
+                  sigmaH_proxy < infinite_divide),
+    breaks = CTmax_breaks
+    ) +
   # x-axis: log10-scale with no buffer space
   scale_x_log10(
     name = TeX("Vertebrate host population density (ind/ha)"),
@@ -1362,17 +1370,19 @@ CTmax_heat_plots <- CTmax_df %>%
     breaks = sigmaH_breaks,
     labels = sigmaH_labels
   ) +
-  # color:
-  scale_fill_viridis_d(
-    name = "Median critical thermal maximum (°C)",
-    option = "plasma"
+  # fill:
+    scale_fill_manual(
+    name = "Critical thermal maximum (°C)",
+    values = c("grey", viridis(9)),
+    labels = ~ ifelse(.x < minCTmax-1, 'n/a', .x)
   ) +
   # faceting:
   facet_wrap(~system_label, scales = "free", nrow = 2, labeller = labeller()) +
   # legend:
   guides(fill = guide_coloursteps(
-    title.position = "top", title.hjust = 0.5,
-    barwidth = unit(10, "cm"),
+    title.position = "top",
+    title.hjust = 0.5,
+    barwidth = unit(7, "cm"),
     show.limits = TRUE
   )) +
   # theme options:
