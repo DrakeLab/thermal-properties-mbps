@@ -29,6 +29,7 @@ library(RColorBrewer)
 library(MetBrewer)
 library(here)
 library(lemon)
+library(see) # for half-violin plots
 library(zplyr) # from https://github.com/burchill/zplyr/ # only needed for placing text using absolute coordinates in contact comparison figure
 
 # Plot settings ----
@@ -1277,7 +1278,7 @@ CTmin_heat_plots <- CTmin_df %>%
   guides(fill = guide_coloursteps(
     title.position = "top",
     title.hjust = 0.5,
-    barwidth = unit(7, "cm"),
+    barwidth = 12,
     show.limits = TRUE
   )) +
   # theme options:
@@ -1382,7 +1383,7 @@ CTmax_heat_plots <- CTmax_df %>%
   guides(fill = guide_coloursteps(
     title.position = "top",
     title.hjust = 0.5,
-    barwidth = unit(7, "cm"),
+    barwidth = 12,
     show.limits = TRUE
   )) +
   # theme options:
@@ -1609,24 +1610,54 @@ all.density.df <- read_rds("results/CTminmaxTopt_densities.rds") %>%
 
 ### Option 1: inline violin plots ----
 plot.densities_violin_inline <- ggplot() +
-  geom_violin(
-    data = filter(all.density.df, variable == "Thermal optimum"),
-    aes(x = value, y = KH_factor, linetype = sigmaH, fill = "Topt")
+  # CT min 
+  geom_violinhalf(
+    data = filter(all.density.df, variable == "Critical thermal minimum",
+                  sigmaH == 100),
+    aes(y = value, x = KH_factor, linetype = sigmaH, fill = "CTmin"),
+    lwd = 1
   ) +
-  geom_violin(
-    data = filter(all.density.df, variable == "Critical thermal minimum"),
-    aes(x = value, y = KH_factor, linetype = sigmaH, fill = "CTmin"),
+  geom_violinhalf(
+    data = filter(all.density.df, variable == "Critical thermal minimum",
+                  sigmaH == Inf),
+    aes(y = value, x = KH_factor, linetype = sigmaH, fill = "CTmin"),
+    lwd = 1,
+    flip = TRUE
   ) +
-  geom_violin(
-    data = filter(all.density.df, variable == "Critical thermal maximum"),
-    aes(x = value, y = KH_factor, linetype = sigmaH, fill = "CTmax"),
+  # CT max 
+  geom_violinhalf(
+    data = filter(all.density.df, variable == "Critical thermal maximum",
+                  sigmaH == 100),
+    aes(y = value, x = KH_factor, linetype = sigmaH, fill = "CTmax"),
+    lwd = 1
   ) +
-  scale_x_continuous(
+  geom_violinhalf(
+    data = filter(all.density.df, variable == "Critical thermal maximum",
+                  sigmaH == Inf),
+    aes(y = value, x = KH_factor, linetype = sigmaH, fill = "CTmax"),
+    lwd = 1,
+    flip = TRUE
+  ) +
+  # Thermal optima
+  geom_violinhalf(
+    data = filter(all.density.df, variable == "Thermal optimum",
+                  sigmaH == 100),
+    aes(y = value, x = KH_factor, linetype = sigmaH, fill = "Topt"),
+    lwd = 1
+  ) +
+  geom_violinhalf(
+    data = filter(all.density.df, variable == "Thermal optimum",
+                  sigmaH == Inf),
+    aes(y = value, x = KH_factor, linetype = sigmaH, fill = "Topt"),
+    lwd = 1,
+    flip = TRUE
+  ) +
+  scale_x_discrete(
+    name = "Vertebrate host population density (ind/ha)"
+  ) +
+  scale_y_continuous(
     name = "Temperature (°C)",
     expand = c(0, 0)
-  ) +
-  scale_y_discrete(
-    name = "Vertebrate host population density (ind/ha)"
   ) +
   scale_linetype(
     name = "Biting tolerance\n(bites per host per day)"
@@ -1648,121 +1679,124 @@ plot.densities_violin_inline <- ggplot() +
       padding = margin(0, 0, 0, 0),
       margin = margin(1, 1, 1, 1)
     )
-  )
+  ) +
+  coord_flip()
 shift_legend(plot.densities_violin_inline)
-
-### Option 2: inline box and whisker plots ----
-plot.densities_boxwhisker_inline <- ggplot() +
-  geom_boxplot(
-    data = filter(all.density.df, variable == "Thermal optimum"),
-    aes(x = value, y = KH_factor, linetype = sigmaH, fill = "Topt")
-  ) +
-  geom_boxplot(
-    data = filter(all.density.df, variable == "Critical thermal minimum"),
-    aes(x = value, y = KH_factor, linetype = sigmaH, fill = "CTmin"),
-  ) +
-  geom_boxplot(
-    data = filter(all.density.df, variable == "Critical thermal maximum"),
-    aes(x = value, y = KH_factor, linetype = sigmaH, fill = "CTmax"),
-  ) +
-  scale_x_continuous(
-    name = "Temperature (°C)",
-    expand = c(0, 0)
-  ) +
-  scale_y_discrete(
-    name = "Vertebrate host population density (ind/ha)"
-  ) +
-  scale_linetype(
-    name = "Biting tolerance\n(bites per host per day)"
-  ) +
-  scale_fill_discrete(
-    name = "",
-    breaks = c("CTmin", "Topt", "CTmax"),
-    labels = c("Critical thermal minimum", "Thermal optimum", "Critical thermal maximum")
-  ) +
-  facet_wrap(~system_label, labeller = labeller()) +
-  theme_minimal_grid() +
-  theme(
-    legend.margin = margin(0, 0, 0, 0),
-    legend.title = element_text(size = 10),
-    axis.title.x = element_text(hjust = 0.5),
-    strip.text = ggtext::element_markdown(
-      size = 11,
-      hjust = 0,
-      padding = margin(0, 0, 0, 0),
-      margin = margin(1, 1, 1, 1)
-    )
-  )
-shift_legend(plot.densities_boxwhisker_inline)
-
-### Option 3: stacked violin plots ----
-plot.densities_violin_stacked <- ggplot() +
-  geom_violin(
-    data = all.density.df,
-    aes(x = value, y = KH_factor, fill = variable, linetype = sigmaH)
-  ) +
-  scale_x_continuous(
-    name = "Temperature (°C)",
-    expand = c(0, 0)
-  ) +
-  scale_y_discrete(
-    name = "Vertebrate host population density (ind/ha)"
-  ) +
-  scale_linetype(
-    name = "Biting tolerance\n(bites per host per day)"
-  ) +
-  scale_fill_discrete(
-    name = ""
-  ) +
-  facet_wrap(~system_label, labeller = labeller()) +
-  theme_minimal_grid() +
-  theme(
-    legend.margin = margin(0, 0, 0, 0),
-    legend.title = element_text(size = 10),
-    axis.title.x = element_text(hjust = 0.5),
-    strip.text = ggtext::element_markdown(
-      size = 11,
-      hjust = 0,
-      padding = margin(0, 0, 0, 0),
-      margin = margin(1, 1, 1, 1)
-    )
-  )
-shift_legend(plot.densities_violin_stacked)
-
-### Option 4: stacked box and whisker plots ----
-plot.densities_boxwhisker_stacked <- ggplot() +
-  geom_boxplot(
-    data = all.density.df,
-    aes(x = value, y = KH_factor, fill = variable, linetype = sigmaH)
-  ) +
-  scale_x_continuous(
-    name = "Temperature (°C)",
-    expand = c(0, 0)
-  ) +
-  scale_y_discrete(
-    name = "Vertebrate host population density (ind/ha)"
-  ) +
-  scale_linetype(
-    name = "Biting tolerance\n(bites per host per day)"
-  ) +
-  scale_fill_discrete(
-    name = ""
-  ) +
-  facet_wrap(~system_label, labeller = labeller()) +
-  theme_minimal_grid() +
-  theme(
-    legend.margin = margin(0, 0, 0, 0),
-    legend.title = element_text(size = 10),
-    axis.title.x = element_text(hjust = 0.5),
-    strip.text = ggtext::element_markdown(
-      size = 11,
-      hjust = 0,
-      padding = margin(0, 0, 0, 0),
-      margin = margin(1, 1, 1, 1)
-    )
-  )
-shift_legend(plot.densities_boxwhisker_stacked)
 ```
+
+
+<!-- ### Option 2: inline box and whisker plots ---- -->
+<!-- plot.densities_boxwhisker_inline <- ggplot() + -->
+<!--   geom_boxplot( -->
+<!--     data = filter(all.density.df, variable == "Thermal optimum"), -->
+<!--     aes(x = value, y = KH_factor, linetype = sigmaH, fill = "Topt") -->
+<!--   ) + -->
+<!--   geom_boxplot( -->
+<!--     data = filter(all.density.df, variable == "Critical thermal minimum"), -->
+<!--     aes(x = value, y = KH_factor, linetype = sigmaH, fill = "CTmin"), -->
+<!--   ) + -->
+<!--   geom_boxplot( -->
+<!--     data = filter(all.density.df, variable == "Critical thermal maximum"), -->
+<!--     aes(x = value, y = KH_factor, linetype = sigmaH, fill = "CTmax"), -->
+<!--   ) + -->
+<!--   scale_x_continuous( -->
+<!--     name = "Temperature (°C)", -->
+<!--     expand = c(0, 0) -->
+<!--   ) + -->
+<!--   scale_y_discrete( -->
+<!--     name = "Vertebrate host population density (ind/ha)" -->
+<!--   ) + -->
+<!--   scale_linetype( -->
+<!--     name = "Biting tolerance\n(bites per host per day)" -->
+<!--   ) + -->
+<!--   scale_fill_discrete( -->
+<!--     name = "", -->
+<!--     breaks = c("CTmin", "Topt", "CTmax"), -->
+<!--     labels = c("Critical thermal minimum", "Thermal optimum", "Critical thermal maximum") -->
+<!--   ) + -->
+<!--   facet_wrap(~system_label, labeller = labeller()) + -->
+<!--   theme_minimal_grid() + -->
+<!--   theme( -->
+<!--     legend.margin = margin(0, 0, 0, 0), -->
+<!--     legend.title = element_text(size = 10), -->
+<!--     axis.title.x = element_text(hjust = 0.5), -->
+<!--     strip.text = ggtext::element_markdown( -->
+<!--       size = 11, -->
+<!--       hjust = 0, -->
+<!--       padding = margin(0, 0, 0, 0), -->
+<!--       margin = margin(1, 1, 1, 1) -->
+<!--     ) -->
+<!--   ) -->
+<!-- shift_legend(plot.densities_boxwhisker_inline) -->
+
+<!-- ### Option 3: stacked violin plots ---- -->
+<!-- plot.densities_violin_stacked <- ggplot() + -->
+<!--   geom_violin( -->
+<!--     data = all.density.df, -->
+<!--     aes(x = value, y = KH_factor, fill = variable, linetype = sigmaH) -->
+<!--   ) + -->
+<!--   scale_x_continuous( -->
+<!--     name = "Temperature (°C)", -->
+<!--     expand = c(0, 0) -->
+<!--   ) + -->
+<!--   scale_y_discrete( -->
+<!--     name = "Vertebrate host population density (ind/ha)" -->
+<!--   ) + -->
+<!--   scale_linetype( -->
+<!--     name = "Biting tolerance\n(bites per host per day)" -->
+<!--   ) + -->
+<!--   scale_fill_discrete( -->
+<!--     name = "" -->
+<!--   ) + -->
+<!--   facet_wrap(~system_label, labeller = labeller()) + -->
+<!--   theme_minimal_grid() + -->
+<!--   theme( -->
+<!--     legend.margin = margin(0, 0, 0, 0), -->
+<!--     legend.title = element_text(size = 10), -->
+<!--     axis.title.x = element_text(hjust = 0.5), -->
+<!--     strip.text = ggtext::element_markdown( -->
+<!--       size = 11, -->
+<!--       hjust = 0, -->
+<!--       padding = margin(0, 0, 0, 0), -->
+<!--       margin = margin(1, 1, 1, 1) -->
+<!--     ) -->
+<!--   ) -->
+<!-- shift_legend(plot.densities_violin_stacked) -->
+
+<!-- ### Option 4: stacked box and whisker plots ---- -->
+<!-- plot.densities_boxwhisker_stacked <- ggplot() + -->
+<!--   geom_boxplot( -->
+<!--     data = all.density.df, -->
+<!--     aes(x = value, y = KH_factor, fill = variable, linetype = sigmaH) -->
+<!--   ) + -->
+<!--   scale_x_continuous( -->
+<!--     name = "Temperature (°C)", -->
+<!--     expand = c(0, 0) -->
+<!--   ) + -->
+<!--   scale_y_discrete( -->
+<!--     name = "Vertebrate host population density (ind/ha)" -->
+<!--   ) + -->
+<!--   scale_linetype( -->
+<!--     name = "Biting tolerance\n(bites per host per day)" -->
+<!--   ) + -->
+<!--   scale_fill_discrete( -->
+<!--     name = "" -->
+<!--   ) + -->
+<!--   facet_wrap(~system_label, labeller = labeller()) + -->
+<!--   theme_minimal_grid() + -->
+<!--   theme( -->
+<!--     legend.margin = margin(0, 0, 0, 0), -->
+<!--     legend.title = element_text(size = 10), -->
+<!--     axis.title.x = element_text(hjust = 0.5), -->
+<!--     strip.text = ggtext::element_markdown( -->
+<!--       size = 11, -->
+<!--       hjust = 0, -->
+<!--       padding = margin(0, 0, 0, 0), -->
+<!--       margin = margin(1, 1, 1, 1) -->
+<!--     ) -->
+<!--   ) -->
+<!-- shift_legend(plot.densities_boxwhisker_stacked) -->
+<!-- ``` -->
 
 ```{r fig-S8_R0_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:R0_sens} The sensitivity of the distribution of $\\mathcal{R}_0$ to mosquito life history traits.'}
 
