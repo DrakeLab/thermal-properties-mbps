@@ -128,7 +128,7 @@ median.Vec <- data.Vec %>%
 
 # Calculate the width of the 95% HPD for the full posterior of R0 across temperatures
 
-sigmaH_vec <- c(100, Inf)#unique(data.Host$sigmaH)
+sigmaH_vec <- c(10, 100, Inf)#unique(data.Host$sigmaH)
 KH_vec <- 10^seq(-2,4)
 
 data.R0HPD <- dplyr::filter(data.Host,
@@ -917,7 +917,7 @@ for (index_KH in unique(data.CTHPD$KH)) {
     summarise(
       HPD_low = hdi(value, credMass = 0.95)[1],
       HPD_high = hdi(value, credMass = 0.95)[2],
-      HPD_width = HPD_high-HPD_low,
+      HPD_width = max(eps, HPD_high-HPD_low),
       .groups = "keep"
     ) %>% 
     rbind(full.CT.HPD)
@@ -1022,7 +1022,7 @@ for (var_name in temp_vars) {
       summarise(
         HPD_low = hdi(value, credMass = 0.95)[1],
         HPD_high = hdi(value, credMass = 0.95)[2],
-        HPD_width = HPD_high-HPD_low,
+        HPD_width = max(eps, HPD_high-HPD_low),
         .groups = "keep"
       ) %>% 
       select(system_ID, sigmaH, KH, variable, HPD_width) %>% 

@@ -1766,13 +1766,13 @@ Temp_range_for_plot <- R0.HPD %>%
 sens_labels <- as_labeller(c(
         "(a) *Ae. aegypti* and DENV" = "(a) *Ae. aegypti* and  \nDENV",
       "(b) *Ae. aegypti* and ZIKV" = "(b) *Ae. aegypti* and   \nZIKV",
-      "(c&#41; *Ae. albopictus* and DENV" = "(c&#41; *Ae. albopictus* and  \nDENV",
+      "(c&#41; *Ae. albopictus* and DENV" = "(c&#41; *Ae. albopictus*  \nand DENV",
       "(d) *An. gambiae* and *P. falciparum*" = "(d) *An. gambiae* and  \n*P. falciparum*",
       "(e) *Cx. quinquefasciatus* and WNV" = "(e) *Cx. quinquefasciatus*  \nand  WNV"
 ))
 
 plot.R0.rel.sens <- R0.HPD %>%
-  filter(KH %in% c(100) & sigmaH %in% c(100, Inf)) %>%
+  filter(KH %in% c(1) & sigmaH %in% c(100, Inf)) %>%
   # filter(!(KH == 100 & sigmaH == Inf)) %>%
   filter(rel_HPD_width != 0) %>%
   # For each KH value, sum up all sensitivity values to get total sensitivity across parameters
@@ -1806,14 +1806,7 @@ plot.R0.rel.sens <- R0.HPD %>%
     ),
     scales = "free"
   ) +
-    facet_grid(
-    rows = vars(KH),
-    cols = vars(system_label),
-    labeller = labeller(.rows = mylabels,
-                        .cols = R0_heatmap_labels),
-    # repeat.tick.labels = "left"
-  ) +
-  theme_minimal_hgrid() +
+  theme_minimal() +
   theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
@@ -1869,13 +1862,13 @@ plot.ddTR0.rel.sens <- ddTR0.HPD %>%
     expand = c(0, 0)
   ) +
   scale_y_continuous(
-    name = unname(TeX("Relative contribution to $R_0$ HPD width"))
+    name = unname(TeX("Relative contribution to $ddTR_0$ HPD width"))
   ) +
   facet_grid(
     cols = vars(system_label),
     rows = vars(KH, sigmaH),
     labeller = labeller(
-      system_label = label_wrap_gen(width = 10),
+      system_label = sens_labels,
       sigmaH = as_labeller(appender_sigmaH, default = label_parsed),
       KH = as_labeller(appender_KH, default = label_parsed)
     ),
@@ -1939,7 +1932,7 @@ plot.Topt.rel.sens <- Topt.HPD %>%
   #   limits = c(0,1)
   # ) +
   facet_wrap(~system_label, scales = "free") +
-  theme_minimal_hgrid() +
+  theme_minimal() +
   theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
@@ -1950,24 +1943,25 @@ plot.Topt.rel.sens <- Topt.HPD %>%
       hjust = 0,
       padding = margin(0, 0, 0, 0),
       margin = margin(1, 1, 1, 1)
-    ),
-    panel.spacing.x = unit(1, "lines")
+    )
   )
 shift_legend(plot.Topt.rel.sens)
 ```
 
 ```{r fig-S11_CTmin_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTmin_sens} The sensitivity of the critical thermal minimum to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$ and $\\sigma_H=\\infty$.'}
 
-plot.CTmin.rel.sens <- CT.HPD %>%
+CTmin_df <- CT.HPD %>%
   filter(variable == "CTmin") %>%
-  filter(sigmaH %in% c(100, Inf)) %>%
+  filter(sigmaH %in% c(10, Inf)) %>%
   filter(!is.na(rel_HPD_width)) %>%
   # For each KH value, sum up all sensitivity values to get total sensitivity
   group_by(system_ID, sigmaH, KH) %>%
   mutate(sens_total = sum(rel_HPD_width)) %>%
   # Divide each sensitivity value by the total sensitivity
-  mutate(sens_rel = rel_HPD_width / sens_total) %>%
+  mutate(sens_rel = rel_HPD_width / sens_total) #%>%
+
   # Make a stacked plot, colored by parameter
+plot.CTmin.rel.sens <- CTmin_df %>% 
   ggplot(aes(x = KH, y = sens_rel, fill = focal_var)) +
   geom_area() +
   scale_fill_manual(
@@ -1977,19 +1971,22 @@ plot.CTmin.rel.sens <- CT.HPD %>%
   scale_x_log10(
     name = TeX("Vertebrate host population density (ind/ha)"),
     expand = c(0, 0),
-    limits = c(0.05, 1E3),
     breaks = 10^seq(-2, 4, 1),
     labels = TeX(c("$0.01$", "$0.1$", "$1$", "$10", "$100$", "$10^3$", "$10^4$"))
   ) +
   scale_y_continuous(
     name = unname(TeX("Relative contribution to $CT_{min}$ HPD width"))
   ) +
-  facet_grid(cols = vars(system_label),
-             rows = vars(sigmaH),
-             labeller = labeller(sigmaH = as_labeller(appender_sigmaH,
-                                                      default = label_parsed)),
-             scales = "free") +
-  theme_minimal_hgrid() +
+  facet_grid(
+    cols = vars(system_label),
+    rows = vars(sigmaH),
+    labeller = labeller(
+      system_label = sens_labels,
+      sigmaH = as_labeller(appender_sigmaH, default = label_parsed)
+    ),
+    scales = "free"
+  ) +
+  theme_minimal() +
   theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
@@ -2002,7 +1999,7 @@ plot.CTmin.rel.sens <- CT.HPD %>%
       padding = margin(0, 0, 0, 0),
       margin = margin(1, 1, 1, 1)
     ),
-    panel.spacing.x = unit(1, "lines")
+    panel.spacing.x = unit(2, "lines")
   )
 plot.CTmin.rel.sens
 ```
@@ -2011,7 +2008,7 @@ plot.CTmin.rel.sens
 
 plot.CTmax.rel.sens <- CT.HPD %>%
   filter(variable == "CTmax") %>%
-  filter(sigmaH %in% c(100, Inf)) %>%
+  filter(sigmaH %in% c(10, Inf)) %>%
   filter(!is.na(rel_HPD_width)) %>%
   # For each KH value, sum up all sensitivity values to get total sensitivity
   group_by(system_ID, sigmaH, KH) %>%
@@ -2028,19 +2025,22 @@ plot.CTmax.rel.sens <- CT.HPD %>%
   scale_x_log10(
     name = TeX("Vertebrate host population density (ind/ha)"),
     expand = c(0, 0),
-    limits = c(0.05, 1E3),
     breaks = 10^seq(-2, 4, 1),
     labels = TeX(c("$0.01$", "$0.1$", "$1$", "$10", "$100$", "$10^3$", "$10^4$"))
   ) +
   scale_y_continuous(
     name = unname(TeX("Relative contribution to $CT_{max}$ HPD width"))
   ) +
-  facet_grid(cols = vars(system_label),
-             rows = vars(sigmaH),
-             labeller = labeller(sigmaH = as_labeller(appender_sigmaH,
-                                                      default = label_parsed)),
-             scales = "free") +
-  theme_minimal_hgrid() +
+  facet_grid(
+    cols = vars(system_label),
+    rows = vars(sigmaH),
+    labeller = labeller(
+      system_label = sens_labels,
+      sigmaH = as_labeller(appender_sigmaH, default = label_parsed)
+    ),
+    scales = "free"
+  ) +
+  theme_minimal() +
   theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
@@ -2053,7 +2053,7 @@ plot.CTmax.rel.sens <- CT.HPD %>%
       padding = margin(0, 0, 0, 0),
       margin = margin(1, 1, 1, 1)
     ),
-    panel.spacing.x = unit(1, "lines")
+    panel.spacing.x = unit(2, "lines")
   )
 plot.CTmax.rel.sens
 ```
@@ -2065,7 +2065,7 @@ plot.CTmax.rel.sens
 
 plot.CTwidth.rel.sens <- CT.HPD %>%
   filter(variable == "CTwidth") %>%
-  filter(sigmaH %in% c(100, Inf)) %>%
+  filter(sigmaH %in% c(10, Inf)) %>%
   filter(!is.na(rel_HPD_width)) %>%
   # For each KH value, sum up all sensitivity values to get total sensitivity
   group_by(system_ID, sigmaH, KH) %>%
@@ -2082,19 +2082,22 @@ plot.CTwidth.rel.sens <- CT.HPD %>%
   scale_x_log10(
     name = TeX("Vertebrate host population density (ind/ha)"),
     expand = c(0, 0),
-    limits = c(0.05, 1E3),
     breaks = 10^seq(-2, 4, 1),
     labels = TeX(c("$0.01$", "$0.1$", "$1$", "$10", "$100$", "$10^3$", "$10^4$"))
   ) +
   scale_y_continuous(
     name = unname(TeX("Relative contribution to $CT_{width}$ HPD width"))
   ) +
-  facet_grid(cols = vars(system_label),
-             rows = vars(sigmaH),
-             labeller = labeller(sigmaH = as_labeller(appender_sigmaH,
-                                                      default = label_parsed)),
-             scales = "free") +
-  theme_minimal_hgrid() +
+  facet_grid(
+    cols = vars(system_label),
+    rows = vars(sigmaH),
+    labeller = labeller(
+      system_label = sens_labels,
+      sigmaH = as_labeller(appender_sigmaH, default = label_parsed)
+    ),
+    scales = "free"
+  ) +
+  theme_minimal() +
   theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
@@ -2107,7 +2110,7 @@ plot.CTwidth.rel.sens <- CT.HPD %>%
       padding = margin(0, 0, 0, 0),
       margin = margin(1, 1, 1, 1)
     ),
-    panel.spacing.x = unit(1, "lines")
+    panel.spacing.x = unit(2, "lines")
   )
 plot.CTwidth.rel.sens
 ```
