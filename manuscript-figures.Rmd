@@ -71,11 +71,21 @@ inf_skew_func <- function(df, skew, divide, n_rows_to_add) {
 
 # Label functions:
 appender_sigmaH <- function(string) {
-  unname(TeX(paste("$\\sigma_H = $", string)))
+  ifelse(string == "Inf", 
+         unname(TeX(paste("$\\sigma_H = \\infty$"))),
+         unname(TeX(paste("$\\sigma_H = $", string))))
 }
 appender_KH <- function(string) {
   unname(TeX(paste("$K_H = $", string)))
 }
+
+sens_labels <- as_labeller(c(
+        "(a) *Ae. aegypti* and DENV" = "(a) *Ae. aegypti* and  \nDENV",
+      "(b) *Ae. aegypti* and ZIKV" = "(b) *Ae. aegypti* and   \nZIKV",
+      "(c&#41; *Ae. albopictus* and DENV" = "(c&#41; *Ae. albopictus*  \nand DENV",
+      "(d) *An. gambiae* and *P. falciparum*" = "(d) *An. gambiae* and  \n*P. falciparum*",
+      "(e) *Cx. quinquefasciatus* and WNV" = "(e) *Cx. quinquefasciatus*  \nand  WNV"
+))
 
 # Helper function: place legends in empty facets of plot grids
 # Code by: Artem Sokolov, found here: https://stackoverflow.com/questions/54438495/shift-legend-into-empty-facets-of-a-faceted-plot-in-ggplot2
@@ -1037,7 +1047,7 @@ R0_plot <- R0_df %>%
     labels = c(
       "R0=1" = unname(TeX("$R_0=1$")),
       "Topt" = "Transmission\nthermal\noptimum",
-      "VTTR" = "Mosquito\nthermal\ntolerance\nlimit"
+      "VTTR" = "Mosquito\npopulation\nthermal\nniche"
     ),
     values = c("black", "purple", "grey"),
     guide = guide_legend(
@@ -1552,7 +1562,7 @@ CTRange_plots <- CTRange_df %>%
   scale_colour_manual(
     name = "Thermal extrema",
     breaks = c("CTmax", "CTmin", "VTTR"),
-    labels = c("Critical maximum", "Critical minimum", "Mosquito thermal\ntolerance range"),
+    labels = c("Critical maximum", "Critical minimum", "Mosquito population\nthermal niche"),
     values = c("red", "blue", "grey"),
     guide = guide_legend(keyheight = unit(40, "cm"))
   ) +
@@ -1763,14 +1773,6 @@ Temp_range_for_plot <- R0.HPD %>%
   dplyr::select(Temperature) %>%
   range()
 
-sens_labels <- as_labeller(c(
-        "(a) *Ae. aegypti* and DENV" = "(a) *Ae. aegypti* and  \nDENV",
-      "(b) *Ae. aegypti* and ZIKV" = "(b) *Ae. aegypti* and   \nZIKV",
-      "(c&#41; *Ae. albopictus* and DENV" = "(c&#41; *Ae. albopictus*  \nand DENV",
-      "(d) *An. gambiae* and *P. falciparum*" = "(d) *An. gambiae* and  \n*P. falciparum*",
-      "(e) *Cx. quinquefasciatus* and WNV" = "(e) *Cx. quinquefasciatus*  \nand  WNV"
-))
-
 plot.R0.rel.sens <- R0.HPD %>%
   filter(KH %in% c(1) & sigmaH %in% c(100, Inf)) %>%
   # filter(!(KH == 100 & sigmaH == Inf)) %>%
@@ -1801,8 +1803,7 @@ plot.R0.rel.sens <- R0.HPD %>%
     rows = vars(KH, sigmaH),
     labeller = labeller(
       system_label = sens_labels,
-      sigmaH = as_labeller(appender_sigmaH, default = label_parsed),
-      KH = as_labeller(appender_KH, default = label_parsed)
+      sigmaH = as_labeller(appender_sigmaH, default = label_parsed)
     ),
     scales = "free"
   ) +
@@ -1899,6 +1900,8 @@ plot.ddTR0.rel.sens
 
 Topt.HPD <- Topt.HPD %>%
   ungroup() %>%
+  distinct() %>% 
+  filter(!is.na(HPD_width)) %>% 
   pathosystem_labeller() %>%
   filter(!is.na(rel_HPD_width)) %>%
   # For each KH value, sum up all sensitivity values to get total sensitivity
@@ -1931,7 +1934,7 @@ plot.Topt.rel.sens <- Topt.HPD %>%
   # scale_y_continuous(
   #   limits = c(0,1)
   # ) +
-  facet_wrap(~system_label, scales = "free") +
+  facet_wrap(~system_label) +
   theme_minimal() +
   theme(
     legend.margin = margin(0, 0, 0, 0),
@@ -1952,7 +1955,7 @@ shift_legend(plot.Topt.rel.sens)
 
 CTmin_df <- CT.HPD %>%
   filter(variable == "CTmin") %>%
-  filter(sigmaH %in% c(10, Inf)) %>%
+  filter(sigmaH %in% c(100, Inf)) %>%
   filter(!is.na(rel_HPD_width)) %>%
   # For each KH value, sum up all sensitivity values to get total sensitivity
   group_by(system_ID, sigmaH, KH) %>%
@@ -1983,8 +1986,7 @@ plot.CTmin.rel.sens <- CTmin_df %>%
     labeller = labeller(
       system_label = sens_labels,
       sigmaH = as_labeller(appender_sigmaH, default = label_parsed)
-    ),
-    scales = "free"
+    )
   ) +
   theme_minimal() +
   theme(
@@ -1994,7 +1996,7 @@ plot.CTmin.rel.sens <- CTmin_df %>%
     legend.position = "bottom",
     axis.title.x = element_text(hjust = 0.5),
     strip.text.x = ggtext::element_markdown(
-      size = 10,
+      size = 8,
       hjust = 0,
       padding = margin(0, 0, 0, 0),
       margin = margin(1, 1, 1, 1)
@@ -2008,7 +2010,7 @@ plot.CTmin.rel.sens
 
 plot.CTmax.rel.sens <- CT.HPD %>%
   filter(variable == "CTmax") %>%
-  filter(sigmaH %in% c(10, Inf)) %>%
+  filter(sigmaH %in% c(100, Inf)) %>%
   filter(!is.na(rel_HPD_width)) %>%
   # For each KH value, sum up all sensitivity values to get total sensitivity
   group_by(system_ID, sigmaH, KH) %>%
@@ -2037,8 +2039,7 @@ plot.CTmax.rel.sens <- CT.HPD %>%
     labeller = labeller(
       system_label = sens_labels,
       sigmaH = as_labeller(appender_sigmaH, default = label_parsed)
-    ),
-    scales = "free"
+    )
   ) +
   theme_minimal() +
   theme(
@@ -2048,7 +2049,7 @@ plot.CTmax.rel.sens <- CT.HPD %>%
     legend.position = "bottom",
     axis.title.x = element_text(hjust = 0.5),
     strip.text.x = ggtext::element_markdown(
-      size = 10,
+      size = 8,
       hjust = 0,
       padding = margin(0, 0, 0, 0),
       margin = margin(1, 1, 1, 1)
@@ -2065,7 +2066,7 @@ plot.CTmax.rel.sens
 
 plot.CTwidth.rel.sens <- CT.HPD %>%
   filter(variable == "CTwidth") %>%
-  filter(sigmaH %in% c(10, Inf)) %>%
+  filter(sigmaH %in% c(100, Inf)) %>%
   filter(!is.na(rel_HPD_width)) %>%
   # For each KH value, sum up all sensitivity values to get total sensitivity
   group_by(system_ID, sigmaH, KH) %>%
@@ -2093,9 +2094,9 @@ plot.CTwidth.rel.sens <- CT.HPD %>%
     rows = vars(sigmaH),
     labeller = labeller(
       system_label = sens_labels,
-      sigmaH = as_labeller(appender_sigmaH, default = label_parsed)
-    ),
-    scales = "free"
+      sigmaH = as_labeller(
+        appender_sigmaH, default = label_parsed)
+    )
   ) +
   theme_minimal() +
   theme(
@@ -2105,7 +2106,7 @@ plot.CTwidth.rel.sens <- CT.HPD %>%
     legend.position = "bottom",
     axis.title.x = element_text(hjust = 0.5),
     strip.text.x = ggtext::element_markdown(
-      size = 10,
+      size = 8,
       hjust = 0,
       padding = margin(0, 0, 0, 0),
       margin = margin(1, 1, 1, 1)
