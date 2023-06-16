@@ -285,14 +285,16 @@ host_vector_contact_func <- function(df) {
 ## Set up density ranges
 host_density_range <- c(1E-1, 1E2)
 host_fixed_value <- 10
-host_density_vec <- sort(c(seq(host_density_range[1], host_density_range[2],
-                               length.out = resolution
+host_density_vec <- sort(c(10^seq(log10(host_density_range[1]), 
+                                  log10(host_density_range[2]),
+                                  length.out = resolution
 ), host_fixed_value))
 
-vector_density_range <- c(0, 1E3)
+vector_density_range <- c(1, 1E3)
 vector_fixed_value <- 1000
-vector_density_vec <- sort(c(seq(vector_density_range[1], vector_density_range[2],
-                                 length.out = resolution
+vector_density_vec <- sort(c(10^seq(log10(vector_density_range[1]), 
+                                    log10(vector_density_range[2]),
+                                    length.out = resolution
 ), vector_fixed_value))
 
 ## Set other parameters
@@ -354,7 +356,7 @@ plot_HD_MC <- new_df %>%
   ggplot(aes(x = x_vals, y = y_vals, colour = `Transmission model`)) +
   # curves:
   geom_path(size = 1) +
-  geom_blank(aes(y = y_max)) +
+  # geom_blank(aes(y = y_max)) +
   # plot labels
   geom_abs_text(aes(xpos = 0.08, ypos = 0.89, label = label),
                 color = "black", show.legend = FALSE
@@ -368,7 +370,7 @@ plot_HD_MC <- new_df %>%
   scale_y_continuous(
     name = "Bites per mosquito per day",
     expand = c(0, 0),
-    limits = c(0, NA)
+    # limits = c(0, NA)
   )
 
 # x = Mosquito population density, y = Bites per mosquito per day
@@ -378,7 +380,7 @@ plot_MD_MC <- new_df %>%
   ggplot(aes(x = x_vals, y = y_vals, colour = `Transmission model`)) +
   # curves:
   geom_path(size = 1) +
-  geom_blank(aes(y = y_max)) +
+  # geom_blank(aes(y = y_max)) +
   # plot labels
   geom_abs_text(aes(xpos = 0.08, ypos = 0.89, label = label),
                 color = "black", show.legend = FALSE
@@ -392,7 +394,7 @@ plot_MD_MC <- new_df %>%
   scale_y_continuous(
     name = "",
     expand = c(0, 0),
-    limits = c(0, NA)
+    # limits = c(0, NA)
   ) +
   # hide legend
   guides(color = FALSE)
@@ -405,7 +407,7 @@ plot_MD_HC <- new_df %>%
   ggplot(aes(x = x_vals, y = y_vals, colour = `Transmission model`)) +
   # curves:
   geom_path(size = 1) +
-  geom_blank(aes(y = y_max)) +
+  # geom_blank(aes(y = y_max)) +
   # plot labels
   geom_abs_text(aes(xpos = 0.08, ypos = 0.89, label = label),
                 color = "black", show.legend = FALSE
@@ -419,7 +421,7 @@ plot_MD_HC <- new_df %>%
   scale_y_continuous(
     name = "",
     expand = c(0, 0),
-    limits = c(0, NA)
+    # limits = c(0, NA)
   )
 
 # x = Host population density, y = Bites per host per day
@@ -430,7 +432,7 @@ plot_HD_HC <- new_df %>%
   ggplot(aes(x = x_vals, y = y_vals, colour = `Transmission model`)) +
   # curves:
   geom_path(size = 1) +
-  geom_blank(aes(y = y_max)) +
+  # geom_blank(aes(y = y_max)) +
   # plot labels
   geom_abs_text(aes(xpos = 0.08, ypos = 0.89, label = label),
                 color = "black", show.legend = FALSE
@@ -444,7 +446,7 @@ plot_HD_HC <- new_df %>%
   scale_y_continuous(
     name = "Bites per host per day",
     expand = c(0, 0),
-    limits = c(0, NA)
+    # limits = c(0, NA)
   ) +
   # hide legend
   guides(color = FALSE)
