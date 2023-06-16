@@ -58,7 +58,7 @@ init.df <- tibble(system_ID = c(), Temperature = c(), Model = c(),
 # Host trait dataset
 data.Host <- read_rds("results/Host_vals.rds")
 # Vector trait dataset
-# data.Vec <- read_rds("results/VecTPC_vals.rds")
+data.Vec <- read_rds("results/VecTPC_vals.rds")
 
 # R0 data
 data.R0 <- read_rds("results/R0_vals.rds") # !!! needs to be updated to include 1e-1, 1e0, 1e1
@@ -607,7 +607,7 @@ plot.ddTR0.rel.sens
 
 data.ToptHPD <- dplyr::filter(data.Host, 
                               sigmaH %in% c(10, 100)) #,
-                              # KH < 1e3) #%>% 
+# KH < 1e3) #%>% 
 # dplyr::filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 31)])
 
 full.Topt.HPD <- tibble(system_ID = c(), Temperature = c(), Model = c(),
@@ -866,19 +866,26 @@ plot.Topt.rel.sens
 
 # !!! [] re-run: make sure KH values have high enough resolution
 
-KH_vec <- unique(data.Host$KH)[seq(1, length(unique(data.Host$KH)), length.out = 5)]
+KH_length <- 601
+KH_vec <- sort(c(10^-1.02, 10^3.02,
+            10^seq(-1, 3, length.out = KH_length)))
+sigmaH_vec <- 100
 
-data.dToptdKH.HPD <- dplyr::filter(data.Host, 
-                                   sigmaH == 100,
-                                   KH %in% KH_vec)
+
+data.dToptdKH.HPD <- dplyr::filter(data.Host, sigmaH == sigmaH_vec) %>% 
+  select(-KH) %>% 
+  full_join(as_tibble(list(KH = KH_vec)), by = character()) %>% 
+  distinct()
 
 full.dToptdKH.HPD <- tibble(system_ID = c(), Temperature = c(), Model = c(),
                             sigmaH = c(), KH = c(), 
                             HPD_low = c(), HPD_high = c(), HPD_width = c())
 
-for (index_KH in unique(data.dToptdKH.HPD$KH)) {
-  temp_df <- expand_grid(dplyr::filter(data.dToptdKH.HPD, KH == index_KH), 
-                         data.Vec) %>%
+for (index_KH in 2:KH_length) {
+  KH_lag = KH_vec[index_KH] - KH_vec[index_KH-1]
+  temp_df <- expand_grid(dplyr::filter(data.dToptdKH.HPD, 
+                                       KH %in% KH_vec[(index_KH-1):index_KH]), 
+                         data.Vec) %>%  
     data.table::data.table() %>%
     mutate(RV = ifelse(is.infinite(sigmaH),
                        sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
@@ -899,18 +906,24 @@ for (index_KH in unique(data.dToptdKH.HPD$KH)) {
     distinct() %>% 
     # Get temperature at which R0 is maximized
     rename(Topt = Temperature) %>% 
-    arrange(system_ID, sample_num, sigmaH, KH) %>% 
-    mutate(dToptdKH = (Topt - lag(Topt)) / (KH - lag(KH))) %>% 
-    select(system_ID, sigmaH, KH, sample_num, dToptdKH) %>% 
-    group_by(system_ID, sigmaH, KH) %>% 
+    select(-R0) %>% 
+    group_by(system_ID, sample_num) %>%
+    arrange(system_ID, sample_num, KH) %>% 
+    mutate(dToptdKH = (Topt - lag(Topt)) /KH_lag) %>% 
+    filter(!is.na(dToptdKH)) %>%
+    ungroup() %>% 
+    select(system_ID, sample_num, dToptdKH) %>% 
+    group_by(system_ID) %>% 
     summarise(
       HPD_low = hdi(dToptdKH, credMass = 0.95)[1],
       HPD_high = hdi(dToptdKH, credMass = 0.95)[2],
-      HPD_width = max(eps,HPD_high-HPD_low),
+      HPD_width = HPD_high-HPD_low,
       .groups = "keep"
-    ) 
+    ) %>% 
+    mutate(sigmaH = sigmaH_vec,
+           KH = KH_vec[index_KH])
   
-  full.dToptdKH.HPD <- rbind(full.dToptdKH.HPD, temp_df)
+  full.dToptdKH.HPD <- rbind(temp_df, full.dToptdKH.HPD)
 }
 
 # Save Topt highest posterior density data
@@ -918,15 +931,14 @@ write_rds(full.dToptdKH.HPD, "results/full_dToptdKH_HPD.rds")
 # full.Topt.HPD <- read_rds("results/full_Topt_HPD.rds")
 
 # # Diagnostic plot
-# test.plot <- full.dToptdKH.HPD %>%
-#   # dplyr::filter(KH == 1e-2) %>%
-#   ggplot(aes(x = KH, y = HPD_width)) +
-#   geom_path() +
-#   scale_x_continuous(
-#     trans = 'log10'
-#   ) +
-#   facet_grid(rows = vars(system_ID), cols = vars(sigmaH), scales = "free")
-# test.plot
+test.plot <- full.dToptdKH.HPD %>%
+  ggplot(aes(x = KH, y = HPD_width)) +
+  geom_path() +
+  scale_x_continuous(
+    trans = 'log10'
+  ) +
+  facet_grid(rows = vars(system_ID), cols = vars(sigmaH), scales = "free")
+test.plot
 
 # Get focal parameter names
 temp_vars <- data.Vec %>% 
