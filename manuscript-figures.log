@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.10) (preloaded format=pdflatex 2022.11.3)  14 JUN 2023 13:03
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.10) (preloaded format=pdflatex 2022.11.3)  16 JUN 2023 10:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -907,7 +907,7 @@ igures_files/figure-latex/fig-S8_R0_sensitivity-1.pdf>] [14 <C:/Users/kd99491/D
 ocuments/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-lat
 ex/fig-S9_ddTR0_sensitivity-1.pdf>]
 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
-es_files/figure-latex/fig-S11_CTmin_sensitivity-1.pdf, id=226, 650.43pt x 433.6
+es_files/figure-latex/fig-S11_CTmin_sensitivity-1.pdf, id=225, 650.43pt x 433.6
 2pt>
 File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
 figures_files/figure-latex/fig-S11_CTmin_sensitivity-1.pdf Graphic file (type p
@@ -921,7 +921,7 @@ used on input line 240.
 [15 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
 igures_files/figure-latex/fig-S10_Topt_sensitivity-1.pdf>]
 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
-es_files/figure-latex/fig-S12_CTmax_sensitivity-1.pdf, id=239, 650.43pt x 433.6
+es_files/figure-latex/fig-S12_CTmax_sensitivity-1.pdf, id=238, 650.43pt x 433.6
 2pt>
 File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
 figures_files/figure-latex/fig-S12_CTmax_sensitivity-1.pdf Graphic file (type p
@@ -935,7 +935,7 @@ used on input line 249.
 [16 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-f
 igures_files/figure-latex/fig-S11_CTmin_sensitivity-1.pdf>]
 <C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-figur
-es_files/figure-latex/fig-S13_CTwidth_sensitivity-1.pdf, id=252, 650.43pt x 433
+es_files/figure-latex/fig-S13_CTwidth_sensitivity-1.pdf, id=251, 650.43pt x 433
 .62pt>
 File: C:/Users/kd99491/Documents/GitHub/thermal-properties-mbps/doc/manuscript-
 figures_files/figure-latex/fig-S13_CTwidth_sensitivity-1.pdf Graphic file (type
@@ -972,9 +972,9 @@ MiKTeX/fonts/type1/public/lm/lmr12.pfb><C:/Program Files/MiKTeX/fonts/type1/pub
 lic/lm/lmr17.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmr7.pfb><C:/Pr
 ogram Files/MiKTeX/fonts/type1/public/lm/lmri10.pfb><C:/Program Files/MiKTeX/fo
 nts/type1/public/lm/lmsy10.pfb>
-Output written on manuscript-figures.pdf (18 pages, 3769215 bytes).
+Output written on manuscript-figures.pdf (18 pages, 3602822 bytes).
 PDF statistics:
- 339 PDF objects out of 1000 (max. 8388607)
+ 338 PDF objects out of 1000 (max. 8388607)
  41 named destinations out of 1000 (max. 500000)
  24683 words of extra memory for PDF output out of 24883 (max. 10000000)
 
