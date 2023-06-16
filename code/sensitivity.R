@@ -864,11 +864,13 @@ plot.Topt.rel.sens
 # Calculate the width of the 95% HPD for the full posterior of Topt across vertebrate host abundance
 
 sigmaH_vec <- c(10, 100, Inf)
-KH_vec <- 10^seq(-2,4)
+KH_vec <- 10^seq(-2, 4, length.out = 601)
 
-data.CTHPD <- dplyr::filter(data.Host, 
-                            sigmaH %in% sigmaH_vec,
-                            KH < 1e4) #%>% 
+data.CTHPD <- dplyr::filter(data.Host, sigmaH %in% sigmaH_vec) %>% 
+  select(-KH) %>% 
+  full_join(as_tibble(list(KH = KH_vec)), by = character()) %>% 
+  distinct()
+
 #dplyr::filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 11)])
 
 full.CT.HPD <- tibble(system_ID = c(), Temperature = c(), Model = c(),

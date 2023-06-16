@@ -906,7 +906,7 @@ R0_df <- data.R0 %>%
   # Consider only 3 values of KH (on a log10-scale)
   filter(KH %in% c(.1, 1, 10)) %>% 
   # Choose a limited range of sigmaH values
-  # filter(sigmaH > 10^0.5) %>%
+  filter(sigmaH < 10^2.275 | is.infinite(sigmaH)) %>%
   # Group by plotting variables
   group_by(system_ID, KH, sigmaH) %>%
   # Calculate Topt (which.max requires grouping)
@@ -916,12 +916,12 @@ R0_df <- data.R0 %>%
 
 ## Add a "point at infinity" for sigmaH
 # Value of sigmaH to replace 'Inf' with for plotting
-infinite_skew <- 10^4
+infinite_skew <- 10^2.75
 
 # Used to create a gap dividing finite and infinite sigmaH
-infinite_divide <- 10^3.5
+infinite_divide <- 10^2.4
 
-R0_df <- inf_skew_func(R0_df, infinite_skew, infinite_divide, 3)
+R0_df <- inf_skew_func(R0_df, infinite_skew, infinite_divide, 8)
 
 Topt_for_R0_df <- data.Topt %>%
   # Arrange along the plotting variables
@@ -934,8 +934,8 @@ Topt_for_R0_df <- inf_skew_func(Topt_for_R0_df, infinite_skew, infinite_divide, 
 
 ## Options
 # Define sigmaH tick breaks and labels
-sigmaH_breaks <- c(10^c(seq(-1, 3, by = 1)), infinite_divide, infinite_skew)
-sigmaH_labels <- c(paste(c(10^c(seq(-1, 3, by = 1)))), TeX("$\\ldots$"), TeX("$\\infty$"))
+sigmaH_breaks_heatmap <- c(10^c(seq(-1, 2, by = 1)), infinite_divide, infinite_skew)
+sigmaH_labels_heatmap <- c(paste(c(10^c(seq(-1, 2, by = 1)))), TeX("$\\ldots$"), TeX("$\\infty$"))
 
 # Labels for facet rows
 R0_df$KH <- factor(R0_df$KH, levels = c(.1, 1, 10))
@@ -965,12 +965,12 @@ R0_plot <- R0_df %>%
   # Mosquito thermal tolerance range lines
   geom_hline(
     data = MosqThermRange_df,
-    mapping = aes(yintercept = CTmin_V0, colour = "VTTR"),
+    aes(yintercept = CTmin_V0, colour = "VTTR"),
     lwd = 1.275
   ) +
   geom_hline(
     data = MosqThermRange_df,
-    mapping = aes(yintercept = CTmax_V0, colour = "VTTR"),
+    aes(yintercept = CTmax_V0, colour = "VTTR"),
     lwd = 1.275
   ) +
   # R0 contours for FINITE sigmaH:
@@ -989,7 +989,7 @@ R0_plot <- R0_df %>%
   geom_contour(aes(colour = "R0=1", z = R0), breaks = c(1), size = 1) +
   # Topt curve:
   geom_path(
-    data = filter(Topt_for_R0_df, KH %in% c(.1, 1, 10)),
+    data = filter(Topt_for_R0_df, KH %in% c(.1, 1, 10)) %>% arrange(sigmaH_proxy),
     mapping = aes(
       x = sigmaH_proxy,
       y = median,
@@ -1020,8 +1020,8 @@ R0_plot <- R0_df %>%
   # x-axis:
   scale_x_log10(
     name = TeX("Vertebrate host biting tolerance (bites per host per day)"),
-    breaks = sigmaH_breaks,
-    labels = sigmaH_labels,
+    breaks = sigmaH_breaks_heatmap,
+    labels = sigmaH_labels_heatmap,
     expand = c(0, 0)
   ) +
   # y-axis:
@@ -1888,14 +1888,7 @@ plot.ddTR0.rel.sens
 
 ```{r fig-S10_Topt_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt_sens} The sensitivity of the thermal optimum to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$.'}
 
-# !!! [] be sure to use a consistent list of mosquito life history traits:
-#         - adult lifespan (1/mu_V)
-#         - biting frequency (sigma_V)
-#         - eggs per female per day (sigma_V * f)
-#         - immature development rate
-#         - Pr(larval survival) (deltaL)
-#         - Pr(surviving EIP) (theta_V)
-#         - vector competence (beta_V)
+
 Topt.HPD <- Topt.HPD %>% 
   ungroup() %>%
   pathosystem_labeller() %>%
@@ -2060,7 +2053,7 @@ plot.CTwidth.rel.sens <- CT.HPD %>%
   filter(sigmaH %in% c(100, Inf)) %>% 
   filter(!is.na(rel_HPD_width)) %>%
   # For each KH value, sum up all sensitivity values to get total sensitivity
-  group_by(system_ID, sigmaH, KH) %>%W
+  group_by(system_ID, sigmaH, KH) %>%
   mutate(sens_total = sum(rel_HPD_width)) %>%
   # Divide each sensitivity value by the total sensitiviWty
   mutate(sens_rel = rel_HPD_width / sens_total) %>%
