@@ -25,8 +25,9 @@ library(latex2exp)
 library(reshape2)
 library(cowplot)
 library(viridis)
-library(RColorBrewer)
-library(MetBrewer)
+library(RColorBrewer) # for colorblind friendly color palettes
+library(MetBrewer) # for colorblind friendly color palettes
+library(cols4all) # for colorblind friendly color palettes
 library(here)
 library(lemon)
 library(see) # for half-violin plots
@@ -130,17 +131,69 @@ data.CT <- read_rds("results/CT_vals.rds") %>%
 # Sensitivity data for R0
 R0.HPD <- read_rds("results/R0_HPD_sens.rds") %>%
   ungroup() %>%
-  pathosystem_labeller()
+  pathosystem_labeller() %>%
+    mutate(focal_var = factor(focal_var,
+                           levels = c("muV", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
+                           labels = c(
+                             TeX("Adult lifespan"),
+                             TeX("Biting frequency"),
+                             TeX("Eggs per female per day"),
+                             TeX("Immature development rate"),
+                             TeX("Prob. of immature survival"),
+                             TeX("Prob. of surviving EIP"),
+                             TeX("Vector competence")
+                           )
+  )) 
+
+ddTR0.HPD <- read_rds("results/ddTR0_HPD_sens.rds") %>%
+  ungroup() %>%
+  pathosystem_labeller() %>%
+    mutate(focal_var = factor(focal_var,
+                           levels = c("muV", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
+                           labels = c(
+                             TeX("Adult lifespan"),
+                             TeX("Biting frequency"),
+                             TeX("Eggs per female per day"),
+                             TeX("Immature development rate"),
+                             TeX("Prob. of immature survival"),
+                             TeX("Prob. of surviving EIP"),
+                             TeX("Vector competence")
+                           )
+  )) 
 
 # Sensitivity data for Topt
 Topt.HPD <- read_rds("results/Topt_HPD_sens.rds") %>%
   ungroup() %>%
-  pathosystem_labeller()
+  pathosystem_labeller() %>%
+    mutate(focal_var = factor(focal_var,
+                           levels = c("muV", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
+                           labels = c(
+                             TeX("Adult lifespan"),
+                             TeX("Biting frequency"),
+                             TeX("Eggs per female per day"),
+                             TeX("Immature development rate"),
+                             TeX("Prob. of immature survival"),
+                             TeX("Prob. of surviving EIP"),
+                             TeX("Vector competence")
+                           )
+  )) 
 
 # Sensitivity data for critical thermal extrema
 CT.HPD <- read_rds("results/CT_HPD_sens.rds") %>%
   ungroup() %>%
-  pathosystem_labeller()
+  pathosystem_labeller() %>%
+    mutate(focal_var = factor(focal_var,
+                           levels = c("muV", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
+                           labels = c(
+                             TeX("Adult lifespan"),
+                             TeX("Biting frequency"),
+                             TeX("Eggs per female per day"),
+                             TeX("Immature development rate"),
+                             TeX("Prob. of immature survival"),
+                             TeX("Prob. of surviving EIP"),
+                             TeX("Vector competence")
+                           )
+  )) 
 
 # Configure data sets for plotting ----
 
@@ -451,9 +504,7 @@ MosqThermTraits_plot <- MosqThermTraits_df %>%
     # breaks = seq(10, 40, 2)
   ) +
   # y-axis:
-  scale_y_continuous(
-    breaks = seq(10, 40, by = 5), 
-    expand = c(0.05, 0)) +
+  scale_y_continuous(expand = c(0.05, 0)) +
   # color:
   scale_color_manual(
     name = "System:",
@@ -1017,7 +1068,6 @@ R0_plot <- R0_df %>%
   theme_minimal_hgrid(11) +
   theme(
     axis.line = element_line(),
-    panel.spacing = unit(1, "lines"),
     legend.text = element_text(size = 10),
     legend.text.align = 0,
     strip.text.y = ggtext::element_markdown(
@@ -1619,7 +1669,8 @@ test_df <- median.Vec %>%
 ```{r fig-S7_CT_distributions, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CT_dists} The distributions of the critical thermal minimum, critical thermal maximum, and thermal optimum vary with vertebrate host availability.'}
 all.density.df <- read_rds("results/CTminmaxTopt_densities.rds") %>%
   ungroup() %>%
-  pathosystem_labeller()
+  pathosystem_labeller() %>% 
+  filter(KH > 0.01)
 
 # half-violin plots
 plot.densities_violin_inline <- ggplot() +
@@ -1680,7 +1731,7 @@ plot.densities_violin_inline <- ggplot() +
     breaks = c("CTmin", "Topt", "CTmax"),
     labels = c("Critical thermal minimum", "Thermal optimum", "Critical thermal maximum")
   ) +
-  facet_wrap(~system_label, labeller = labeller(), scales = "free") +
+  facet_wrap(~system_label, labeller = labeller(), scales = "free_x") +
   theme_minimal_grid() +
   theme(
     legend.margin = margin(0, 0, 0, 0),
@@ -1698,118 +1749,6 @@ shift_legend(plot.densities_violin_inline)
 ```
 
 
-<!-- ### Option 2: inline box and whisker plots ---- -->
-<!-- plot.densities_boxwhisker_inline <- ggplot() + -->
-<!--   geom_boxplot( -->
-<!--     data = filter(all.density.df, variable == "Thermal optimum"), -->
-<!--     aes(x = value, y = KH_factor, linetype = sigmaH, fill = "Topt") -->
-<!--   ) + -->
-<!--   geom_boxplot( -->
-<!--     data = filter(all.density.df, variable == "Critical thermal minimum"), -->
-<!--     aes(x = value, y = KH_factor, linetype = sigmaH, fill = "CTmin"), -->
-<!--   ) + -->
-<!--   geom_boxplot( -->
-<!--     data = filter(all.density.df, variable == "Critical thermal maximum"), -->
-<!--     aes(x = value, y = KH_factor, linetype = sigmaH, fill = "CTmax"), -->
-<!--   ) + -->
-<!--   scale_x_continuous( -->
-<!--     name = "Temperature (°C)", -->
-<!--     expand = c(0, 0) -->
-<!--   ) + -->
-<!--   scale_y_discrete( -->
-<!--     name = "Vertebrate host population density (ind/ha)" -->
-<!--   ) + -->
-<!--   scale_linetype( -->
-<!--     name = "Biting tolerance\n(bites per host per day)" -->
-<!--   ) + -->
-<!--   scale_fill_discrete( -->
-<!--     name = "", -->
-<!--     breaks = c("CTmin", "Topt", "CTmax"), -->
-<!--     labels = c("Critical thermal minimum", "Thermal optimum", "Critical thermal maximum") -->
-<!--   ) + -->
-<!--   facet_wrap(~system_label, labeller = labeller()) + -->
-<!--   theme_minimal_grid() + -->
-<!--   theme( -->
-<!--     legend.margin = margin(0, 0, 0, 0), -->
-<!--     legend.title = element_text(size = 10), -->
-<!--     axis.title.x = element_text(hjust = 0.5), -->
-<!--     strip.text = ggtext::element_markdown( -->
-<!--       size = 10, -->
-<!--       hjust = 0, -->
-<!--       padding = margin(0, 0, 0, 0), -->
-<!--       margin = margin(1, 1, 1, 1) -->
-<!--     ) -->
-<!--   ) -->
-<!-- shift_legend(plot.densities_boxwhisker_inline) -->
-
-<!-- ### Option 3: stacked violin plots ---- -->
-<!-- plot.densities_violin_stacked <- ggplot() + -->
-<!--   geom_violin( -->
-<!--     data = all.density.df, -->
-<!--     aes(x = value, y = KH_factor, fill = variable, linetype = sigmaH) -->
-<!--   ) + -->
-<!--   scale_x_continuous( -->
-<!--     name = "Temperature (°C)", -->
-<!--     expand = c(0, 0) -->
-<!--   ) + -->
-<!--   scale_y_discrete( -->
-<!--     name = "Vertebrate host population density (ind/ha)" -->
-<!--   ) + -->
-<!--   scale_linetype( -->
-<!--     name = "Biting tolerance\n(bites per host per day)" -->
-<!--   ) + -->
-<!--   scale_fill_discrete( -->
-<!--     name = "" -->
-<!--   ) + -->
-<!--   facet_wrap(~system_label, labeller = labeller()) + -->
-<!--   theme_minimal_grid() + -->
-<!--   theme( -->
-<!--     legend.margin = margin(0, 0, 0, 0), -->
-<!--     legend.title = element_text(size = 10), -->
-<!--     axis.title.x = element_text(hjust = 0.5), -->
-<!--     strip.text = ggtext::element_markdown( -->
-<!--       size = 10, -->
-<!--       hjust = 0, -->
-<!--       padding = margin(0, 0, 0, 0), -->
-<!--       margin = margin(1, 1, 1, 1) -->
-<!--     ) -->
-<!--   ) -->
-<!-- shift_legend(plot.densities_violin_stacked) -->
-
-<!-- ### Option 4: stacked box and whisker plots ---- -->
-<!-- plot.densities_boxwhisker_stacked <- ggplot() + -->
-<!--   geom_boxplot( -->
-<!--     data = all.density.df, -->
-<!--     aes(x = value, y = KH_factor, fill = variable, linetype = sigmaH) -->
-<!--   ) + -->
-<!--   scale_x_continuous( -->
-<!--     name = "Temperature (°C)", -->
-<!--     expand = c(0, 0) -->
-<!--   ) + -->
-<!--   scale_y_discrete( -->
-<!--     name = "Vertebrate host population density (ind/ha)" -->
-<!--   ) + -->
-<!--   scale_linetype( -->
-<!--     name = "Biting tolerance\n(bites per host per day)" -->
-<!--   ) + -->
-<!--   scale_fill_discrete( -->
-<!--     name = "" -->
-<!--   ) + -->
-<!--   facet_wrap(~system_label, labeller = labeller()) + -->
-<!--   theme_minimal_grid() + -->
-<!--   theme( -->
-<!--     legend.margin = margin(0, 0, 0, 0), -->
-<!--     legend.title = element_text(size = 10), -->
-<!--     axis.title.x = element_text(hjust = 0.5), -->
-<!--     strip.text = ggtext::element_markdown( -->
-<!--       size = 10, -->
-<!--       hjust = 0, -->
-<!--       padding = margin(0, 0, 0, 0), -->
-<!--       margin = margin(1, 1, 1, 1) -->
-<!--     ) -->
-<!--   ) -->
-<!-- shift_legend(plot.densities_boxwhisker_stacked) -->
-<!-- ``` -->
 
 ```{r fig-S8_R0_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:R0_sens} The sensitivity of the distribution of $\\mathcal{R}_0$ to mosquito life history traits.'}
 
@@ -1821,29 +1760,26 @@ shift_legend(plot.densities_violin_inline)
 Temp_range_for_plot <- R0.HPD %>%
   ungroup() %>%
   dplyr::filter(rel_HPD_width > eps) %>%
-  select(Temperature) %>%
+  dplyr::select(Temperature) %>%
   range()
 
 plot.R0.rel.sens <- R0.HPD %>%
-  filter(KH %in% c(100) & sigmaH %in% c(50, Inf)) %>%
+  filter(KH %in% c(100) & sigmaH %in% c(100, Inf)) %>%
   # filter(!(KH == 100 & sigmaH == Inf)) %>%
-  filter(rel_HPD_width != 0) %>%
+  filter(rel_HPD_width != 0) %>% 
   # For each KH value, sum up all sensitivity values to get total sensitivity across parameters
   group_by(system_ID, sigmaH, KH, Temperature) %>%
   mutate(sens_total = sum(rel_HPD_width)) %>%
   # Divide each sensitivity value by the total sensitivity
   mutate(sens_rel = rel_HPD_width / sens_total) %>%
   arrange(sens_rel) %>%
+  arrange(focal_var) %>% 
   # Make a stacked plot, colored by parameter
   ggplot(aes(x = Temperature, y = sens_rel, fill = focal_var)) +
   geom_area() +
-  scale_fill_discrete(
+  scale_fill_manual(
     name = "Focal trait:",
-    breaks = c("muV", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
-    labels = c(
-      "Adult lifespan", "Biting frequency", "Eggs per female per day",
-      "Immature development rate", "Prob. of immature survival",
-      "Prob. of surviving EIP", "Vector competence")
+    values = rev(c4a("misc.okabe", 7))
   ) +
   scale_x_continuous(
     # limits = Temp_range_for_plot,
@@ -1888,10 +1824,6 @@ plot.R0.rel.sens
 #        "high host availability (sigmaH = Inf, KH = 100)" scenarios
 
 
-ddTR0.HPD <- read_rds("results/ddTR0_HPD_sens.rds") %>%
-  ungroup() %>%
-  pathosystem_labeller()
-
 ## Plot R0 uncertainty
 Temp_range_for_plot <- ddTR0.HPD %>%
   ungroup() %>%
@@ -1899,43 +1831,30 @@ Temp_range_for_plot <- ddTR0.HPD %>%
   select(Temperature) %>%
   range()
 
-var_name_table <- list(
-  betaV = c(TeX("$\\beta_V$")),
-  deltaL = c(TeX("$\\delta_L$")),
-  etaV = c(TeX("$\\eta_V$")),
-  muV = c(TeX("$\\mu_V$")),
-  rhoL = c(TeX("$\\rho_L$")),
-  sigmaV = c(TeX("$\\sigma_V$")),
-  sigmaV_f = c(TeX("$\\sigma_v f$"))
-)
-
 plot.ddTR0.rel.sens <- ddTR0.HPD %>%
-  filter(KH %in% c(100) & sigmaH %in% c(50, Inf)) %>%
+  filter(KH %in% c(100) & sigmaH %in% c(100, Inf)) %>%
   # filter(!(KH == 100 & sigmaH == Inf)) %>%
-  filter(rel_HPD_width != 0) %>%
+  filter(rel_HPD_width != 0) %>% 
   # For each KH value, sum up all sensitivity values to get total sensitivity across parameters
   group_by(system_ID, sigmaH, KH, Temperature) %>%
   mutate(sens_total = sum(rel_HPD_width)) %>%
   # Divide each sensitivity value by the total sensitivity
   mutate(sens_rel = rel_HPD_width / sens_total) %>%
   arrange(sens_rel) %>%
+  arrange(focal_var) %>% 
   # Make a stacked plot, colored by parameter
   ggplot(aes(x = Temperature, y = sens_rel, fill = focal_var)) +
   geom_area() +
-  scale_fill_discrete(
-    name = "Focal trait",
-    breaks = c("muV", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
-    labels = c(
-      "Adult lifespan", "Biting frequency", "Eggs per female per day",
-      "Immature development rate", "Prob. of immature survival",
-      "Prob. of surviving EIP", "Vector competence")
+  scale_fill_manual(
+    name = "Focal trait:",
+    values = rev(c4a("misc.okabe", 7))
   ) +
   scale_x_continuous(
-    limits = Temp_range_for_plot,
+    # limits = Temp_range_for_plot,
     expand = c(0, 0)
   ) +
   scale_y_continuous(
-    name = unname(TeX("Relative contribution to $dR_0/dT$ HPD width"))
+    name = unname(TeX("Relative contribution to $R_0$ HPD width"))
   ) +
   facet_grid(
     cols = vars(system_label),
@@ -1945,9 +1864,9 @@ plot.ddTR0.rel.sens <- ddTR0.HPD %>%
       sigmaH = as_labeller(appender_sigmaH, default = label_parsed),
       KH = as_labeller(appender_KH, default = label_parsed)
     ),
-    scales = "free_y"
+    scales = "free"
   ) +
-  theme_minimal_hgrid() +
+  theme_minimal() +
   theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
@@ -1961,8 +1880,12 @@ plot.ddTR0.rel.sens <- ddTR0.HPD %>%
       margin = margin(1, 1, 1, 1)
     )
   )
+
+# shift_legend(plot.R0.rel.sens)
 plot.ddTR0.rel.sens
+
 ```
+
 ```{r fig-S10_Topt_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt_sens} The sensitivity of the thermal optimum to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$.'}
 
 # !!! [] be sure to use a consistent list of mosquito life history traits:
@@ -1973,7 +1896,7 @@ plot.ddTR0.rel.sens
 #         - Pr(larval survival) (deltaL)
 #         - Pr(surviving EIP) (theta_V)
 #         - vector competence (beta_V)
-Topt.HPD <- read_rds("results/Topt_HPD_sens.rds") %>%
+Topt.HPD <- Topt.HPD %>% 
   ungroup() %>%
   pathosystem_labeller() %>%
   filter(!is.na(rel_HPD_width)) %>%
@@ -1990,13 +1913,9 @@ plot.Topt.rel.sens <- Topt.HPD %>%
   # Make a stacked plot, colored by parameter
   ggplot(aes(x = KH, y = sens_rel, fill = focal_var)) +
   geom_area() +
-  scale_fill_discrete(
-    name = "Focal trait",
-    breaks = c("muV", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
-    labels = c(
-      "Adult lifespan", "Biting frequency", "Eggs per female per day",
-      "Immature development rate", "Prob. of immature survival",
-      "Prob. of surviving EIP", "Vector competence")
+  scale_fill_manual(
+    name = "Focal trait:",
+    values = rev(c4a("misc.okabe", 7))
   ) +
   scale_x_log10(
     name = TeX("Vertebrate host population density (ind/ha)"),
@@ -2024,7 +1943,7 @@ plot.Topt.rel.sens <- Topt.HPD %>%
       padding = margin(0, 0, 0, 0),
       margin = margin(1, 1, 1, 1)
     ),
-    panel.spacing.x = unit(2, "lines")
+    panel.spacing.x = unit(1, "lines")
   )
 shift_legend(plot.Topt.rel.sens)
 ```
@@ -2033,7 +1952,7 @@ shift_legend(plot.Topt.rel.sens)
 
 plot.CTmin.rel.sens <- CT.HPD %>%
   filter(variable == "CTmin") %>%
-  filter(sigmaH %in% c(10, Inf)) %>% 
+  filter(sigmaH %in% c(100, Inf)) %>% 
   filter(!is.na(rel_HPD_width)) %>%
   # For each KH value, sum up all sensitivity values to get total sensitivity
   group_by(system_ID, sigmaH, KH) %>%
@@ -2043,13 +1962,9 @@ plot.CTmin.rel.sens <- CT.HPD %>%
   # Make a stacked plot, colored by parameter
   ggplot(aes(x = KH, y = sens_rel, fill = focal_var)) +
   geom_area() +
-  scale_fill_discrete(
-    name = "Focal trait",
-    breaks = c("muV", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
-    labels = c(
-      "Adult lifespan", "Biting frequency", "Eggs per female per day",
-      "Immature development rate", "Prob. of immature survival",
-      "Prob. of surviving EIP", "Vector competence")
+  scale_fill_manual(
+    name = "Focal trait:",
+    values = rev(c4a("misc.okabe", 7))
   ) +
   scale_x_log10(
     name = TeX("Vertebrate host population density (ind/ha)"),
@@ -2079,7 +1994,7 @@ plot.CTmin.rel.sens <- CT.HPD %>%
       padding = margin(0, 0, 0, 0),
       margin = margin(1, 1, 1, 1)
     ),
-    panel.spacing.x = unit(2, "lines")
+    panel.spacing.x = unit(1, "lines")
   )
 plot.CTmin.rel.sens
 ```
@@ -2088,7 +2003,7 @@ plot.CTmin.rel.sens
 
 plot.CTmax.rel.sens <- CT.HPD %>%
   filter(variable == "CTmax") %>%
-  filter(sigmaH %in% c(10, Inf)) %>% 
+  filter(sigmaH %in% c(100, Inf)) %>% 
   filter(!is.na(rel_HPD_width)) %>%
   # For each KH value, sum up all sensitivity values to get total sensitivity
   group_by(system_ID, sigmaH, KH) %>%
@@ -2098,13 +2013,9 @@ plot.CTmax.rel.sens <- CT.HPD %>%
   # Make a stacked plot, colored by parameter
   ggplot(aes(x = KH, y = sens_rel, fill = focal_var)) +
   geom_area() +
-  scale_fill_discrete(
-    name = "Focal trait",
-    breaks = c("muV", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
-    labels = c(
-      "Adult lifespan", "Biting frequency", "Eggs per female per day",
-      "Immature development rate", "Prob. of immature survival",
-      "Prob. of surviving EIP", "Vector competence")
+  scale_fill_manual(
+    name = "Focal trait:",
+    values = rev(c4a("misc.okabe", 7))
   ) +
   scale_x_log10(
     name = TeX("Vertebrate host population density (ind/ha)"),
@@ -2134,7 +2045,7 @@ plot.CTmax.rel.sens <- CT.HPD %>%
       padding = margin(0, 0, 0, 0),
       margin = margin(1, 1, 1, 1)
     ),
-    panel.spacing.x = unit(2, "lines")
+    panel.spacing.x = unit(1, "lines")
   )
 plot.CTmax.rel.sens
 ```
@@ -2142,27 +2053,23 @@ plot.CTmax.rel.sens
 
 
 
-```{r fig-S13_CTwidth_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTmin_sens} The sensitivity of the thermal niche width to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$ and $\\sigma_H=\\infty$.'}
+```{r fig-S13_CTwidth_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTwidth_sens} The sensitivity of the thermal niche width to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$ and $\\sigma_H=\\infty$.'}
 
 plot.CTwidth.rel.sens <- CT.HPD %>%
   filter(variable == "CTwidth") %>%
-  filter(sigmaH %in% c(10, Inf)) %>% 
+  filter(sigmaH %in% c(100, Inf)) %>% 
   filter(!is.na(rel_HPD_width)) %>%
   # For each KH value, sum up all sensitivity values to get total sensitivity
-  group_by(system_ID, sigmaH, KH) %>%
+  group_by(system_ID, sigmaH, KH) %>%W
   mutate(sens_total = sum(rel_HPD_width)) %>%
-  # Divide each sensitivity value by the total sensitivity
+  # Divide each sensitivity value by the total sensitiviWty
   mutate(sens_rel = rel_HPD_width / sens_total) %>%
   # Make a stacked plot, colored by parameter
   ggplot(aes(x = KH, y = sens_rel, fill = focal_var)) +
   geom_area() +
-  scale_fill_discrete(
-    name = "Focal trait",
-    breaks = c("muV", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
-    labels = c(
-      "Adult lifespan", "Biting frequency", "Eggs per female per day",
-      "Immature development rate", "Prob. of immature survival",
-      "Prob. of surviving EIP", "Vector competence")
+  scale_fill_manual(
+    name = "Focal trait:",
+    values = rev(c4a("misc.okabe", 7))
   ) +
   scale_x_log10(
     name = TeX("Vertebrate host population density (ind/ha)"),
@@ -2192,7 +2099,7 @@ plot.CTwidth.rel.sens <- CT.HPD %>%
       padding = margin(0, 0, 0, 0),
       margin = margin(1, 1, 1, 1)
     ),
-    panel.spacing.x = unit(2, "lines")
+    panel.spacing.x = unit(1, "lines")
   )
 plot.CTwidth.rel.sens
 ```
