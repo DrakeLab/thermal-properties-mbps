@@ -864,64 +864,122 @@ plot.Topt.rel.sens
 
 # Calculate the width of the 95% HPD for the full posterior of dTopt/dKH across vertebrate host abundance
 
-KH_vec <- unique(data.Host$KH)[seq(1, length(unique(data.Host$KH)), length.out = 5)]
+KH_length <- 301
+KH_vec <- sort(c(10^-1.02, 10^3.02,
+                 10^seq(-1, 3, length.out = KH_length)))
+sigmaH_vec <- 100
 
-data.dToptdKH.HPD <- dplyr::filter(data.Host, 
-                                   sigmaH == 100,
-                                   KH %in% KH_vec)
+
+data.dToptdKH.HPD <- dplyr::filter(data.Host, sigmaH == sigmaH_vec) %>% 
+  select(-KH) %>% 
+  full_join(as_tibble(list(KH = KH_vec)), by = character()) %>% 
+  distinct()
 
 full.dToptdKH.HPD <- tibble(system_ID = c(), Temperature = c(), Model = c(),
                             sigmaH = c(), KH = c(), 
                             HPD_low = c(), HPD_high = c(), HPD_width = c())
 
-temp_df <- expand_grid(data.dToptdKH.HPD, 
-                       data.Vec) %>%
-  data.table::data.table() %>%
-  mutate(RV = ifelse(is.infinite(sigmaH),
-                     sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
-                     sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>%
-  mutate(bV = ifelse(is.infinite(sigmaH),
-                     sigmaV, # Ross-Macdonald model
-                     sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>%
-  mutate(RH = ifelse(V0 == 0,
-                     0,
-                     bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>%
-  # Basic reproduction number
-  mutate(R0 = sqrt(RV*RH)) %>%
-  # dplyr::filter to maximum value of R0
-  dplyr::filter(R0>0) %>% 
-  select(system_ID, sample_num, sigmaH, KH, Temperature, R0) %>% 
-  group_by(system_ID, sample_num, sigmaH, KH) %>%
-  dplyr::filter(R0 == max(R0)) %>%
-  distinct() %>% 
-  # Get temperature at which R0 is maximized
-  rename(Topt = Temperature) %>% 
-  arrange(system_ID, sample_num, sigmaH, KH) %>% 
-  mutate(dToptdKH = (Topt - lag(Topt)) / (KH - lag(KH))) %>% 
-  select(system_ID, sigmaH, KH, sample_num, dToptdKH) %>% 
-  group_by(system_ID, sigmaH, KH) %>% 
-  summarise(
-    HPD_low = hdi(dToptdKH, credMass = 0.95)[1],
-    HPD_high = hdi(dToptdKH, credMass = 0.95)[2],
-    HPD_width = max(eps,HPD_high-HPD_low),
-    .groups = "keep"
-  ) 
+full.dToptdKH.HPD <- foreach(index_KH = 2:KH_length,
+                            .combine = 'rbind') %dopar%  {
+    expand_grid(dplyr::filter(data.dToptdKH.HPD, 
+                              KH %in% KH_vec[(index_KH-1):index_KH]), 
+                data.Vec) %>%  
+      data.table::data.table() %>%
+      mutate(RV = ifelse(is.infinite(sigmaH),
+                         sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
+                         sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>%
+      mutate(bV = ifelse(is.infinite(sigmaH),
+                         sigmaV, # Ross-Macdonald model
+                         sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>%
+      mutate(RH = ifelse(V0 == 0,
+                         0,
+                         bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>%
+      # Basic reproduction number
+      mutate(R0 = sqrt(RV*RH)) %>%
+      # dplyr::filter to maximum value of R0
+      dplyr::filter(R0>0) %>% 
+      select(system_ID, sample_num, sigmaH, KH, Temperature, R0) %>% 
+      group_by(system_ID, sample_num, sigmaH, KH) %>%
+      dplyr::filter(R0 == max(R0)) %>%
+      distinct() %>% 
+      # Get temperature at which R0 is maximized
+      rename(Topt = Temperature) %>% 
+      select(-R0) %>% 
+      group_by(system_ID, sample_num) %>%
+      arrange(system_ID, sample_num, KH) %>% 
+      mutate(dToptdKH = (Topt - lag(Topt)) / (KH_vec[index_KH] - KH_vec[index_KH-1])) %>% 
+      filter(!is.na(dToptdKH)) %>%
+      ungroup() %>% 
+      select(system_ID, sample_num, dToptdKH) %>% 
+      group_by(system_ID) %>% 
+      summarise(
+        HPD_low = hdi(dToptdKH, credMass = 0.95)[1],
+        HPD_high = hdi(dToptdKH, credMass = 0.95)[2],
+        HPD_width = max(eps,HPD_high-HPD_low),
+        .groups = "keep"
+      ) %>% 
+      mutate(sigmaH = sigmaH_vec,
+             KH = KH_vec[index_KH])
+  }
+
+for (index_KH in 2:KH_length) {
+  KH_lag = KH_vec[index_KH] - KH_vec[index_KH-1]
+  temp_df <- expand_grid(dplyr::filter(data.dToptdKH.HPD, 
+                                       KH %in% KH_vec[(index_KH-1):index_KH]), 
+                         data.Vec) %>%  
+    data.table::data.table() %>%
+    mutate(RV = ifelse(is.infinite(sigmaH),
+                       sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
+                       sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>%
+    mutate(bV = ifelse(is.infinite(sigmaH),
+                       sigmaV, # Ross-Macdonald model
+                       sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>%
+    mutate(RH = ifelse(V0 == 0,
+                       0,
+                       bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>%
+    # Basic reproduction number
+    mutate(R0 = sqrt(RV*RH)) %>%
+    # dplyr::filter to maximum value of R0
+    dplyr::filter(R0>0) %>% 
+    select(system_ID, sample_num, sigmaH, KH, Temperature, R0) %>% 
+    group_by(system_ID, sample_num, sigmaH, KH) %>%
+    dplyr::filter(R0 == max(R0)) %>%
+    distinct() %>% 
+    # Get temperature at which R0 is maximized
+    rename(Topt = Temperature) %>% 
+    select(-R0) %>% 
+    group_by(system_ID, sample_num) %>%
+    arrange(system_ID, sample_num, KH) %>% 
+    mutate(dToptdKH = (Topt - lag(Topt)) / (KH_vec[index_KH] - KH_vec[index_KH-1])) %>% 
+    filter(!is.na(dToptdKH)) %>%
+    ungroup() %>% 
+    select(system_ID, sample_num, dToptdKH) %>% 
+    group_by(system_ID) %>% 
+    summarise(
+      HPD_low = hdi(dToptdKH, credMass = 0.95)[1],
+      HPD_high = hdi(dToptdKH, credMass = 0.95)[2],
+      HPD_width = max(eps,HPD_high-HPD_low),
+      .groups = "keep"
+    ) %>% 
+    mutate(sigmaH = sigmaH_vec,
+           KH = KH_vec[index_KH])
+  
+  full.dToptdKH.HPD <- rbind(temp_df, full.dToptdKH.HPD)
+}
 
 # Save Topt highest posterior density data
 write_rds(full.dToptdKH.HPD, "results/full_dToptdKH_HPD.rds")
 # full.Topt.HPD <- read_rds("results/full_Topt_HPD.rds")
 
 # # Diagnostic plot
-# test.plot <- full.dToptdKH.HPD %>%
-#   # dplyr::filter(KH == 1e-2) %>%
-#   ggplot(aes(x = KH, y = HPD_width)) +
-#   geom_path() +
-#   scale_x_continuous(
-#     trans = 'log10'
-#   ) +
-#   facet_grid(rows = vars(system_ID), cols = vars(sigmaH), scales = "free")
-# test.plot
-
+test.plot <- full.dToptdKH.HPD %>%
+  ggplot(aes(x = KH, y = HPD_width)) +
+  geom_path() +
+  scale_x_continuous(
+    trans = 'log10'
+  ) +
+  facet_grid(rows = vars(system_ID), cols = vars(sigmaH), scales = "free")
+test.plot
 # Get focal parameter names
 temp_vars <- data.Vec %>% 
   select(-c(system_ID, mosquito_species, pathogen, Temperature, sample_num,
