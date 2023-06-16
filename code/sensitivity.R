@@ -607,7 +607,7 @@ plot.ddTR0.rel.sens
 
 data.ToptHPD <- dplyr::filter(data.Host, 
                               sigmaH %in% c(10, 100)) #,
-                              # KH < 1e3) #%>% 
+# KH < 1e3) #%>% 
 # dplyr::filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 31)])
 
 full.Topt.HPD <- tibble(system_ID = c(), Temperature = c(), Model = c(),
@@ -862,9 +862,7 @@ plot.Topt.rel.sens
 
 # 5*) dTopt dKH uncertainty -------------------------------------------------------
 
-# Calculate the width of the 95% HPD for the full posterior of Topt across vertebrate host abundance
-
-# !!! [] re-run: make sure KH values have high enough resolution
+# Calculate the width of the 95% HPD for the full posterior of dTopt/dKH across vertebrate host abundance
 
 KH_vec <- unique(data.Host$KH)[seq(1, length(unique(data.Host$KH)), length.out = 5)]
 
@@ -876,42 +874,38 @@ full.dToptdKH.HPD <- tibble(system_ID = c(), Temperature = c(), Model = c(),
                             sigmaH = c(), KH = c(), 
                             HPD_low = c(), HPD_high = c(), HPD_width = c())
 
-for (index_KH in unique(data.dToptdKH.HPD$KH)) {
-  temp_df <- expand_grid(dplyr::filter(data.dToptdKH.HPD, KH == index_KH), 
-                         data.Vec) %>%
-    data.table::data.table() %>%
-    mutate(RV = ifelse(is.infinite(sigmaH),
-                       sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
-                       sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>%
-    mutate(bV = ifelse(is.infinite(sigmaH),
-                       sigmaV, # Ross-Macdonald model
-                       sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>%
-    mutate(RH = ifelse(V0 == 0,
-                       0,
-                       bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>%
-    # Basic reproduction number
-    mutate(R0 = sqrt(RV*RH)) %>%
-    # dplyr::filter to maximum value of R0
-    dplyr::filter(R0>0) %>% 
-    select(system_ID, sample_num, sigmaH, KH, Temperature, R0) %>% 
-    group_by(system_ID, sample_num, sigmaH, KH) %>%
-    dplyr::filter(R0 == max(R0)) %>%
-    distinct() %>% 
-    # Get temperature at which R0 is maximized
-    rename(Topt = Temperature) %>% 
-    arrange(system_ID, sample_num, sigmaH, KH) %>% 
-    mutate(dToptdKH = (Topt - lag(Topt)) / (KH - lag(KH))) %>% 
-    select(system_ID, sigmaH, KH, sample_num, dToptdKH) %>% 
-    group_by(system_ID, sigmaH, KH) %>% 
-    summarise(
-      HPD_low = hdi(dToptdKH, credMass = 0.95)[1],
-      HPD_high = hdi(dToptdKH, credMass = 0.95)[2],
-      HPD_width = max(eps,HPD_high-HPD_low),
-      .groups = "keep"
-    ) 
-  
-  full.dToptdKH.HPD <- rbind(full.dToptdKH.HPD, temp_df)
-}
+temp_df <- expand_grid(data.dToptdKH.HPD, 
+                       data.Vec) %>%
+  data.table::data.table() %>%
+  mutate(RV = ifelse(is.infinite(sigmaH),
+                     sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
+                     sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>%
+  mutate(bV = ifelse(is.infinite(sigmaH),
+                     sigmaV, # Ross-Macdonald model
+                     sigmaV * sigmaH * KH / (sigmaH * KH + sigmaV * V0 + eps))) %>%
+  mutate(RH = ifelse(V0 == 0,
+                     0,
+                     bV * betaV * V0 * exp(-1 / (lf * etaV)) / (KH * (gammaH + muH) + eps))) %>%
+  # Basic reproduction number
+  mutate(R0 = sqrt(RV*RH)) %>%
+  # dplyr::filter to maximum value of R0
+  dplyr::filter(R0>0) %>% 
+  select(system_ID, sample_num, sigmaH, KH, Temperature, R0) %>% 
+  group_by(system_ID, sample_num, sigmaH, KH) %>%
+  dplyr::filter(R0 == max(R0)) %>%
+  distinct() %>% 
+  # Get temperature at which R0 is maximized
+  rename(Topt = Temperature) %>% 
+  arrange(system_ID, sample_num, sigmaH, KH) %>% 
+  mutate(dToptdKH = (Topt - lag(Topt)) / (KH - lag(KH))) %>% 
+  select(system_ID, sigmaH, KH, sample_num, dToptdKH) %>% 
+  group_by(system_ID, sigmaH, KH) %>% 
+  summarise(
+    HPD_low = hdi(dToptdKH, credMass = 0.95)[1],
+    HPD_high = hdi(dToptdKH, credMass = 0.95)[2],
+    HPD_width = max(eps,HPD_high-HPD_low),
+    .groups = "keep"
+  ) 
 
 # Save Topt highest posterior density data
 write_rds(full.dToptdKH.HPD, "results/full_dToptdKH_HPD.rds")
