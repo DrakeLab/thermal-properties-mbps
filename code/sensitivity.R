@@ -58,7 +58,7 @@ init.df <- tibble(system_ID = c(), Temperature = c(), Model = c(),
 # Host trait dataset
 data.Host <- read_rds("results/Host_vals.rds")
 # Vector trait dataset
-data.Vec <- read_rds("results/VecTPC_vals.rds")
+# data.Vec <- read_rds("results/VecTPC_vals.rds")
 
 # R0 data
 data.R0 <- read_rds("results/R0_vals.rds") # !!! needs to be updated to include 1e-1, 1e0, 1e1
@@ -738,7 +738,7 @@ for (var_name in temp_vars) {
       mutate(focal_var = var_name) %>% 
       group_by(system_ID, sigmaH, KH, focal_var) %>% 
       # d) Normalize HPD width by the full HPD width when all parameters are allowed to vary
-      mutate(rel_HPD_width = ifelse(full_HPD_width %in% c(0,eps), 0, HPD_width / full_HPD_width))
+      mutate(rel_HPD_width = ifelse(full_HPD_width < 1.1 * eps, 0, HPD_width / full_HPD_width))
     
     Topt.HPD <- rbind(Topt.HPD, temp_df)
   }
@@ -1034,7 +1034,7 @@ for (var_name in temp_vars) {
       mutate(focal_var = var_name) %>% 
       group_by(system_ID, sigmaH, KH, focal_var) %>% 
       # d) Normalize HPD width by the full HPD width when all parameters are allowed to vary
-      mutate(rel_HPD_width = ifelse(full_HPD_width %in% c(0,eps), 0, HPD_width / full_HPD_width))
+      mutate(rel_HPD_width = ifelse(full_HPD_width < 1.1 * eps, 0, HPD_width / full_HPD_width))
     
     CT.HPD <- rbind(CT.HPD, temp_df)
   }
