@@ -176,7 +176,7 @@ Topt.HPD <- read_rds("results/Topt_HPD_sens.rds") %>%
   ungroup() %>%
   pathosystem_labeller() %>%
     mutate(focal_var = factor(focal_var,
-                           levels = c("muV", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
+                           levels = c("lf", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
                            labels = c(
                              TeX("Adult lifespan"),
                              TeX("Biting frequency"),
@@ -1778,7 +1778,7 @@ Temp_range_for_plot <- R0.HPD %>%
 plot.R0.rel.sens <- R0.HPD %>%
   filter(KH %in% c(1) & sigmaH %in% c(100, Inf)) %>%
   # filter(!(KH == 100 & sigmaH == Inf)) %>%
-  filter(rel_HPD_width != 0) %>%
+  # filter(rel_HPD_width != 0) %>%
   # For each KH value, sum up all sensitivity values to get total sensitivity across parameters
   group_by(system_ID, sigmaH, KH, Temperature) %>%
   mutate(sens_total = sum(rel_HPD_width)) %>%
@@ -1802,7 +1802,7 @@ plot.R0.rel.sens <- R0.HPD %>%
   ) +
   facet_grid(
     cols = vars(system_label),
-    rows = vars(KH, sigmaH),
+    rows = vars(sigmaH),
     labeller = labeller(
       system_label = sens_labels,
       sigmaH = as_labeller(appender_sigmaH, default = label_parsed)
@@ -1834,7 +1834,6 @@ plot.R0.rel.sens
 # !!! [] just compare "low host availability (sigmaH = 50, KH = 1 or 10)" and
 #        "high host availability (sigmaH = Inf, KH = 100)" scenarios
 
-
 ## Plot R0 uncertainty
 Temp_range_for_plot <- ddTR0.HPD %>%
   ungroup() %>%
@@ -1843,9 +1842,9 @@ Temp_range_for_plot <- ddTR0.HPD %>%
   range()
 
 plot.ddTR0.rel.sens <- ddTR0.HPD %>%
-  filter(KH %in% c(100) & sigmaH %in% c(100, Inf)) %>%
+  filter(KH %in% c(1) & sigmaH %in% c(100, Inf)) %>%
   # filter(!(KH == 100 & sigmaH == Inf)) %>%
-  filter(rel_HPD_width != 0) %>%
+  # filter(rel_HPD_width != 0) %>%
   # For each KH value, sum up all sensitivity values to get total sensitivity across parameters
   group_by(system_ID, sigmaH, KH, Temperature) %>%
   mutate(sens_total = sum(rel_HPD_width)) %>%
@@ -1865,15 +1864,14 @@ plot.ddTR0.rel.sens <- ddTR0.HPD %>%
     expand = c(0, 0)
   ) +
   scale_y_continuous(
-    name = unname(TeX("Relative contribution to $ddTR_0$ HPD width"))
+    name = unname(TeX("Relative contribution to $dR_0 / dT$ HPD width"))
   ) +
   facet_grid(
     cols = vars(system_label),
-    rows = vars(KH, sigmaH),
+    rows = vars(sigmaH),
     labeller = labeller(
       system_label = sens_labels,
-      sigmaH = as_labeller(appender_sigmaH, default = label_parsed),
-      KH = as_labeller(appender_KH, default = label_parsed)
+      sigmaH = as_labeller(appender_sigmaH, default = label_parsed)
     ),
     scales = "free"
   ) +
@@ -1899,10 +1897,12 @@ plot.ddTR0.rel.sens
 
 ```{r fig-S10_Topt_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt_sens} The sensitivity of the thermal optimum to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$.'}
 
+# !!! mention the value of sigmaH
 
-Topt.HPD <- Topt.HPD %>%
+plot.Topt.rel.sens <- Topt.HPD %>% 
   ungroup() %>%
   distinct() %>% 
+  filter(sigmaH == 100) %>% 
   filter(!is.na(HPD_width)) %>% 
   pathosystem_labeller() %>%
   filter(!is.na(rel_HPD_width)) %>%
@@ -1910,12 +1910,7 @@ Topt.HPD <- Topt.HPD %>%
   group_by(system_ID, sigmaH, KH) %>%
   mutate(sens_total = sum(rel_HPD_width)) %>%
   # Divide each sensitivity value by the total sensitivity
-  mutate(sens_rel = rel_HPD_width / sens_total) # %>%
-# arrange(sens_rel)
-
-# !!! mention the value of sigmaH
-
-plot.Topt.rel.sens <- Topt.HPD %>%
+  mutate(sens_rel = rel_HPD_width / sens_total) %>% 
   # Make a stacked plot, colored by parameter
   ggplot(aes(x = KH, y = sens_rel, fill = focal_var)) +
   geom_area() +
@@ -1933,9 +1928,6 @@ plot.Topt.rel.sens <- Topt.HPD %>%
   scale_y_continuous(
     name = unname(TeX("Relative contribution to $T_{opt}$ HPD width"))
   ) +
-  # scale_y_continuous(
-  #   limits = c(0,1)
-  # ) +
   facet_wrap(~system_label) +
   theme_minimal() +
   theme(
@@ -1951,6 +1943,72 @@ plot.Topt.rel.sens <- Topt.HPD %>%
     )
   )
 shift_legend(plot.Topt.rel.sens)
+```
+
+```{r fig-S10_2_dToptdKH_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt_sens} The sensitivity of the thermal optimum to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$.'}
+
+
+
+dToptdKH.HPD <- read_rds("results/dToptdKH_HPD_sens.rds") %>%
+  ungroup() %>%
+  distinct() %>% 
+  filter(!is.na(HPD_width)) %>% 
+  pathosystem_labeller() %>%
+    mutate(focal_var = factor(focal_var,
+                           levels = c("muV", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
+                           labels = c(
+                             TeX("Adult lifespan"),
+                             TeX("Biting frequency"),
+                             TeX("Eggs per female per day"),
+                             TeX("Immature development rate"),
+                             TeX("Prob. of immature survival"),
+                             TeX("Prob. of surviving EIP"),
+                             TeX("Vector competence")
+                           )
+  )) %>% 
+  filter(!is.na(rel_HPD_width)) %>%
+  # For each KH value, sum up all sensitivity values to get total sensitivity
+  group_by(system_ID, sigmaH, KH) %>%
+  mutate(sens_total = sum(rel_HPD_width)) %>%
+  # Divide each sensitivity value by the total sensitivity
+  mutate(sens_rel = rel_HPD_width / sens_total) # %>%
+# arrange(sens_rel)
+
+# !!! mention the value of sigmaH
+
+plot.dToptdKH.rel.sens <- dToptdKH.HPD %>%
+  # Make a stacked plot, colored by parameter
+  ggplot(aes(x = KH, y = sens_rel, fill = focal_var)) +
+  geom_area() +
+  scale_fill_manual(
+    name = "Focal trait:",
+    values = rev(c4a("misc.okabe", 7))
+  ) +
+  scale_x_log10(
+    name = TeX("Vertebrate host population density (ind/ha)"),
+    expand = c(0, 0),
+    # limits = c(0.05, 1E3),
+    breaks = 10^seq(-2, 4, 1),
+    labels = TeX(c("$0.01$", "$0.1$", "$1$", "$10", "$100$", "$10^3$", "$10^4$"))
+  ) +
+  scale_y_continuous(
+    name = unname(TeX("Relative contribution to $ dT_{opt}/dK_H$ HPD width"))
+  ) +
+  facet_wrap(~system_label) +
+  theme_minimal() +
+  theme(
+    legend.margin = margin(0, 0, 0, 0),
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 10),
+    axis.title.x = element_text(hjust = 0.5),
+    strip.text.x = ggtext::element_markdown(
+      size = 10,
+      hjust = 0,
+      padding = margin(0, 0, 0, 0),
+      margin = margin(1, 1, 1, 1)
+    )
+  )
+shift_legend(plot.dToptdKH.rel.sens)
 ```
 
 ```{r fig-S11_CTmin_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTmin_sens} The sensitivity of the critical thermal minimum to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$ and $\\sigma_H=\\infty$.'}

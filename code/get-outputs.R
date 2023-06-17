@@ -317,7 +317,7 @@ gc()
 
 # Collect R0 TPC data across systems and host trait values
 for (system_name in unique(data.Vec$system_ID)) {
-  print(paste0("Topt vals: ", system_name))
+  print(paste0("R0 vals: ", system_name))
   KHslice_num <- 1
   pb <- progress_bar$new(
     format = ":spin :system progress = :percent [:bar] :elapsedfull | eta: :eta",
@@ -334,7 +334,7 @@ for (system_name in unique(data.Vec$system_ID)) {
         filter(sigmaH %in% index_sigmaH,
                KH %in% index_KH) %>%
         R0_TPC_func(., system_name)
-        
+      
       R0.df <- rbind(temp_df, R0.df)
       sigmaHslice_num <- sigmaHslice_num  + 1
     }
@@ -359,9 +359,121 @@ R0_heat.df <- R0.df %>%
   filter(KH %in% c(0.1, 1, 10, 100))
 write_rds(R0_heat.df, "results/R0_vals.rds", compress = "gz")
 
-# !!! [] filter down R0.df to get it under 100 MB
 
-# 3) Calculate Topt -------------------------------------------------------
+# 3) Calculate R0 derivatives ---------------------------------------------
+
+# Set up parallel
+if (!exists("cluster")) {
+  cluster_size <- min(21, parallel::detectCores() - 2)
+  cluster <- new_cluster(cluster_size)
+  cluster_library(cluster, c("dplyr", "tidyr"))
+}
+
+# Set up host trait data frame (for future visualization)
+data.dR0dk <- data.Host %>%
+  filter(sigmaH %in% c(100, Inf)) #%>%
+  # filter(sigmaH %in% c(10^seq(-1,2), Inf,
+  #                      unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 51)])) %>%
+  # filter(KH %in% c(10^seq(-2,5)))
+# filter(KH %in% c(10^seq(-2,5) ,
+#                  unique(KH)[seq(1, length(unique(KH)), length.out = 51)]))
+
+# Slice host trait data
+sigmaH_slices <- slice(unique(data.dR0dk$sigmaH), 2)
+KH_slices <- slice(unique(data.dR0dk$KH), cluster_size)
+
+# Initialize R0 data frame
+dR0dvar.df <- init.df
+
+gc()
+
+temp_vars <- data.Vec %>% 
+  select(-c(system_ID, mosquito_species, pathogen, Temperature, sample_num,
+            etaL, muL, KL, V0,)) %>% 
+  colnames()
+
+R0_deriv_func <- function(in_df, var_name) {
+  out_df <- in_df %>% # Pr(surviving the EIP)
+    mutate(thetaV = exp(-1 / (lf * etaV + eps))) %>% 
+    # Host constant
+    mutate(C = betaH / (KH * (gammaH + muH))) %>% 
+    # Biting rate term
+    mutate(K = ifelse(is.infinite(sigmaH), 1, sigmaH * KH / (sigmaH * KH + sigmaV * V0))) %>% 
+    # Basic reproduction number
+    mutate(R0 = K * sqrt(C * sigmaV^2 * V0 * betaV * thetaV * lf)) %>% 
+    # Derivative of biting rate term wrt vector abundance
+    mutate(dKdV0 = -sigmaV * K^2 / (sigmaH * KH)) %>% 
+    # Derivative of vector abundance wrt variable
+    mutate(dV0dvar = case_when(
+      var_name == "lf" ~ rhoL * KL,
+      var_name == "sigmaV_f" ~ (rhoL * KL)/ ((sigmaV_f^2) * deltaL + eps),
+      var_name == "deltaL" ~ (rhoL * KL)/ (sigmaV_f * (deltaL^2) + eps),
+      var_name == "rhoL" ~ (KL * (1 - deltaL))/ (sigmaV_f * deltaL + eps),
+      TRUE ~ 0
+    )) %>% 
+    # Derivative of R0 wrt variable
+    mutate(dR0dk = (C / (2 * R0 + eps)) * case_when(
+      var_name == "lf" ~ sigmaV^2 * betaV * K * thetaV * (2 * dKdV0 * dV0dvar * V0 * lf + dV0dvar * K * lf + K * V0 * lf / (etaV * (lf^2) + eps) + K * V0),
+      var_name == "sigmaV" ~ 2 * V0 * betaV * thetaV * lf * K * sigmaV * (K + sigmaV * dKdV0 * dV0dvar),
+      var_name == "sigmaV_f" ~ sigmaV^2 * betaV * thetaV * lf * K * dV0dvar * (2 * dKdV0 * V0 + K),
+      var_name == "deltaL" ~ sigmaV^2 * betaV * thetaV * lf * K * dV0dvar * (2 * dKdV0 * V0 + K),
+      var_name == "rhoL" ~ sigmaV^2 * betaV * thetaV * lf * K * dV0dvar * (2 * dKdV0 * V0 + K),
+      var_name == "etaV" ~ K^2 *sigmaV^2 * V0 * betaV * thetaV / (etaV^2 + eps),
+      var_name == "betaV" ~ K^2 *sigmaV^2 * V0 * thetaV * lf,
+      TRUE ~ NA
+    ))
+}
+
+# Collect R0 TPC data across systems and host trait values
+print_index = 1
+for (system_name in unique(data.Vec$system_ID)) {
+  for (var_name in temp_vars) {
+    print(paste0("(",print_index, "/", length(temp_vars) * length(unique(data.Vec$system_ID)),") dR0 / d", var_name,": ", system_name))
+    KHslice_num <- 1
+    pb <- progress_bar$new(
+      format = ":spin :system progress = :percent [:bar] :elapsedfull | eta: :eta",
+      total = length(KH_slices) * length(sigmaH_slices),
+      width = 120)  
+    for(index_KH in KH_slices) {
+      for (index_sigmaH in sigmaH_slices) {
+        pb$tick()
+        
+        temp_df <- data.dR0dk %>%
+          filter(sigmaH %in% index_sigmaH,
+                 KH %in% index_KH) %>%
+          expand_grid(filter(data.Vec, system_ID == system_name)) %>%
+          # Calculate derivatives
+          R0_deriv_func(., var_name) %>% 
+          mutate(focal_var = var_name) %>% 
+          dplyr::select(system_ID, sample_num, Temperature, Model, sigmaH, KH, focal_var, dR0dk) %>%
+          group_by(system_ID, Temperature, Model, sigmaH, KH) %>%
+          partition(cluster) %>%
+          summarise(
+            lowHCI = quantile(dR0dk, 0.055),
+            highHCI = quantile(dR0dk, 0.945),
+            mean = mean(dR0dk),
+            median = median(dR0dk)
+          ) %>%
+          collect()
+        
+        dR0dvar.df <- rbind(temp_df, dR0dvar.df)
+      }
+    }
+    gc()
+    print_index <- print_index + 1
+  }
+}
+pb$terminate()
+
+# Save data
+proper_dim <- dim(data.dR0dk)[1] * length(unique(data.Vec$system_ID)) * length(unique(data.Vec$Temperature)) * length(temp_vars)
+
+(dim(dR0dvar.df)[1] == proper_dim)
+
+write_rds(dR0dvar.df, "results/dR0dk_vals.rds", compress = "gz")
+
+
+# 4) Calculate Topt -------------------------------------------------------
 
 # Set up new cluster
 # Close old cluster connections
