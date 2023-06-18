@@ -372,10 +372,11 @@ if (!exists("cluster")) {
 # Set up host trait data frame (for future visualization)
 data.dR0dk <- data.Host %>%
   filter(sigmaH %in% c(100, Inf)) %>%
+  filter(KH %in% 10^seq(-2,5))
   # filter(sigmaH %in% c(10^seq(-1,2), Inf,
   #                      unique(sigmaH)[seq(1, length(unique(sigmaH)), length.out = 51)])) %>%
   # filter(KH %in% c(10^seq(-2,5)))
-  filter(KH %in% c(10^seq(-2,5) ,unique(KH)[seq(1, length(unique(KH)), length.out = 201)]))
+  # filter(KH %in% c(10^seq(-2,5) ,unique(KH)[seq(1, length(unique(KH)), length.out = 201)]))
 
 R0_deriv_func <- function(in_df) {
   out_df <- in_df %>% # Pr(surviving the EIP)
@@ -466,6 +467,7 @@ pb$terminate()
 dR0dvar.df2 <- dR0dvar.df %>% 
   ungroup() %>% 
   filter(Temperature %in% unique(Temperature)[seq(1, length(unique(Temperature)), length.out = 500)])
+
 write_rds(dR0dvar.df2, "results/dR0dk_vals.rds", compress = "gz")
 
 # Save data

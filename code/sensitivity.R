@@ -261,8 +261,8 @@ for (var_name in temp_vars) {
 }
 
 # Save R0 relative highest posterior density data
-write_rds(R0.HPD, "results/R0_HPD_sens.rds")
-# R0.HPD <- read_rds("results/R0_HPD_sens.rds")
+write_rds(R0.HPD, "results/R0_HPD_unc.rds")
+# R0.HPD <- read_rds("results/R0_HPD_unc.rds")
 
 ## Plot R0 uncertainty 
 Temp_range_for_plot <- R0.HPD %>% 
@@ -493,8 +493,8 @@ for (var_name in temp_vars) {
 }
 
 # Save R0 relative highest posterior density data
-write_rds(ddTR0.HPD, "results/ddTR0_HPD_sens.rds")
-# ddTR0.HPD <- read_rds("results/ddTR0_HPD_sens.rds")
+write_rds(ddTR0.HPD, "results/ddTR0_HPD_unc.rds")
+# ddTR0.HPD <- read_rds("results/ddTR0_HPD_unc.rds")
 
 ## Plot R0 uncertainty 
 Temp_range_for_plot <- ddTR0.HPD %>% ungroup() %>% 
@@ -669,7 +669,7 @@ full.Topt.HPD <- foreach(index_KH = 1:KH_length,
 close(pb)
 
 # Save Topt highest posterior density data
-# write_rds(full.Topt.HPD, "results/full_Topt_HPD.rds")
+write_rds(full.Topt.HPD, "results/full_Topt_HPD.rds")
 # full.Topt.HPD <- read_rds("results/full_Topt_HPD.rds")
 
 # # Diagnostic plot
@@ -773,8 +773,8 @@ for (var_name in temp_vars) {
 }
 
 # Save Topt relative highest posterior density data
-# write_rds(Topt.HPD, "results/Topt_HPD_sens.rds")
-# Topt.HPD <- read_rds("results/Topt_HPD_sens.rds")
+write_rds(Topt.HPD, "results/Topt_HPD_unc.rds")
+# Topt.HPD <- read_rds("results/Topt_HPD_unc.rds")
 
 ## Plot Topt uncertainty 
 var_name_table <- list(
@@ -1024,8 +1024,8 @@ dToptdKH.HPD <- dToptdKH.HPD %>%
   distinct()
 
 # Save Topt relative highest posterior density data
-write_rds(dToptdKH.HPD, "results/dToptdKH_HPD_sens.rds")
-# Topt.HPD <- read_rds("results/Topt_HPD_sens.rds")
+write_rds(dToptdKH.HPD, "results/dToptdKH_HPD_unc.rds")
+# Topt.HPD <- read_rds("results/Topt_HPD_unc.rds")
 
 
 
@@ -1142,8 +1142,7 @@ for (var_name in temp_vars) {
     mutate(lf = 1/muV) %>%
     mutate(V0 = ifelse(sigmaV_f * deltaL < (1 / lf),
                        0,
-                       KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL)))) %>%
-    select(-lf)
+                       KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL))))
   
   pb <- progress_bar$new(
     format = ":spin :system progress = :percent [:bar] :elapsed | eta: :eta",
@@ -1154,8 +1153,6 @@ for (var_name in temp_vars) {
     # b) Get posterior samples of R0 (as a function of temperature)
     temp_df <- expand_grid(dplyr::filter(data.CTHPD, KH == index_KH), 
                            data.HPD.Vec) %>%
-      mutate(lf = 1/muV) %>% 
-      data.table::data.table() %>%
       mutate(RV = ifelse(is.infinite(sigmaH),
                          sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald
                          sigmaH * sigmaV * betaH * KH / ((1 / (lf + eps)) * (sigmaH * KH + sigmaV * V0)))) %>%
@@ -1213,8 +1210,8 @@ for (var_name in temp_vars) {
 
 
 # Save CT relative highest posterior density data
-write_rds(CT.HPD, "results/CT_HPD_sens.rds", compress = 'gz')
-# CT.HPD <- read_rds("results/CT_HPD_sens.rds")
+write_rds(CT.HPD, "results/CT_HPD_unc.rds", compress = 'gz')
+# CT.HPD <- read_rds("results/CT_HPD_unc.rds")
 
 ## Plot Topt uncertainty 
 var_name_table <- list(
