@@ -675,7 +675,7 @@ R0_plot <- ggplot(mapping = aes(x = Temperature, group = KH)) +
     )
   ) +
   # theme options:
-  theme_minimal_vgrid() +
+  theme_minimal_vgrid(10) +
   theme(
     legend.box = "vertical",
     legend.margin = margin(),
@@ -801,7 +801,7 @@ Toptalt_plots <- Toptalt_df %>%
         show.limits = TRUE
   )) +
   # theme options:
-  theme_minimal() +
+  theme_minimal(10) +
   theme(
     legend.box = "vertical",
     legend.position = "right",
@@ -885,7 +885,7 @@ CTWidth_heat_plots <- CTwidth_df %>%
     show.limits = TRUE
   )) +
   # theme options:
-  theme_minimal() +
+  theme_minimal(10) +
   theme(
     legend.box = "horizontal",
     legend.position = "bottom",
@@ -1094,7 +1094,7 @@ R0_plot <- R0_df %>%
     # repeat.tick.labels = "left"
   ) +
   # theme options:
-  theme_minimal_hgrid(11) +
+  theme_minimal_hgrid(10) +
   theme(
     axis.line = element_line(),
     legend.text = element_text(size = 10),
@@ -1165,7 +1165,7 @@ Topt_plot <- Topt_df %>%
   # faceting:
   facet_wrap(~system_label, nrow = 2, labeller = labeller()) +
   # theme options:
-  theme_minimal() +
+  theme_minimal(10) +
   guides(color = guide_legend(override.aes = list(size = 4))) +
   theme(
     legend.position = "bottom",
@@ -1264,7 +1264,7 @@ Topt_plot <- Topt_df %>%
              nrow = 2,
              labeller = labeller()  ) +
   # theme options:
-  theme_minimal() +
+  theme_minimal(10) +
   guides(color = guide_legend(override.aes = list(size = 4))) +
   theme(
     legend.position = "bottom",
@@ -1374,7 +1374,7 @@ CTmin_heat_plots <- CTmin_df %>%
     show.limits = TRUE
   )) +
   # theme options:
-  theme_minimal() +
+  theme_minimal(10) +
   theme(
     legend.box = "horizontal",
     legend.position = "bottom",
@@ -1479,7 +1479,7 @@ CTmax_heat_plots <- CTmax_df %>%
     show.limits = TRUE
   )) +
   # theme options:
-  theme_minimal() +
+  theme_minimal(10) +
   theme(
     legend.box = "horizontal",
     legend.position = "bottom",
@@ -1593,7 +1593,7 @@ CTRange_plots <- CTRange_df %>%
     linetype = guide_legend(keywidth = 4, order = 2),
   ) +
   # theme options:
-  theme_minimal_hgrid() +
+  theme_minimal_hgrid(10) +
   theme(
     axis.title.x = element_text(hjust = 0.5),
     strip.text = ggtext::element_markdown(
@@ -1761,7 +1761,7 @@ plot.densities_violin_inline <- ggplot() +
     labels = c("Critical thermal minimum", "Thermal optimum", "Critical thermal maximum")
   ) +
   facet_wrap(~system_label, labeller = labeller(), scales = "free_x") +
-  theme_minimal_grid() +
+  theme_minimal_grid(10) +
   theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
@@ -1826,7 +1826,7 @@ plot.R0.rel.sens <- R0.HPD %>%
     ),
     scales = "free"
   ) +
-  theme_minimal() +
+  theme_minimal(10) +
   theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
@@ -1846,7 +1846,7 @@ plot.R0.rel.sens
 
 ```
 
-```{r fig-S8_2_dR0dvar_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:R0_unc} The uncertainty in the local sensitivity of $\\mathcal{R}_0$ with respect to mosquito life history traits.'}
+```{r fig-S8_2_dR0dvar_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:dR0dvar_unc} The uncertainty in the local sensitivity of $\\mathcal{R}_0$ with respect to mosquito life history traits.'}
 
 # !!! [] change factor/levels for focal_var so that they show up in the same
 #        order as in the legend
@@ -1899,6 +1899,7 @@ plot.dR0dk <- dR0dk.df  %>%
     cols = vars(system_label),
     rows = vars(KH, sigmaH),
     labeller = labeller(
+      system_label = sens_labels,
       sigmaH = as_labeller(appender_sigmaH, default = label_parsed),
       KH = as_labeller(appender_KH, default = label_parsed)
     ),
@@ -1908,11 +1909,11 @@ plot.dR0dk <- dR0dk.df  %>%
     title.position = "left",
     title.vjust = 0.5,
     direction = "vertical")) +
-  theme_minimal_hgrid() +
+  theme_minimal_hgrid(10) +
   theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
-    legend.text = element_text(size = 10),
+    legend.text = element_text(size = 8),
     legend.position = "bottom",
     legend.justification = 0.5,
     axis.title.x = element_text(hjust = 0.5),
@@ -1975,7 +1976,7 @@ plot.ddTR0.rel.sens <- ddTR0.HPD %>%
     ),
     scales = "free"
   ) +
-  theme_minimal() +
+  theme_minimal(10) +
   theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
@@ -2031,7 +2032,7 @@ plot.Topt.rel.sens <- Topt.HPD %>%
     name = unname(TeX("Relative contribution to $T_{opt}$ HPD width"))
   ) +
   facet_wrap(~system_label) +
-  theme_minimal() +
+  theme_minimal(10) +
   theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
@@ -2097,7 +2098,7 @@ plot.dToptdKH.rel.sens <- dToptdKH.HPD %>%
     name = unname(TeX("Relative contribution to $ dT_{opt}/dK_H$ HPD width"))
   ) +
   facet_wrap(~system_label) +
-  theme_minimal() +
+  theme_minimal(10) +
   theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
@@ -2150,7 +2151,7 @@ plot.CTmin.rel.sens <- CTmin_df %>%
       sigmaH = as_labeller(appender_sigmaH, default = label_parsed)
     )
   ) +
-  theme_minimal() +
+  theme_minimal(10) +
   theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
@@ -2203,7 +2204,7 @@ plot.CTmax.rel.sens <- CT.HPD %>%
       sigmaH = as_labeller(appender_sigmaH, default = label_parsed)
     )
   ) +
-  theme_minimal() +
+  theme_minimal(10) +
   theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
@@ -2260,7 +2261,7 @@ plot.CTwidth.rel.sens <- CT.HPD %>%
         appender_sigmaH, default = label_parsed)
     )
   ) +
-  theme_minimal() +
+  theme_minimal(10) +
   theme(
     legend.margin = margin(0, 0, 0, 0),
     legend.title = element_text(size = 10),
