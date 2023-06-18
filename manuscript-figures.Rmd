@@ -137,9 +137,26 @@ data.Topt <- read_rds("results/Topt_vals.rds") %>%
 # Critical thermal extrema data
 data.CT <- read_rds("results/CT_vals.rds") %>%
   pathosystem_labeller()
+# Local sensitivity of R0 to mosquito traits
+data.dR0dvar <- read_rds("results/dR0dk_vals.rds") %>% 
+  ungroup() %>% 
+  pathosystem_labeller() %>%
+    mutate(focal_var = factor(focal_var,
+                           levels = c("lf", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
+                           labels = c(
+                             TeX("Adult lifespan"),
+                             TeX("Biting frequency"),
+                             TeX("Eggs per female per day"),
+                             TeX("Immature development rate"),
+                             TeX("Prob. of immature survival"),
+                             TeX("Prob. of surviving EIP"),
+                             TeX("Vector competence")
+                           )
+  ))
 
-# Sensitivity data for R0
-R0.HPD <- read_rds("results/R0_HPD_sens.rds") %>%
+
+# Uncertainty data for R0
+R0.HPD <- read_rds("results/R0_HPD_unc.rds") %>%
   ungroup() %>%
   pathosystem_labeller() %>%
     mutate(focal_var = factor(focal_var,
@@ -155,7 +172,7 @@ R0.HPD <- read_rds("results/R0_HPD_sens.rds") %>%
                            )
   ))
 
-ddTR0.HPD <- read_rds("results/ddTR0_HPD_sens.rds") %>%
+ddTR0.HPD <- read_rds("results/ddTR0_HPD_unc.rds") %>%
   ungroup() %>%
   pathosystem_labeller() %>%
     mutate(focal_var = factor(focal_var,
@@ -171,8 +188,8 @@ ddTR0.HPD <- read_rds("results/ddTR0_HPD_sens.rds") %>%
                            )
   ))
 
-# Sensitivity data for Topt
-Topt.HPD <- read_rds("results/Topt_HPD_sens.rds") %>%
+# Uncertainty data for Topt
+Topt.HPD <- read_rds("results/Topt_HPD_unc.rds") %>%
   ungroup() %>%
   pathosystem_labeller() %>%
     mutate(focal_var = factor(focal_var,
@@ -188,8 +205,8 @@ Topt.HPD <- read_rds("results/Topt_HPD_sens.rds") %>%
                            )
   ))
 
-# Sensitivity data for critical thermal extrema
-CT.HPD <- read_rds("results/CT_HPD_sens.rds") %>%
+# Uncertainty data for critical thermal extrema
+CT.HPD <- read_rds("results/CT_HPD_unc.rds") %>%
   ungroup() %>%
   pathosystem_labeller() %>%
     mutate(focal_var = factor(focal_var,
@@ -1762,7 +1779,7 @@ shift_legend(plot.densities_violin_inline)
 
 
 
-```{r fig-S8_R0_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:R0_sens} The sensitivity of the distribution of $\\mathcal{R}_0$ to mosquito life history traits.'}
+```{r fig-S8_R0_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:R0_unc} The uncertainty of the distribution of $\\mathcal{R}_0$ to mosquito life history traits.'}
 
 # !!! [] change factor/levels for focal_var so that they show up in the same
 #        order as in the legend
@@ -1779,10 +1796,10 @@ plot.R0.rel.sens <- R0.HPD %>%
   filter(KH %in% c(1) & sigmaH %in% c(100, Inf)) %>%
   # filter(!(KH == 100 & sigmaH == Inf)) %>%
   # filter(rel_HPD_width != 0) %>%
-  # For each KH value, sum up all sensitivity values to get total sensitivity across parameters
+  # For each KH value, sum up all uncertainty values to get total uncertainty across parameters
   group_by(system_ID, sigmaH, KH, Temperature) %>%
   mutate(sens_total = sum(rel_HPD_width)) %>%
-  # Divide each sensitivity value by the total sensitivity
+  # Divide each uncertainty value by the total uncertainty
   mutate(sens_rel = rel_HPD_width / sens_total) %>%
   arrange(sens_rel) %>%
   arrange(focal_var) %>%
@@ -1829,7 +1846,90 @@ plot.R0.rel.sens
 
 ```
 
-```{r fig-S9_ddTR0_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:ddTR0_sens} The sensitivity of the distribution of the derivative of $\\mathcal{R}_0$ with respect to temperature to mosquito life history traits.'}
+```{r fig-S8_2_dR0dvar_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:R0_unc} The uncertainty in the local sensitivity of $\\mathcal{R}_0$ with respect to mosquito life history traits.'}
+
+# !!! [] change factor/levels for focal_var so that they show up in the same
+#        order as in the legend
+# !!! [] figure out what's going on with the "color" bars occuring at low temperatures for plots (a) (b) and (e)
+
+KH_vals <- c(1)
+
+dR0dk.df <- data.dR0dvar %>%
+  filter(KH %in% KH_vals,
+         sigmaH %in% c(100, Inf)) %>%
+  # filter(median > 0) %>%
+  right_join(select(data.R0, system_label, Temperature, Model, sigmaH, KH, median_R0 = median) %>% 
+              filter(KH %in% KH_vals & sigmaH %in% c(100, Inf)) ) %>% 
+  filter(median_R0 > 0) %>%
+  mutate(abs_median = abs(median)) %>% 
+  mutate(sign_median = sign(median)) %>% 
+  filter(sign_median != 0, !is.na(sign_median)) %>% 
+  # filter(!(focal_var %in% c("Immature development rate", "Prob. of immature survival", "Eggs per female per day", "Vector competence", "Adult lifespan"))) %>% 
+  arrange(sign_median) %>% 
+  arrange(Temperature) 
+  
+
+plot.dR0dk <- dR0dk.df  %>% 
+  # Make a stacked plot, colored by parameter
+  ggplot(aes(x = Temperature, y = abs_median, color = focal_var, linetype = (as.factor(sign_median)))) +
+  geom_line(lwd = 1) +
+  scale_color_manual(
+    name = "Focal trait:",
+    values = rev(c4a("misc.okabe", 7))
+  ) +
+  scale_x_continuous(
+    # limits = Temp_range_for_plot,
+    expand = c(0, 0)
+  ) +
+  scale_y_continuous(
+    name = unname(TeX("Local sensitivity of $R_0$")),
+    limits = 10^c(-4, 3),
+    breaks = 10^(seq(-4,3)), 
+    labels = TeX(c("$10^{-4}$", "$10^{-3}$", "$10^{-2}$", "$10^{-1}$", "$10^0$", "$10^1$", "$10^2$", "$10^3$")),
+    trans = 'log10',
+    expand = c(0,0)
+  ) +
+  scale_linetype_manual(
+    name = "Sign of sensitivity:",
+    values = c(1,3),
+    breaks = c(1,-1),
+    labels = c("Positive", "Negative")
+  ) +
+  facet_rep_grid(
+    cols = vars(system_label),
+    rows = vars(KH, sigmaH),
+    labeller = labeller(
+      sigmaH = as_labeller(appender_sigmaH, default = label_parsed),
+      KH = as_labeller(appender_KH, default = label_parsed)
+    ),
+    scales = "free"
+  ) +
+  guides(linetype = guide_legend(
+    title.position = "left",
+    title.vjust = 0.5,
+    direction = "vertical")) +
+  theme_minimal_hgrid() +
+  theme(
+    legend.margin = margin(0, 0, 0, 0),
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 10),
+    legend.position = "bottom",
+    legend.justification = 0.5,
+    axis.title.x = element_text(hjust = 0.5),
+    strip.text.x = ggtext::element_markdown(
+      size = 10,
+      hjust = 0,
+      padding = margin(0, 0, 0, 0),
+      margin = margin(1, 1, 1, 1)
+    )
+  )
+
+# shift_legend(plot.R0.rel.sens)
+plot.dR0dk
+
+```
+
+```{r fig-S9_ddTR0_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:ddTR0_unc} The uncertainty in the sensitivity of $\\mathcal{R}_0$ with respect to temperature.'}
 
 # !!! [] just compare "low host availability (sigmaH = 50, KH = 1 or 10)" and
 #        "high host availability (sigmaH = Inf, KH = 100)" scenarios
@@ -1845,10 +1945,10 @@ plot.ddTR0.rel.sens <- ddTR0.HPD %>%
   filter(KH %in% c(1) & sigmaH %in% c(100, Inf)) %>%
   # filter(!(KH == 100 & sigmaH == Inf)) %>%
   # filter(rel_HPD_width != 0) %>%
-  # For each KH value, sum up all sensitivity values to get total sensitivity across parameters
+  # For each KH value, sum up all uncertainty values to get total uncertainty across parameters
   group_by(system_ID, sigmaH, KH, Temperature) %>%
   mutate(sens_total = sum(rel_HPD_width)) %>%
-  # Divide each sensitivity value by the total sensitivity
+  # Divide each uncertainty value by the total uncertainty
   mutate(sens_rel = rel_HPD_width / sens_total) %>%
   arrange(sens_rel) %>%
   arrange(focal_var) %>%
@@ -1895,7 +1995,9 @@ plot.ddTR0.rel.sens
 
 ```
 
-```{r fig-S10_Topt_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt_sens} The sensitivity of the thermal optimum to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$.'}
+
+
+```{r fig-S10_Topt_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt_unc} The uncertainty of the thermal optimum to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$.'}
 
 # !!! mention the value of sigmaH
 
@@ -1906,10 +2008,10 @@ plot.Topt.rel.sens <- Topt.HPD %>%
   filter(!is.na(HPD_width)) %>% 
   pathosystem_labeller() %>%
   filter(!is.na(rel_HPD_width)) %>%
-  # For each KH value, sum up all sensitivity values to get total sensitivity
+  # For each KH value, sum up all uncertainty values to get total uncertainty
   group_by(system_ID, sigmaH, KH) %>%
   mutate(sens_total = sum(rel_HPD_width)) %>%
-  # Divide each sensitivity value by the total sensitivity
+  # Divide each uncertainty value by the total uncertainty
   mutate(sens_rel = rel_HPD_width / sens_total) %>% 
   # Make a stacked plot, colored by parameter
   ggplot(aes(x = KH, y = sens_rel, fill = focal_var)) +
@@ -1945,11 +2047,11 @@ plot.Topt.rel.sens <- Topt.HPD %>%
 shift_legend(plot.Topt.rel.sens)
 ```
 
-```{r fig-S10_2_dToptdKH_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt_sens} The sensitivity of the thermal optimum to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$.'}
+```{r fig-S10_2_dToptdKH_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt_unc} The uncertainty in the sensitivity of the thermal optimum to host availability as a function of vertebrate host population density when $\\sigma_H = 50$.'}
 
 
 
-dToptdKH.HPD <- read_rds("results/dToptdKH_HPD_sens.rds") %>%
+dToptdKH.HPD <- read_rds("results/dToptdKH_HPD_unc.rds") %>%
   ungroup() %>%
   distinct() %>% 
   filter(!is.na(HPD_width)) %>% 
@@ -1967,10 +2069,10 @@ dToptdKH.HPD <- read_rds("results/dToptdKH_HPD_sens.rds") %>%
                            )
   )) %>% 
   filter(!is.na(rel_HPD_width)) %>%
-  # For each KH value, sum up all sensitivity values to get total sensitivity
+  # For each KH value, sum up all uncertainty values to get total uncertainty
   group_by(system_ID, sigmaH, KH) %>%
   mutate(sens_total = sum(rel_HPD_width)) %>%
-  # Divide each sensitivity value by the total sensitivity
+  # Divide each uncertainty value by the total uncertainty
   mutate(sens_rel = rel_HPD_width / sens_total) # %>%
 # arrange(sens_rel)
 
@@ -2011,16 +2113,16 @@ plot.dToptdKH.rel.sens <- dToptdKH.HPD %>%
 shift_legend(plot.dToptdKH.rel.sens)
 ```
 
-```{r fig-S11_CTmin_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTmin_sens} The sensitivity of the critical thermal minimum to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$ and $\\sigma_H=\\infty$.'}
+```{r fig-S11_CTmin_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTmin_unc} The uncertainty of the critical thermal minimum to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$ and $\\sigma_H=\\infty$.'}
 
 CTmin_df <- CT.HPD %>%
   filter(variable == "CTmin") %>%
   filter(sigmaH %in% c(100, Inf)) %>%
   filter(!is.na(rel_HPD_width)) %>%
-  # For each KH value, sum up all sensitivity values to get total sensitivity
+  # For each KH value, sum up all uncertainty values to get total uncertainty
   group_by(system_ID, sigmaH, KH) %>%
   mutate(sens_total = sum(rel_HPD_width)) %>%
-  # Divide each sensitivity value by the total sensitivity
+  # Divide each uncertainty value by the total uncertainty
   mutate(sens_rel = rel_HPD_width / sens_total) #%>%
 
   # Make a stacked plot, colored by parameter
@@ -2066,16 +2168,16 @@ plot.CTmin.rel.sens <- CTmin_df %>%
 plot.CTmin.rel.sens
 ```
 
-```{r fig-S12_CTmax_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTmax_sens} The sensitivity of the critical thermal maximum to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$ and $\\sigma_H=\\infty$.'}
+```{r fig-S12_CTmax_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTmax_unc} The uncertainty of the critical thermal maximum to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$ and $\\sigma_H=\\infty$.'}
 
 plot.CTmax.rel.sens <- CT.HPD %>%
   filter(variable == "CTmax") %>%
   filter(sigmaH %in% c(100, Inf)) %>%
   filter(!is.na(rel_HPD_width)) %>%
-  # For each KH value, sum up all sensitivity values to get total sensitivity
+  # For each KH value, sum up all uncertainty values to get total uncertainty
   group_by(system_ID, sigmaH, KH) %>%
   mutate(sens_total = sum(rel_HPD_width)) %>%
-  # Divide each sensitivity value by the total sensitivity
+  # Divide each uncertainty value by the total uncertainty
   mutate(sens_rel = rel_HPD_width / sens_total) %>%
   # Make a stacked plot, colored by parameter
   ggplot(aes(x = KH, y = sens_rel, fill = focal_var)) +
@@ -2122,16 +2224,16 @@ plot.CTmax.rel.sens
 
 
 
-```{r fig-S13_CTwidth_sensitivity, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTwidth_sens} The sensitivity of the thermal niche width to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$ and $\\sigma_H=\\infty$.'}
+```{r fig-S13_CTwidth_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTwidth_unc} The uncertainty of the thermal niche width to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$ and $\\sigma_H=\\infty$.'}
 
 plot.CTwidth.rel.sens <- CT.HPD %>%
   filter(variable == "CTwidth") %>%
   filter(sigmaH %in% c(100, Inf)) %>%
   filter(!is.na(rel_HPD_width)) %>%
-  # For each KH value, sum up all sensitivity values to get total sensitivity
+  # For each KH value, sum up all uncertainty values to get total uncertainty
   group_by(system_ID, sigmaH, KH) %>%
   mutate(sens_total = sum(rel_HPD_width)) %>%
-  # Divide each sensitivity value by the total sensitiviWty
+  # Divide each uncertainty value by the total sensitiviWty
   mutate(sens_rel = rel_HPD_width / sens_total) %>%
   # Make a stacked plot, colored by parameter
   ggplot(aes(x = KH, y = sens_rel, fill = focal_var)) +
