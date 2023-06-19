@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (MiKTeX 21.10) (preloaded format=pdflatex 2022.1.20)  18 JUN 2023 14:17
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (MiKTeX 21.10) (preloaded format=pdflatex 2022.1.20)  18 JUN 2023 20:24
 entering extended mode
 **F:/GitHub/thermal-properties-mbps/doc/manuscript-figures.tex
 (F:/GitHub/thermal-properties-mbps/doc/manuscript-figures.tex
@@ -563,9 +563,6 @@ File: l3backend-pdftex.def 2021-10-18 L3 backend support: PDF output (pdfTeX)
 \l__pdf_internal_box=\box62
 ) (manuscript-figures.aux
 
-LaTeX Warning: Label `fig:R0_unc' multiply defined.
-
-
 LaTeX Warning: Label `fig:Topt_unc' multiply defined.
 
 )
@@ -871,28 +868,28 @@ es_files/figure-latex/fig-S7_CT_distributions-1.pdf  used on input line 205.
 [11 <F:/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-late
 x/fig-S6_CT_Range-1.pdf>]
 <F:/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-latex/fi
-g-S8_R0_uncertainty-1.pdf, id=186, 650.43pt x 433.62pt>
-File: F:/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-lat
-ex/fig-S8_R0_uncertainty-1.pdf Graphic file (type pdf)
-<use F:/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-late
-x/fig-S8_R0_uncertainty-1.pdf>
-Package pdftex.def Info: F:/GitHub/thermal-properties-mbps/doc/manuscript-figur
-es_files/figure-latex/fig-S8_R0_uncertainty-1.pdf  used on input line 214.
-(pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
-[12 <F:/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-late
-x/fig-S7_CT_distributions-1.pdf>]
-<F:/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-latex/fi
-g-S8_2_dR0dvar_uncertainty-1.pdf, id=198, 650.43pt x 433.62pt>
+g-S8_2_dR0dvar_uncertainty-1.pdf, id=186, 650.43pt x 433.62pt>
 File: F:/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-lat
 ex/fig-S8_2_dR0dvar_uncertainty-1.pdf Graphic file (type pdf)
 <use F:/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-late
 x/fig-S8_2_dR0dvar_uncertainty-1.pdf>
 Package pdftex.def Info: F:/GitHub/thermal-properties-mbps/doc/manuscript-figur
-es_files/figure-latex/fig-S8_2_dR0dvar_uncertainty-1.pdf  used on input line 22
-3.
+es_files/figure-latex/fig-S8_2_dR0dvar_uncertainty-1.pdf  used on input line 21
+4.
+(pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
+[12 <F:/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-late
+x/fig-S7_CT_distributions-1.pdf>]
+<F:/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-latex/fi
+g-S8_R0_uncertainty-1.pdf, id=198, 650.43pt x 433.62pt>
+File: F:/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-lat
+ex/fig-S8_R0_uncertainty-1.pdf Graphic file (type pdf)
+<use F:/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-late
+x/fig-S8_R0_uncertainty-1.pdf>
+Package pdftex.def Info: F:/GitHub/thermal-properties-mbps/doc/manuscript-figur
+es_files/figure-latex/fig-S8_R0_uncertainty-1.pdf  used on input line 223.
 (pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
 [13 <F:/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-late
-x/fig-S8_R0_uncertainty-1.pdf>]
+x/fig-S8_2_dR0dvar_uncertainty-1.pdf>]
 <F:/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-latex/fi
 g-S9_ddTR0_uncertainty-1.pdf, id=213, 650.43pt x 433.62pt>
 File: F:/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-lat
@@ -903,7 +900,7 @@ Package pdftex.def Info: F:/GitHub/thermal-properties-mbps/doc/manuscript-figur
 es_files/figure-latex/fig-S9_ddTR0_uncertainty-1.pdf  used on input line 232.
 (pdftex.def)             Requested size: 469.76817pt x 313.17879pt.
 [14 <F:/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-late
-x/fig-S8_2_dR0dvar_uncertainty-1.pdf>]
+x/fig-S8_R0_uncertainty-1.pdf>]
 <F:/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-latex/fi
 g-S10_Topt_uncertainty-1.pdf, id=226, 650.43pt x 433.62pt>
 File: F:/GitHub/thermal-properties-mbps/doc/manuscript-figures_files/figure-lat
@@ -968,10 +965,10 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 17282 strings out of 478681
- 285456 string characters out of 2846535
- 650516 words of memory out of 3000000
- 34938 multiletter control sequences out of 15000+600000
+ 17283 strings out of 478681
+ 285473 string characters out of 2846535
+ 650620 words of memory out of 3000000
+ 34939 multiletter control sequences out of 15000+600000
  452047 words of font info for 109 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  74i,6n,77p,3286b,340s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -988,7 +985,7 @@ s/kydah/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr12.pfb><C:/Users
 kydah/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr7.pfb><C:/Users/ky
 dah/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri10.pfb><C:/Users/ky
 dah/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy10.pfb>
-Output written on manuscript-figures.pdf (20 pages, 4938687 bytes).
+Output written on manuscript-figures.pdf (20 pages, 4955103 bytes).
 PDF statistics:
  366 PDF objects out of 1000 (max. 8388607)
  45 named destinations out of 1000 (max. 500000)
