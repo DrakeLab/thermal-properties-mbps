@@ -35,8 +35,6 @@ library(zplyr) # from https://github.com/burchill/zplyr/ # only needed for placi
 
 # Plot settings ----
 
-# !!! [] make sure all plots have font size set at 11 max, unless necessary
-
 # Set theme
 theme_set(theme_minimal(10))
 
@@ -53,7 +51,7 @@ inf_skew_func <- function(df, skew, divide, n_rows_to_add) {
 
   # Create a proxy sigmaH variable that replaces Inf with the value of "skew"
   df <- mutate(df, sigmaH_proxy = ifelse(is.finite(sigmaH),
-                                         sigmaH, skew
+    sigmaH, skew
   ))
 
   # add more proxy sigmaH values to make a "spread" at Inf
@@ -62,7 +60,7 @@ inf_skew_func <- function(df, skew, divide, n_rows_to_add) {
     bump_val <- 1 + 0.05 * (i - 1)
     temp <- filter(df, is.infinite(sigmaH)) %>%
       mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH,
-                                   added_sigma_vals[i]
+        added_sigma_vals[i]
       ))
     df <- add_row(df, temp) %>% distinct()
   }
@@ -71,20 +69,21 @@ inf_skew_func <- function(df, skew, divide, n_rows_to_add) {
 
 # Label functions:
 appender_sigmaH <- function(string) {
-  ifelse(string == "Inf", 
-         unname(TeX(paste("$\\sigma_H = \\infty$"))),
-         unname(TeX(paste("$\\sigma_H = $", string))))
+  ifelse(string == "Inf",
+    unname(TeX(paste("$\\sigma_H = \\infty$"))),
+    unname(TeX(paste("$\\sigma_H = $", string)))
+  )
 }
 appender_KH <- function(string) {
   unname(TeX(paste("$K_H = $", string)))
 }
 
 sens_labels <- as_labeller(c(
-        "(a) *Ae. aegypti* and DENV" = "(a) *Ae. aegypti* and  \nDENV",
-      "(b) *Ae. aegypti* and ZIKV" = "(b) *Ae. aegypti* and   \nZIKV",
-      "(c&#41; *Ae. albopictus* and DENV" = "(c&#41; *Ae. albopictus*  \nand DENV",
-      "(d) *An. gambiae* and *P. falciparum*" = "(d) *An. gambiae* and  \n*P. falciparum*",
-      "(e) *Cx. quinquefasciatus* and WNV" = "(e) *Cx. quinquefasciatus*  \nand  WNV"
+  "(a) *Ae. aegypti* and DENV" = "(a) *Ae. aegypti* and  \nDENV",
+  "(b) *Ae. aegypti* and ZIKV" = "(b) *Ae. aegypti* and   \nZIKV",
+  "(c&#41; *Ae. albopictus* and DENV" = "(c&#41; *Ae. albopictus*  \nand DENV",
+  "(d) *An. gambiae* and *P. falciparum*" = "(d) *An. gambiae* and  \n*P. falciparum*",
+  "(e) *Cx. quinquefasciatus* and WNV" = "(e) *Cx. quinquefasciatus*  \nand  WNV"
 ))
 
 # Helper function: place legends in empty facets of plot grids
@@ -114,113 +113,90 @@ pathosystem_labeller <- function(df) {
   return(df)
 }
 
-# Load required data ----
+# Helper function: apply nice labels for focal variables
+focalvar_labeller <- function(df) {
+  df <- df %>%
+    mutate(focal_var = ifelse(focal_var == "muV", "lf", focal_var)) %>%
+    mutate(focal_var = factor(focal_var,
+      levels = c("lf", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
+      labels = c(
+        TeX("Adult lifespan"),
+        TeX("Biting frequency"),
+        TeX("Eggs per female per day"),
+        TeX("Immature development rate"),
+        TeX("Prob. of immature survival"),
+        TeX("Prob. of surviving EIP"),
+        TeX("Vector competence")
+      )
+    ))
+}
 
-# !!! [] make sure all data is getting loaded here
+# Load required data ----
 
 eps <- .Machine$double.eps
 
 # Vector trait TPC data
 data.Vec <- read_rds("results/VecTPC_vals.rds") %>%
-  #
   pathosystem_labeller()
+
 # R0 data
-# !!! [] needs to be updated to include 1e-1, 1e0, 1e1
 data.R0_TPCs <- read_rds("results/R0_TPC_vals.rds") %>%
   pathosystem_labeller()
 
 data.R0 <- read_rds("results/R0_vals.rds") %>%
   pathosystem_labeller()
+
 # Topt data
 data.Topt <- read_rds("results/Topt_vals.rds") %>%
   pathosystem_labeller()
+
 # Critical thermal extrema data
 data.CT <- read_rds("results/CT_vals.rds") %>%
   pathosystem_labeller()
-# Local sensitivity of R0 to mosquito traits
-data.dR0dvar <- read_rds("results/dR0dk_vals.rds") %>% 
-  ungroup() %>% 
-  pathosystem_labeller() %>%
-    mutate(focal_var = factor(focal_var,
-                           levels = c("lf", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
-                           labels = c(
-                             TeX("Adult lifespan"),
-                             TeX("Biting frequency"),
-                             TeX("Eggs per female per day"),
-                             TeX("Immature development rate"),
-                             TeX("Prob. of immature survival"),
-                             TeX("Prob. of surviving EIP"),
-                             TeX("Vector competence")
-                           )
-  ))
 
+# Local sensitivity of R0 to mosquito traits
+data.dR0dvar <- read_rds("results/dR0dk_vals.rds") %>%
+  ungroup() %>%
+  pathosystem_labeller() %>%
+  focalvar_labeller()
+
+# Densities of CTmin/max and Topt
+all.density.df <- read_rds("results/CTminmaxTopt_densities.rds") %>%
+  ungroup() %>%
+  pathosystem_labeller() %>%
+  filter(KH > 0.01)
 
 # Uncertainty data for R0
 R0.HPD <- read_rds("results/R0_HPD_unc.rds") %>%
   ungroup() %>%
   pathosystem_labeller() %>%
-    mutate(focal_var = factor(focal_var,
-                           levels = c("muV", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
-                           labels = c(
-                             TeX("Adult lifespan"),
-                             TeX("Biting frequency"),
-                             TeX("Eggs per female per day"),
-                             TeX("Immature development rate"),
-                             TeX("Prob. of immature survival"),
-                             TeX("Prob. of surviving EIP"),
-                             TeX("Vector competence")
-                           )
-  ))
+  focalvar_labeller()
 
+# Uncertainty data for the derivative of R0 wrt temperature
 ddTR0.HPD <- read_rds("results/ddTR0_HPD_unc.rds") %>%
   ungroup() %>%
   pathosystem_labeller() %>%
-    mutate(focal_var = factor(focal_var,
-                           levels = c("muV", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
-                           labels = c(
-                             TeX("Adult lifespan"),
-                             TeX("Biting frequency"),
-                             TeX("Eggs per female per day"),
-                             TeX("Immature development rate"),
-                             TeX("Prob. of immature survival"),
-                             TeX("Prob. of surviving EIP"),
-                             TeX("Vector competence")
-                           )
-  ))
+  focalvar_labeller()
 
 # Uncertainty data for Topt
 Topt.HPD <- read_rds("results/Topt_HPD_unc.rds") %>%
   ungroup() %>%
   pathosystem_labeller() %>%
-    mutate(focal_var = factor(focal_var,
-                           levels = c("lf", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
-                           labels = c(
-                             TeX("Adult lifespan"),
-                             TeX("Biting frequency"),
-                             TeX("Eggs per female per day"),
-                             TeX("Immature development rate"),
-                             TeX("Prob. of immature survival"),
-                             TeX("Prob. of surviving EIP"),
-                             TeX("Vector competence")
-                           )
-  ))
+  focalvar_labeller()
 
 # Uncertainty data for critical thermal extrema
 CT.HPD <- read_rds("results/CT_HPD_unc.rds") %>%
   ungroup() %>%
   pathosystem_labeller() %>%
-    mutate(focal_var = factor(focal_var,
-                           levels = c("muV", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
-                           labels = c(
-                             TeX("Adult lifespan"),
-                             TeX("Biting frequency"),
-                             TeX("Eggs per female per day"),
-                             TeX("Immature development rate"),
-                             TeX("Prob. of immature survival"),
-                             TeX("Prob. of surviving EIP"),
-                             TeX("Vector competence")
-                           )
-  ))
+  focalvar_labeller()
+
+# Derivative of Topt with respect to host pop. density
+dToptdKH.HPD <- read_rds("results/dToptdKH_HPD_unc.rds") %>%
+  ungroup() %>%
+  distinct() %>%
+  filter(!is.na(HPD_width)) %>%
+  pathosystem_labeller() %>%
+  focalvar_labeller()
 
 # Configure data sets for plotting ----
 
@@ -236,9 +212,10 @@ mean.Vec <- data.Vec %>%
   mutate(etaL = rhoL / (deltaL + eps)) %>%
   mutate(muL = etaL - rhoL) %>%
   mutate(V0 = ifelse(sigmaV_f * deltaL < (1 / lf),
-                     0,
-                     KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL))
+    0,
+    KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL))
   ))
+
 # Median values (this one is used more frequently)
 median.Vec <- data.Vec %>%
   select(-c(mosquito_species, pathogen, muL, etaL)) %>%
@@ -248,11 +225,10 @@ median.Vec <- data.Vec %>%
   ungroup() %>%
   pivot_wider(names_from = "variable", values_from = "median") %>%
   mutate(etaL = rhoL / (deltaL + eps)) %>%
-  # Aquatic-stage mosquito mortality rate. This should be ~infinite if deltaL = 0
   mutate(muL = etaL - rhoL) %>%
   mutate(V0 = ifelse(sigmaV_f * deltaL < (1 / lf),
-                     0,
-                     KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL))
+    0,
+    KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL))
   ))
 
 # Compute *mosquito* thermal tolerance range (minimum and maximum)
@@ -268,7 +244,7 @@ MosqThermRange_df <- mean.Vec %>%
 
 # Figures
 
-```{r fig-1_contact_comparison, dev = c('pdf','svg', 'png'), out.width='100%', fig.align='center', fig.height=5, fig.width=7, fig.align='center', fig.cap='\\label{fig:contact_comparison} A comparison of the Ross-Macdonald and Chitnis contact rate formulations.'}
+```{r fig-1_contact_comparison, dev = c('pdf','svg', 'png'), out.width='100%', fig.align='center', fig.height=5, fig.width=7, fig.align='center', fig.cap='\\label{fig:contact_comparison} A comparison of the Chitnis dynamic contact rate and the standard Ross-Macdonald contact rate models. In the left columns, mosquito population is held constant while in the right columns host population density is held constant. Upper panel: In the Ross-Macdonald model, the mosquito biting rate is constant with respect to both host and mosquito population density (a and b, blue lines) while in the Chitnis model mosquito biting increases with host population density (a, red curve) and decreases with mosquito population density (b, red curve). Lower panels: The relationships between the number of bites that a host receives per day and host and mosquito densities diverge at low host population densities (c) and, to a lesser extent, at high mosquito densities (d). For plots (a) and (c), mosquito population density is fixed at 1000 individuals per km2. For plots (b) and (d), host population density is fixed at 10 individuals per square kilometer. Maximum mosquito biting rate is 0.45 bites per mosquito per day and maximum host biting rate is 100 bites per host per day. Mosquito and host population densities are plotted on a logarithmic scale. '}
 # resolution setting
 resolution <- 1E2
 
@@ -302,16 +278,16 @@ host_vector_contact_func <- function(df) {
 ## Set up density ranges
 host_density_range <- c(1E0, 1E3)
 host_fixed_value <- 10
-host_density_vec <- sort(c(10^seq(log10(host_density_range[1]), 
-                                  log10(host_density_range[2]),
-                                  length.out = resolution
+host_density_vec <- sort(c(10^seq(log10(host_density_range[1]),
+  log10(host_density_range[2]),
+  length.out = resolution
 ), host_fixed_value))
 
 vector_density_range <- c(1E0, 1E3)
 vector_fixed_value <- 1000
-vector_density_vec <- sort(c(10^seq(log10(vector_density_range[1]), 
-                                    log10(vector_density_range[2]),
-                                    length.out = resolution
+vector_density_vec <- sort(c(10^seq(log10(vector_density_range[1]),
+  log10(vector_density_range[2]),
+  length.out = resolution
 ), vector_fixed_value))
 
 ## Set other parameters
@@ -343,8 +319,7 @@ contact_df <- expand.grid(
 ## Put plots together:
 new_df <- contact_df %>%
   filter(`Mosquito population density` == vector_fixed_value |
-           `Host population density` == host_fixed_value) %>%
-  # filter(`Bites per host per day` < 1E3) %>%
+    `Host population density` == host_fixed_value) %>%
   select(-sigma_V, -sigma_H, -model) %>%
   melt(
     id = c(
@@ -376,7 +351,7 @@ plot_HD_MC <- new_df %>%
   geom_blank(aes(y = y_max)) +
   # plot labels
   geom_abs_text(aes(xpos = 0.08, ypos = 0.89, label = label),
-                color = "black", show.legend = FALSE
+    color = "black", show.legend = FALSE
   ) +
   # x-axis:
   scale_x_log10(
@@ -386,8 +361,7 @@ plot_HD_MC <- new_df %>%
   # y-axis:
   scale_y_continuous(
     name = "Bites per mosquito per day",
-    expand = c(0, 0),
-    # limits = c(0, NA)
+    expand = c(0, 0)
   )
 
 # x = Mosquito population density, y = Bites per mosquito per day
@@ -400,7 +374,7 @@ plot_MD_MC <- new_df %>%
   geom_blank(aes(y = y_max)) +
   # plot labels
   geom_abs_text(aes(xpos = 0.08, ypos = 0.89, label = label),
-                color = "black", show.legend = FALSE
+    color = "black", show.legend = FALSE
   ) +
   # x-axis:
   scale_x_log10(
@@ -427,7 +401,7 @@ plot_MD_HC <- new_df %>%
   geom_blank(aes(y = y_max)) +
   # plot labels
   geom_abs_text(aes(xpos = 0.08, ypos = 0.89, label = label),
-                color = "black", show.legend = FALSE
+    color = "black", show.legend = FALSE
   ) +
   # x-axis:
   scale_x_log10(
@@ -452,7 +426,7 @@ plot_HD_HC <- new_df %>%
   geom_blank(aes(y = y_max)) +
   # plot labels
   geom_abs_text(aes(xpos = 0.08, ypos = 0.89, label = label),
-                color = "black", show.legend = FALSE
+    color = "black", show.legend = FALSE
   ) +
   # x-axis:
   scale_x_log10(
@@ -490,7 +464,7 @@ contact_plot <- plot_grid(contact_plot, legend, ncol = 1, rel_heights = c(1, .05
 contact_plot
 ```
 
-```{r fig-3_MosquitoThermalTraits, dev = c('pdf','svg', 'png'),  out.width='100%', fig.height=6, fig.width=9, fig.align='center', fig.cap='\\label{fig:MosquitoThermalTraits} Thermal performance curves for the mosquito and parasite traits used in our model. The range of temperatures is restricted to values where the immature development rate is positive. For traits that do not involve a parasite, \\textit{Aedes aegypti} with DENV and \\textit{Ae. aegypti} with ZIKV curves overlap.'}
+```{r fig-3_MosquitoThermalTraits, dev = c('pdf','svg', 'png'),  out.width='100%', fig.height=6, fig.width=9, fig.align='center', fig.cap='\\label{fig:MosquitoThermalTraits} Thermal performance curves (TPCs) for the mosquito and parasite traits used in our model. Curves are shown in color for each of the five systems we considered. Temperatures vary from 10\textdegree C to 35\textdegree C to encompass the full thermal niche of all mosquito species considered in this study (defined as the range of temperatures at which all traits for a given species are positive). Each trait is a unimodal function of temperature except for the lifespan of \\textit{Culex quinquefasciatus} (d). Recruitment rate (a) is derived from a sub-model of immature mosquito population dynamics in equations  (2.6) and (2.7. The \\textit{Aedes aegypti} and DENV and \\textit{Ae. aegypti} and ZIKV recruitment rate (a) and maximum biting frequency (b) curves overlap because infection is assumed to not affect these traits (but see Tesla et al. (2018)). All functions and parameters for generating these curves are derived from Mordecai et al., 2013, 2017, 2019; Tesla et al., 2018; Shocket et al., 2020. Shown here are the median values of the mosquito traits with respect to their TPC hyperparameter posterior distributions. A full description of how these curves were obtained is available in Appendix S2: Section S1.'}
 ## Set up plot dataframe
 MosqThermTraits_df <- median.Vec %>%
   # Mortality rate
@@ -502,20 +476,19 @@ MosqThermTraits_df <- median.Vec %>%
   # Prob. of larval survival
   # Select relevant traits and parameters
   select(Temperature, system_ID, sigmaV, sigmaV_f, rhoL, lf, deltaL, P_EIP, betaV) %>%
-  # select(Temperature, system_ID, lambdaV, sigmaV, betaV, lf, P_EIP) %>%
   # Turn all columns except Temperature and system_ID into variables
   melt(id = c("Temperature", "system_ID")) %>%
   mutate(variable = factor(variable,
-                           levels = c("lf", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "P_EIP", "betaV"),
-                           labels = c(
-                             TeX("(a) Adult lifespan: $1/\\mu_V$ (days)"),
-                             TeX("(b) Biting frequency: $\\sigma_V$ (day$^{-1}$)"),
-                             TeX("(c) Eggs per female per day: $\\sigma_V f$"),
-                             TeX("(d) Immature development rate: $\\rho_L$ (day$^{-1}$)"),
-                             TeX("(e) Prob. of immature survival: $\\delta_L$"),
-                             TeX("(f) Prob. of surviving EIP: $\\theta_V$"),
-                             TeX("(g) Vector competence: $\\beta_V$")
-                           )
+    levels = c("lf", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "P_EIP", "betaV"),
+    labels = c(
+      TeX("(a) Adult lifespan: $1/\\mu_V$ (days)"),
+      TeX("(b) Biting frequency: $\\sigma_V$ (day$^{-1}$)"),
+      TeX("(c) Eggs per female per day: $\\sigma_V f$"),
+      TeX("(d) Immature development rate: $\\rho_L$ (day$^{-1}$)"),
+      TeX("(e) Prob. of immature survival: $\\delta_L$"),
+      TeX("(f) Prob. of surviving EIP: $\\theta_V$"),
+      TeX("(g) Vector competence: $\\beta_V$")
+    )
   )) %>%
   group_by(Temperature, system_ID)
 
@@ -550,8 +523,8 @@ MosqThermTraits_plot <- MosqThermTraits_df %>%
   ) +
   # faceting:
   facet_wrap(~variable,
-             nrow = 3, scales = "free",
-             labeller = labeller(variable = label_parsed)
+    nrow = 3, scales = "free",
+    labeller = labeller(variable = label_parsed)
   ) +
   # legend:
   guides(color = guide_legend(override.aes = list(size = 4))) +
@@ -574,19 +547,7 @@ MosqThermTraits_plot <- MosqThermTraits_df %>%
 shift_legend(MosqThermTraits_plot)
 ```
 
-```{r fig-4_R0_TPCs, dev = c('pdf','svg', 'png'),  message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:R0_plots} ${R}_0$ as a function of temperature has the properties of a thermal performance curve (TPC): it is positive on a single bounded interval and has a unique maximum value.'}
-# Plot R0 vs. temperature curves. One plot for each pathosysten
-# One curve for Ross-Macdonald and a few illustrative examples for Chitnis
-
-# x-axes = temperature
-# y-axes = R0 (normalized so that max(R0) = 1)
-# plots = one for each mosquito+pathogen combination, "system_ID"
-# curve 1 = Ross-Macdonald R0 (shape doesn't depend on KH)
-# curves  = Chitnis dynamic R0,
-#   - colour = value of KH. place it on a color scale in the bottom right corner
-
-# R0 as a function of temperature, separate curves across values of KH and sigmaH
-
+```{r fig-4_R0_TPCs, dev = c('pdf','svg', 'png'),  message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:R0_plots} $\\mathcal{R}_0$ as a function of temperature has the usual properties of a thermal performance curve (TPC): it is positive on a single bounded interval and has a unique maximum value. The shape of the $\\mathcal{R}_0$ TPC depends on vertebrate host availability and the mosquito-parasite system. The shape of the thermal response of $\\mathcal{R}_0$ derived from the Ross-Macdonald model (dotted black curves) is independent of vertebrate host population density while those derived from the Chitnis dynamic model are dependent on vertebrate host population density (solid lines in color). Shown here are the median values of $\\mathcal{R}_0$ with respect to the mosquito trait TPC posterior distributions. $\\mathcal{R}_0$ is normalized by dividing by its maximum value in each system, for the given value of biting tolerance and vertebrate host population density. Vertebrate host population density is varied on a log$_{10}$ scale.'}
 # Plot R0 vs. temperature curves. One plot for each system
 # One curve for Ross-Macdonald, a few for Chitnis
 
@@ -698,7 +659,7 @@ R0_plot <- ggplot(mapping = aes(x = Temperature, group = KH)) +
 shift_legend(R0_plot)
 ```
 
-```{r fig-5_Topt, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt} The thermal optimum for transmission, $T_{opt}$, may be sensitive to vertebrate host population density and biting tolerance.'}
+```{r fig-5_Topt, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt} The thermal optimum for transmission, $T_{\\mathrm{opt}}$, may be sensitive to vertebrate host population density and biting tolerance. Here, $T_{\\mathrm{opt}}$ is plotted as a function of vertebrate host population density and biting tolerance for each of the five systems. In the Ross-Macdonald model, where biting tolerance is assumed to be infinite, $T_{\\mathrm{opt}}$ is independent of vertebrate host population density (upper bars in plots). But when biting tolerance is limited, $T_{\\mathrm{opt}}$ can vary as much as 5\textdegree C (d). $T_{\\mathrm{opt}}$ may increase (d) or decrease (a, b, c, e) as vertebrate host population density or biting tolerance is increased. Shown here are the median values of $T_{\\mathrm{opt}}$ with respect to the mosquito trait TPC posterior distributions. Both biting tolerance and vertebrate host population density are varied on a $\\log_{10}$ scale. $\\mathcal{R}_0$ is greater than one in the region contained within the black $\\mathcal{R}_0=1$ curve. All remaining parameters are given in Table 1 and Figure 3. '}
 # Shows how the transmission thermal optimum depends on vertebrate host availability (density and biting tolerance) in each of the systems we consider.
 
 #   x    = biting tolerance (with a point at infinity)
@@ -716,7 +677,7 @@ max_sigmaH <- max(filter(Toptalt_df, is.finite(sigmaH))$sigmaH)
 # Value of sigmaH to replace 'Inf' with for plotting
 infinite_skew <- 10^2.35
 # Used to create a gap dividing finite and infinite sigmaH
-infinite_divide <- 10^2.7 # 10^log10(max_sigmaH*1)
+infinite_divide <- 10^2.7
 
 Toptalt_df <- inf_skew_func(Toptalt_df, infinite_skew, infinite_divide, 8)
 
@@ -741,7 +702,6 @@ Toptalt_plots <- Toptalt_df %>%
     breaks = Topt_breaks
   ) +
   # Topt for INFINITE sigmaH:
-  # take median of median to hide variation from artifacts of uncertainty
   geom_contour_filled(
     data = filter(Toptalt_df, sigmaH_proxy > infinite_skew) %>%
       group_by(system_ID) %>%
@@ -749,7 +709,7 @@ Toptalt_plots <- Toptalt_df %>%
     size = 1,
     breaks = Topt_breaks
   ) +
-  # # R0 = 1 contour: cheat and use where CTwidth = 0 (i.e. where R0<1 at any temperature)
+  # # R0 = 1 contour: use where CTwidth = 0 (i.e. where R0<1 at any temperature)
   geom_contour(
     data = filter(data.CT, variable == "CTwidth", sigmaH < infinite_divide),
     aes(y = sigmaH, z = median, colour = "R0 = 1"),
@@ -771,13 +731,12 @@ Toptalt_plots <- Toptalt_df %>%
     breaks = sigmaH_breaks,
     labels = sigmaH_labels
   ) +
-
   # fill:
   scale_fill_manual(
     name = "Transmission thermal optimum (°C)",
     values = met.brewer("Johnson",
-                        n = length(Topt_breaks),
-                        direction = -1
+      n = length(Topt_breaks),
+      direction = -1
     )
   ) +
   # color:
@@ -795,10 +754,10 @@ Toptalt_plots <- Toptalt_df %>%
   facet_wrap(~system_label, scales = "free", nrow = 2, labeller = labeller()) +
   # legend:
   guides(fill = guide_coloursteps(
-        title.position = "top",
-        title.hjust = 0.5,
-        barwidth = 12,
-        show.limits = TRUE
+    title.position = "top",
+    title.hjust = 0.5,
+    barwidth = 12,
+    show.limits = TRUE
   )) +
   # theme options:
   theme_minimal(10) +
@@ -822,7 +781,7 @@ Toptalt_plots <- Toptalt_df %>%
 shift_legend(Toptalt_plots)
 ```
 
-```{r fig-6_CT_Width, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CT_Width} The parasite population thermal tolerance range, the range of temperatures at which parasite transmission is expected to persist, is widest when biting tolerance is high and vertebrate host population density is low.'}
+```{r fig-6_CT_Width, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CT_Width} The parasite population thermal niche, the range of temperatures at which parasite transmission is expected to persist, is widest when biting tolerance is high and vertebrate host population density is low. As vertebrate host population density approaches an upper threshold, the width of the parasite population thermal niche shrinks to zero. At low levels of biting tolerance, there is also a lower threshold to vertebrate host population density. Shown here are the median values of $\\textrm{CT}_{\\textrm{width}}$ with respect to the mosquito trait TPC posterior distributions. Vertebrate host population density and biting tolerance are both plotted on $\\log_{10}$ scales. Biting tolerance is varied from one to one thousand bites per day, with an additional point at infinity to illustrate the case where biting tolerance is unlimited (the Ross-Macdonald model). Both biting tolerance and vertebrate host population density are varied on a $\\log_{10}$ scale. All remaining parameters are given in Table 1 and Figure 3.'}
 # Shows how the parasite thermal niche (temperatures between CT_min and CT_max)
 # depends on vertebrate host availability (density and biting tolerance) in each
 # of the focal systems.
@@ -881,7 +840,7 @@ CTWidth_heat_plots <- CTwidth_df %>%
   guides(fill = guide_coloursteps(
     title.position = "top",
     title.hjust = 0.5,
-    barwidth = 12,#unit(5, "cm"),
+    barwidth = 12, # unit(5, "cm"),
     show.limits = TRUE
   )) +
   # theme options:
@@ -908,7 +867,7 @@ shift_legend(CTWidth_heat_plots)
 
 # Supplementary Figures
 
-```{r fig-S1_R0_heatmap_plots_all, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=11, fig.align='center', fig.cap='\\label{fig:R0_heatmap_plots_all} R0 heatmap expressing threshold (R0 = 1) as a contour and thermal optimum as ridges.'}
+```{r fig-S1_R0_heatmap_plots_all, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=11, fig.align='center', fig.cap='\\label{fig:R0_heatmap_plots_all} The transmission thermal optimum, $T_{\\textrm{opt}}$, is a sigmoidal function of vertebrate host population density. The variation in $T_{\\textrm{opt}}$ varies substantially between the five systems, with \\textit{Anopheles} spp. and \\textit{P. falciparum} (d) having an over 5\textdegree C change in $T_{\\textrm{opt}}$ as vertebrate host population density is increased. Note that the thermal optimum can be an increasing (d) or decreasing (a, b, c, e) function of vertebrate host population density. Shown here are the median values of $T_{\\textrm{opt}}$ with respect to mosquito trait TPC hyperparameter posterior distributions. Vertebrate host population density is varied on a $\\log_{10}$ scale. All remaining parameters are given in Table 1 and Figure 3.'}
 # Plot R0 vs. temperature and biting tolerance (sigmaH). One panel each for low, mid, high vert host pop density.
 
 # x = vertebrate host biting tolerance (needs to vary from "zero" to "infinity")
@@ -975,11 +934,11 @@ mylabels <- as_labeller(c(
 ))
 
 R0_heatmap_labels <- as_labeller(c(
-        "(a) *Ae. aegypti* and DENV" = "(a) *Ae. aegypti*  \nand  DENV",
-      "(b) *Ae. aegypti* and ZIKV" = "(b) *Ae. aegypti*  \nand  ZIKV",
-      "(c&#41; *Ae. albopictus* and DENV" = "(c&#41; *Ae. albopictus*  \nand  DENV",
-      "(d) *An. gambiae* and *P. falciparum*" = "(d) *An. gambiae*  \nand  *P. falciparum*",
-      "(e) *Cx. quinquefasciatus* and WNV" = "(e) *Cx. quinquefasciatus*  \nand  WNV"
+  "(a) *Ae. aegypti* and DENV" = "(a) *Ae. aegypti*  \nand  DENV",
+  "(b) *Ae. aegypti* and ZIKV" = "(b) *Ae. aegypti*  \nand  ZIKV",
+  "(c&#41; *Ae. albopictus* and DENV" = "(c&#41; *Ae. albopictus*  \nand  DENV",
+  "(d) *An. gambiae* and *P. falciparum*" = "(d) *An. gambiae*  \nand  *P. falciparum*",
+  "(e) *Cx. quinquefasciatus* and WNV" = "(e) *Cx. quinquefasciatus*  \nand  WNV"
 ))
 
 # Breaks used to decide fill for the heat map
@@ -1089,8 +1048,10 @@ R0_plot <- R0_df %>%
   facet_grid(
     rows = vars(KH),
     cols = vars(system_label),
-    labeller = labeller(.rows = mylabels,
-                        .cols = R0_heatmap_labels),
+    labeller = labeller(
+      .rows = mylabels,
+      .cols = R0_heatmap_labels
+    ),
     # repeat.tick.labels = "left"
   ) +
   # theme options:
@@ -1101,25 +1062,31 @@ R0_plot <- R0_df %>%
     legend.text.align = 0,
     strip.text.y = ggtext::element_markdown(
       size = 7,
-      hjust = 0.5),
+      hjust = 0.5
+    ),
     strip.text.x = ggtext::element_markdown(
       size = 7,
-      hjust = 0),
+      hjust = 0
+    ),
     panel.spacing = unit(2, "pt")
-    )
+  )
 
 # Plot it
 R0_plot
 ```
 
-```{r fig-S2_Topt_plots_varyKH, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt_plots_varyKH} The thermal optimum for transmission, $T_{opt}$, may be sensitive to vertebrate host population density and biting tolerance.'}
+```{r fig-S2_Topt_plots_varyKH, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt_plots_varyKH} The transmission thermal optimum, $T_{\\textrm{opt}}$, is a sigmoidal function of vertebrate host population density. The variation in $T_{\\textrm{opt}}$ varies substantially between the five systems, with \\textit{Anopheles} spp. and \\textit{P. falciparum} (d) having an over 5\textdegree C change in $T_{\\textrm{opt}}$ as vertebrate host population density is increased. Note that the thermal optimum can be an increasing (d) or decreasing (a, b, c, e) function of vertebrate host population density. Shown here are the median values of $T_{\\textrm{opt}}$ with respect to mosquito trait TPC hyperparameter posterior distributions. Vertebrate host population density is varied on a $\\log_{10}$ scale. All remaining parameters are given in Table 1 and Figure 3.'}
 Topt_df <- data.Topt %>%
   filter(KH < 10^4 + 1) %>%
-  pivot_wider(id_cols = c("system_label", "Model", "sigmaH", "KH"),
-              names_from = variable,
-              values_from = c("mean", "median", "lowHCI", "highHCI"))  %>%
-  rename(mean = mean_Topt, median = median_Topt, lowHCI = lowHCI_Topt,
-         highHCI = highHCI_Topt) %>%
+  pivot_wider(
+    id_cols = c("system_label", "Model", "sigmaH", "KH"),
+    names_from = variable,
+    values_from = c("mean", "median", "lowHCI", "highHCI")
+  ) %>%
+  rename(
+    mean = mean_Topt, median = median_Topt, lowHCI = lowHCI_Topt,
+    highHCI = highHCI_Topt
+  ) %>%
   # Arrange along the plotting variables
   arrange(system_label, KH, median, sigmaH) %>%
   ungroup()
@@ -1136,29 +1103,26 @@ Topt_plot <- Topt_df %>%
   scale_x_log10(
     name = TeX("Vertebrate host population density (ind/ha)"),
     expand = c(0, 0),
-    # limits = c(0.5, 150),
     breaks = c(10^c(seq(-1, 4, by = 1))),
     labels = TeX(c("$0.1$", "$1$", "$10", "$100$", "$10^3$", "$10^4$"))
-    ) +
+  ) +
   # y-axis
   scale_y_continuous(
     name = expression("Thermal optimum "(degree * C)),
-    expand = c(0,0), # c(0.05, 0.05),
-    limits = c(21,30.5), # mean: 21-31, median: 21-32
-    breaks = seq(21,32, by = 1)
+    expand = c(0, 0),
+    limits = c(21, 30.5),
+    breaks = seq(21, 32, by = 1)
   ) +
   # color:
   scale_colour_manual(
     name = "Vertebrate host biting tolerance\n(bites per host per day)",
     values = c(met.brewer("VanGogh3", 4, direction = 1), "black"),
-    # values = c(brewer.pal(9, "YlOrRd")[c(3, 5, 7)], "black"),
     breaks = c(1, 10, 100, Inf),
     labels = unname(c("1 (Chitnis)", "10 (Chitnis)", "100 (Chitnis)", TeX("$\\infty$ (Ross-Macdonald)")))
   ) +
   scale_fill_manual(
     name = "Vertebrate host biting tolerance\n(bites per host per day)",
     values = c(met.brewer("VanGogh3", 4, direction = 1), "black"),
-    # values = c(brewer.pal(9, "YlOrRd")[c(3, 5, 7)], "black"),
     breaks = c(1, 10, 100, Inf),
     labels = unname(c("1 (Chitnis)", "10 (Chitnis)", "100 (Chitnis)", TeX("$\\infty$ (Ross-Macdonald)")))
   ) +
@@ -1191,8 +1155,7 @@ Topt_plot <- Topt_df %>%
 shift_legend(Topt_plot)
 ```
 
-```{r fig-S3_Topt_plots_varysigmaH, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt_plots} Transmission thermal optimum as a function of vertebrate host availability.'}
-
+```{r fig-S3_Topt_plots_varysigmaH, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt_plots} The thermal optima predicted by the model can be substantially different at low levels of biting tolerance. At low host population densities, there may be warmer (a, b, c, e) or cooler (d) thermal optima when biting tolerance is low compared to when it is high. Shown here are the median values of $T_{\\textrm{opt}}$ with respect to mosquito trait TPC hyperparameter posterior distributions. Vertebrate host biting tolerance is varied on a $\\log_{10}$ scale with a break to indicate values of $\\mathcal{R}_0$ when biting tolerance is unlimited. '}
 # x-axis = vertebrate host biting tolerance
 # y-axis = thermal optimum
 # color = vertebrate host population density
@@ -1203,11 +1166,12 @@ infinite_divide <- 10^3.35 # 10^log10(max_sigmaH*1)
 
 Topt_df <- data.Topt %>%
   mutate(sigmaH_proxy = ifelse(is.finite(sigmaH),
-                               sigmaH,
-                               infinite_skew))
+    sigmaH,
+    infinite_skew
+  ))
 Topt_df <- inf_skew_func(Topt_df, infinite_skew, infinite_divide, 6)
 
-sigmaH_breaks <- c(10^c(seq(-1, 3, by = 1)), 1.15*infinite_divide, infinite_skew)
+sigmaH_breaks <- c(10^c(seq(-1, 3, by = 1)), 1.15 * infinite_divide, infinite_skew)
 sigmaH_labels <- c(TeX(c("$0.1$", "$1$", "$10", "$100$", "$10^3$")), TeX("$\\ldots$"), TeX("$\\infty$"))
 
 Topt_plot <- Topt_df %>%
@@ -1249,22 +1213,25 @@ Topt_plot <- Topt_df %>%
   # y-axis
   scale_y_continuous(
     name = expression("Thermal optimum "(degree * C)),
-    expand = c(0,0), # c(0.05, 0.05),
-    limits = c(21,30), # mean: 21-31, median: 21-32
-    breaks = seq(21,32, by = 1)
+    expand = c(0, 0), # c(0.05, 0.05),
+    limits = c(21, 30), # mean: 21-31, median: 21-32
+    breaks = seq(21, 32, by = 1)
   ) +
   # color:
   scale_colour_manual(
     name = "Vertebrate host population\ndensity (ind/ha)",
-    values = met.brewer("Hokusai3", 4)) +
+    values = met.brewer("Hokusai3", 4)
+  ) +
   scale_fill_manual(
     name = "Vertebrate host population\ndensity (ind/ha)",
-    values = met.brewer("Hokusai3", 4)) +
+    values = met.brewer("Hokusai3", 4)
+  ) +
   # faceting:
   facet_wrap(~system_label,
-             scales = "free",
-             nrow = 2,
-             labeller = labeller()  ) +
+    scales = "free",
+    nrow = 2,
+    labeller = labeller()
+  ) +
   # theme options:
   theme_minimal(10) +
   guides(color = guide_legend(override.aes = list(size = 4))) +
@@ -1287,13 +1254,12 @@ Topt_plot <- Topt_df %>%
     )
   )
 
-
 # Plot
 shift_legend(Topt_plot)
 ```
 
 
-```{r fig-S4_CTmin, dev = c('pdf','svg', 'png'), dev="cairo_pdf", message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTmin} Critical thermal minimum as a function of vertebrate host availability.'}
+```{r fig-S4_CTmin, dev = c('pdf','svg', 'png'), dev="cairo_pdf", message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTmin} The critical thermal minimum for parasite population persistence as a function of vertebrate host population density and biting tolerance. Grey areas indicate combinations of vertebrate host population density and biting tolerance in which the parasite population is expected to not persist at any temperature. In the region where vertebrate host population density and biting tolerance are both less than 10, critical thermal minima and maxima are very similar (see Figure 6 in the main text). Shown here are the median values of the critical thermal minimum with respect to mosquito trait TPC hyperparameter posterior distributions. Both vertebrate host population density and biting tolerance are varied on a $\\log_{10}$ scale with a break in biting tolerance values to indicate when biting tolerance is unlimited. '}
 #   x    = biting tolerance (with a point at infinity)
 #   y    = vertebrate host population density
 # colour = parasite critical thermal minimum (CTmin)
@@ -1304,7 +1270,7 @@ max_sigmaH <- max(filter(data.CT, is.finite(sigmaH))$sigmaH)
 # Value of sigmaH to replace 'Inf' with for plotting
 infinite_skew <- 10^2.35
 # Used to create a gap dividing finite and infinite sigmaH
-infinite_divide <- 10^2.7 # 10^log10(max_sigmaH*1)
+infinite_divide <- 10^2.7
 
 # Define sigmaH tick breaks and labels
 sigmaH_breaks <- c(10^c(seq(-1, 2, by = 1)), 10^2.3125, 10^2.5625)
@@ -1323,7 +1289,7 @@ CTmin_df <- inf_skew_func(CTmin_df, infinite_skew, infinite_divide, 8)
 
 maxCTmin <- ceiling(max(filter(CTmin_df, is.finite(median))$median))
 
-CTmin_breaks <- c(seq(14,35, by = 2), 101)
+CTmin_breaks <- c(seq(14, 35, by = 2), 101)
 
 CTmin_heat_plots <- CTmin_df %>%
   select(-median) %>%
@@ -1334,17 +1300,21 @@ CTmin_heat_plots <- CTmin_df %>%
   ggplot(aes(x = KH, y = sigmaH_proxy, z = median_proxy)) +
   # CTmin for FINITE sigmaH:
   geom_contour_filled(
-    data = filter(CTmin_df,
-                  sigmaH_proxy < 10^2.2),
+    data = filter(
+      CTmin_df,
+      sigmaH_proxy < 10^2.2
+    ),
     breaks = CTmin_breaks
-    ) +
+  ) +
   # CTmin for INFINITE sigmaH:
   geom_contour_filled(
-    data = filter(CTmin_df,
-                  sigmaH_proxy > 10^2.4,
-                  sigmaH_proxy < infinite_divide),
+    data = filter(
+      CTmin_df,
+      sigmaH_proxy > 10^2.4,
+      sigmaH_proxy < infinite_divide
+    ),
     breaks = CTmin_breaks
-    ) +
+  ) +
   # x-axis: log10-scale with no buffer space
   scale_x_log10(
     name = TeX("Vertebrate host population density (ind/ha)"),
@@ -1361,10 +1331,10 @@ CTmin_heat_plots <- CTmin_df %>%
     labels = sigmaH_labels
   ) +
   # fill:
-    scale_fill_manual(
+  scale_fill_manual(
     name = "Critical thermal minimum (°C)",
     values = c(viridis(9), "grey", "grey"),
-    labels = ~ ifelse(.x < maxCTmin, .x, 'n/a')
+    labels = ~ ifelse(.x < maxCTmin, .x, "n/a")
   ) +
   # faceting:
   facet_wrap(~system_label, scales = "free", nrow = 2, labeller = labeller()) +
@@ -1397,8 +1367,7 @@ CTmin_heat_plots <- CTmin_df %>%
 shift_legend(CTmin_heat_plots)
 ```
 
-```{r fig-S5_CTmax, dev = c('pdf','svg', 'png'), dev="cairo_pdf", message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTmax} Critical thermal maximum as a function of vertebrate host availability.'}
-
+```{r fig-S5_CTmax, dev = c('pdf','svg', 'png'), dev="cairo_pdf", message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTmax} The critical thermal maximum for parasite population persistence as a function of vertebrate host population density and biting tolerance. Grey areas indicate combinations of vertebrate host population density and biting tolerance in which the parasite population is expected to not persist at any temperature. In the region where vertebrate host population density and biting tolerance are both less than 10, critical thermal minima and maxima are very similar (see Figure 6 in the main text). Shown here are the median values of the critical thermal maximum with respect to mosquito trait TPC hyperparameter posterior distributions. Both vertebrate host population density and biting tolerance are varied on a $\\log_{10}$ scale with a break in biting tolerance values to indicate when biting tolerance is unlimited. '}
 #   x    = biting tolerance (with a point at infinity)
 #   y    = vertebrate host population density
 # colour = parasite critical thermal maximum (CTmax)
@@ -1428,7 +1397,7 @@ CTmax_df <- inf_skew_func(CTmax_df, infinite_skew, infinite_divide, 8)
 
 minCTmax <- floor(min(filter(CTmax_df, is.finite(median))$median))
 
-CTmax_breaks <- c(-101, seq(21,35, by = 2))
+CTmax_breaks <- c(-101, seq(21, 35, by = 2))
 
 CTmax_heat_plots <- CTmax_df %>%
   select(-median) %>%
@@ -1439,17 +1408,21 @@ CTmax_heat_plots <- CTmax_df %>%
   ggplot(aes(x = KH, y = sigmaH_proxy, z = median_proxy)) +
   # CTmin for FINITE sigmaH:
   geom_contour_filled(
-    data = filter(CTmax_df,
-                  sigmaH_proxy < 10^2.2),
+    data = filter(
+      CTmax_df,
+      sigmaH_proxy < 10^2.2
+    ),
     breaks = CTmax_breaks
-    ) +
+  ) +
   # CTmin for INFINITE sigmaH:
   geom_contour_filled(
-    data = filter(CTmax_df,
-                  sigmaH_proxy > 10^2.4,
-                  sigmaH_proxy < infinite_divide),
+    data = filter(
+      CTmax_df,
+      sigmaH_proxy > 10^2.4,
+      sigmaH_proxy < infinite_divide
+    ),
     breaks = CTmax_breaks
-    ) +
+  ) +
   # x-axis: log10-scale with no buffer space
   scale_x_log10(
     name = TeX("Vertebrate host population density (ind/ha)"),
@@ -1466,10 +1439,10 @@ CTmax_heat_plots <- CTmax_df %>%
     labels = sigmaH_labels
   ) +
   # fill:
-    scale_fill_manual(
+  scale_fill_manual(
     name = "Critical thermal maximum (°C)",
     values = c("grey", viridis(9)),
-    labels = ~ ifelse(.x < minCTmax-1, 'n/a', .x)
+    labels = ~ ifelse(.x < minCTmax - 1, "n/a", .x)
   ) +
   # faceting:
   facet_wrap(~system_label, scales = "free", nrow = 2, labeller = labeller()) +
@@ -1504,21 +1477,22 @@ shift_legend(CTmax_heat_plots)
 
 
 
-```{r fig-S6_CT_Range, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CT_Range} Parasite thermal niche as a function of vertebrate host population density and biting tolerance.'}
+```{r fig-S6_CT_Range, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CT_Range} The critical thermal minimum ($\\textrm{CT}_{\\min}$, blue curves) and maximum ($\\textrm{CT}_{\\max}$, red curves) for parasite population persistence depend on vertebrate host availability, even when vertebrate hosts tolerate any level of mosquito biting (dotted curves). Transmission is sustained ($\\mathcal{R}_0$>1) in the regions enclosed by the red and blue curves. $\\textrm{CT}_{\\min}$ is a convex function of vertebrate host population density while $\\textrm{CT}_{\\max}$ is concave. The points where the red and blue curves touch indicate thresholds of vertebrate host population density beyond which parasite population persistence is no longer possible at any temperature (i.e. $\\mathcal{R}_0$(T)<1) (see Figure 6 in the main text). Shown here are the median values of the critical thermal minimum, maximum, and mosquito thermal tolerance niche with respect to mosquito trait TPC hyperparameter posterior distributions. Both vertebrate host population density and biting tolerance are varied on a $\\log_{10}$ scale with a break in biting tolerance values to indicate when biting tolerance is unlimited. All remaining parameters are given in Table 1 and Figure 2.'}
 # x-axis = vertebrate host population density
 # y-axis = Temperature
 # linetype = biting tolerance
 # colour = CT_min (blue), CT_max (red)
 
-CTRange_df <- read_rds("results/CT_vals.rds") %>%
-  pathosystem_labeller() %>%
+CTRange_df <- data.CT %>%
   # Arrange along the plotting variables
   select(system_label, sigmaH, KH, variable, value = median) %>%
   # Choose a few sigmaH values to plot, including Inf
   filter(sigmaH %in% c(1, 10, 100, Inf)) %>%
   filter(KH %in% unique(KH)[seq(1, length(unique(KH)), length.out = 101)]) %>%
-  pivot_wider(id_cols = c("system_label", "sigmaH", "KH"),
-              names_from = variable, values_from = value) %>%
+  pivot_wider(
+    id_cols = c("system_label", "sigmaH", "KH"),
+    names_from = variable, values_from = value
+  ) %>%
   group_by(system_label, KH, sigmaH) %>%
   mutate(CTwidth = max(CTmax - CTmin, 0)) %>%
   filter(CTwidth > 0.05) %>%
@@ -1569,8 +1543,9 @@ CTRange_plots <- CTRange_df %>%
     expand = c(0.05, 0.05),
     limits = c(min(MosqThermRange_df$CTmin_V0), max(MosqThermRange_df$CTmax_V0)),
     breaks = seq(floor(range(CTRange_df$value, na.rm = TRUE)[1]),
-                 floor(range(CTRange_df$value, na.rm = TRUE)[2]),
-                 by = 2)
+      floor(range(CTRange_df$value, na.rm = TRUE)[2]),
+      by = 2
+    )
   ) +
   # linetype:
   scale_linetype_manual(
@@ -1588,7 +1563,7 @@ CTRange_plots <- CTRange_df %>%
     guide = guide_legend(keyheight = unit(40, "cm"))
   ) +
   # faceting:
-  facet_wrap(~system_label,scales = "free",nrow = 2,labeller = labeller()) +
+  facet_wrap(~system_label, scales = "free", nrow = 2, labeller = labeller()) +
   # legend:
   guides(
     color = guide_legend(override.aes = list(size = 4), order = 1),
@@ -1645,19 +1620,11 @@ Topt0_df <- median.Vec %>%
   select(system_ID, Temperature, proxy_0) %>%
   group_by(system_ID)
 
-# test_plot <- Topt0_df %>%
-#   ggplot(aes(x = Temperature, y = proxy_0)) +
-#   geom_point() +
-#   facet_wrap(~system_ID, scales = "free")
-# test_plot
-
 Topt0_base_estimates <- Topt0_df %>%
   group_by(system_ID) %>%
   # Calculate Topt_0
   filter(proxy_0 == proxy_0[which.max(proxy_0)]) %>%
   rename(Topt_0 = Temperature)
-# check with above: Topt_0 matches with Topt when sigmaH*KH is minimized
-# also shows that these estimates are independent of KL (and thus ABSOLUTE adult mosquito density)
 
 # Calculating Topt0 using the "simplified" equation
 ToptRM_df <- median.Vec %>%
@@ -1673,76 +1640,66 @@ ToptRM_base_estimates <- data.Topt %>%
   select(system_ID, median) %>%
   rename(Topt_RM = median) %>%
   distinct()
-# Calculate Topt_RM
-# filter(proxy_RM == proxy_RM[which.max(proxy_RM)]) %>%
-# rename(Topt_RM = Temperature)
-# check with above: Topt_RM matches with Topt when sigmaH*KH is maximized
-# also shows that these estimates are independent of KL (and thus ABSOLUTE adult mosquito density)
 
 Topt_estimates_median <- left_join(ToptRM_base_estimates, Topt0_base_estimates) %>%
   select(system_ID, Topt_RM, Topt_0) %>%
   mutate(Topt_diff = Topt_RM - Topt_0) %>%
   mutate(prop_Topt_diff = abs(Topt_diff) / Topt_RM)
-
-
-# Investigating Topt_RM and Topt_0 further
-
-test_df <- median.Vec %>%
-  mutate(muV = 1 / (lf + eps)) %>%
-  mutate(P_EIP = exp(-muV / etaV)) %>%
-  mutate(sigmaVV0 = sigmaV * V0) %>%
-  mutate(proxy_0 = betaV * P_EIP / (muV * V0)) %>%
-  mutate(proxy_RM = sigmaV^2 * V0 * betaV * P_EIP / muV) %>% # = sigmaVV0^2*proxy_0
-  filter(is.finite(proxy_0)) %>%
-  select(system_ID, Temperature, proxy_RM, proxy_0, sigmaVV0)
 ```
 
-```{r fig-S7_CT_distributions, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CT_dists} The distributions of the critical thermal minimum, critical thermal maximum, and thermal optimum vary with vertebrate host availability.'}
-all.density.df <- read_rds("results/CTminmaxTopt_densities.rds") %>%
-  ungroup() %>%
-  pathosystem_labeller() %>%
-  filter(KH > 0.01)
-
+```{r fig-S7_CT_distributions, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CT_dists} The distributions of the critical thermal minimum and maximum and thermal optimum vary across transmission systems and levels of vertebrate host availability. Distributions for the limited biting tolerance case (solid lines) and unlimited biting tolerance case (dashed lines) are shown above and below the vertebrate host population density levels, respectively. As vertebrate host population density is increased, the distributions become approximately equal, with the critical thermal minimum and maximum converging to each other at sufficiently high population densities. The \\textit{An. gambiae} and \\textit{P. falciparum} system shows the most drastic differences between the limited and unlimited biting tolerance cases at low vertebrate host population density levels. Vertebrate host population density is varied on a $\\log_{10}$ scale. '}
 # half-violin plots
 plot.densities_violin_inline <- ggplot() +
   # CT min
   geom_violinhalf(
-    data = filter(all.density.df, variable == "Critical thermal minimum",
-                  sigmaH == 100),
+    data = filter(
+      all.density.df, variable == "Critical thermal minimum",
+      sigmaH == 100
+    ),
     aes(y = value, x = KH_factor, linetype = sigmaH, fill = "CTmin"),
     lwd = 0.75
   ) +
   geom_violinhalf(
-    data = filter(all.density.df, variable == "Critical thermal minimum",
-                  sigmaH == Inf),
+    data = filter(
+      all.density.df, variable == "Critical thermal minimum",
+      sigmaH == Inf
+    ),
     aes(y = value, x = KH_factor, linetype = sigmaH, fill = "CTmin"),
     lwd = 0.75,
     flip = TRUE
   ) +
   # CT max
   geom_violinhalf(
-    data = filter(all.density.df, variable == "Critical thermal maximum",
-                  sigmaH == 100),
+    data = filter(
+      all.density.df, variable == "Critical thermal maximum",
+      sigmaH == 100
+    ),
     aes(y = value, x = KH_factor, linetype = sigmaH, fill = "CTmax"),
     lwd = 0.75
   ) +
   geom_violinhalf(
-    data = filter(all.density.df, variable == "Critical thermal maximum",
-                  sigmaH == Inf),
+    data = filter(
+      all.density.df, variable == "Critical thermal maximum",
+      sigmaH == Inf
+    ),
     aes(y = value, x = KH_factor, linetype = sigmaH, fill = "CTmax"),
     lwd = 0.75,
     flip = TRUE
   ) +
   # Thermal optima
   geom_violinhalf(
-    data = filter(all.density.df, variable == "Thermal optimum",
-                  sigmaH == 100),
+    data = filter(
+      all.density.df, variable == "Thermal optimum",
+      sigmaH == 100
+    ),
     aes(y = value, x = KH_factor, linetype = sigmaH, fill = "Topt"),
     lwd = 0.75
   ) +
   geom_violinhalf(
-    data = filter(all.density.df, variable == "Thermal optimum",
-                  sigmaH == Inf),
+    data = filter(
+      all.density.df, variable == "Thermal optimum",
+      sigmaH == Inf
+    ),
     aes(y = value, x = KH_factor, linetype = sigmaH, fill = "Topt"),
     lwd = 0.75,
     flip = TRUE
@@ -1779,26 +1736,25 @@ plot.densities_violin_inline <- ggplot() +
 shift_legend(plot.densities_violin_inline)
 ```
 
-```{r fig-S8_2_dR0dvar_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:dR0dvar_unc} The uncertainty in the local sensitivity of $\\mathcal{R}_0$ with respect to mosquito life history traits.'}
-
+```{r fig-S8_2_dR0dvar_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:dR0dvar_unc} The local sensitivity of $\\mathcal{R}_0$ to mosquito traits across temperatures for two values of $\\sigma_H$. Generally, $\\mathcal{R}_0$ is most sensitive to biting frequency, the probability of surviving the extrinsic incubation period, and vector competence. Shown here are the median values of the derivative of $\\mathcal{R}_0$ with respect to each focal mosquito trait across the mosquito trait TPC hyperparameter posterior distributions. Sensitivity values are shown on a logarithmic scale with solid lines indicating positive values and dotted lines indicating negative. Temperatures are restricted to those at which the median of $\\mathcal{R}_0$ is positive for the given system. '}
 KH_vals <- c(1)
 
 dR0dk.df <- data.dR0dvar %>%
-  filter(KH %in% KH_vals,
-         sigmaH %in% c(100, Inf)) %>%
-  # filter(median > 0) %>%
-  right_join(select(data.R0, system_label, Temperature, Model, sigmaH, KH, median_R0 = median) %>% 
-              filter(KH %in% KH_vals & sigmaH %in% c(100, Inf)) ) %>% 
+  filter(
+    KH %in% KH_vals,
+    sigmaH %in% c(100, Inf)
+  ) %>%
+  right_join(select(data.R0, system_label, Temperature, Model, sigmaH, KH, median_R0 = median) %>%
+    filter(KH %in% KH_vals & sigmaH %in% c(100, Inf))) %>%
   filter(median_R0 > 0) %>%
-  mutate(abs_median = abs(median)) %>% 
-  mutate(sign_median = sign(median)) %>% 
+  mutate(abs_median = abs(median)) %>%
+  mutate(sign_median = sign(median)) %>%
   filter(sign_median != 0, !is.na(sign_median)) %>%
-  # filter(!(focal_var %in% c("Immature development rate", "Prob. of immature survival", "Eggs per female per day", "Vector competence", "Adult lifespan"))) %>% 
-  arrange(sign_median) %>% 
-  arrange(Temperature) 
-  
+  arrange(sign_median) %>%
+  arrange(Temperature)
 
-plot.dR0dk <- dR0dk.df  %>% 
+
+plot.dR0dk <- dR0dk.df %>%
   # Make a stacked plot, colored by parameter
   ggplot(aes(x = Temperature, y = abs_median, color = focal_var, linetype = (as.factor(sign_median)))) +
   geom_line(lwd = 1) +
@@ -1806,22 +1762,19 @@ plot.dR0dk <- dR0dk.df  %>%
     name = "Focal trait:",
     values = rev(c4a("misc.okabe", 7))
   ) +
-  scale_x_continuous(
-    # limits = Temp_range_for_plot,
-    expand = c(0, 0)
-  ) +
+  scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(
     name = unname(TeX("Local sensitivity of $R_0$")),
     limits = 10^c(-4, 3),
-    breaks = 10^(seq(-4,3)), 
+    breaks = 10^(seq(-4, 3)),
     labels = TeX(c("$10^{-4}$", "$10^{-3}$", "$10^{-2}$", "$10^{-1}$", "$10^0$", "$10^1$", "$10^2$", "$10^3$")),
-    trans = 'log10',
-    expand = c(0,0)
+    trans = "log10",
+    expand = c(0, 0)
   ) +
   scale_linetype_manual(
     name = "Sign of sensitivity:",
-    values = c(1,3),
-    breaks = c(1,-1),
+    values = c(1, 3),
+    breaks = c(1, -1),
     labels = c("Positive", "Negative")
   ) +
   facet_rep_grid(
@@ -1837,7 +1790,8 @@ plot.dR0dk <- dR0dk.df  %>%
   guides(linetype = guide_legend(
     title.position = "left",
     title.vjust = 0.5,
-    direction = "vertical")) +
+    direction = "vertical"
+  )) +
   theme_minimal_hgrid(10) +
   theme(
     legend.margin = margin(0, 0, 0, 0),
@@ -1854,18 +1808,10 @@ plot.dR0dk <- dR0dk.df  %>%
     )
   )
 
-# shift_legend(plot.R0.rel.sens)
 plot.dR0dk
-
 ```
 
-```{r fig-S8_R0_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:R0_unc} The uncertainty of the distribution of $\\mathcal{R}_0$ to mosquito life history traits.'}
-
-# !!! [] change factor/levels for focal_var so that they show up in the same
-#        order as in the legend
-# !!! [] figure out what's going on with the "color" bars occuring at low temperatures for plots (a) (b) and (e)
-
-
+```{r fig-S8_R0_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:R0_unc}  The uncertainty of $\\mathcal{R}_0$ to mosquito traits across temperatures as measured by the change in the 95\\% highest posterior density interval width for two values of $\\sigma_H$ when vertebrate host population density is set to one individual per hectare. Temperatures are restricted to those at which $\\mathcal{R}_0$ is positive for the given system. At the cool end of the thermal niche, variation in $\\mathcal{R}_0$ is mostly driven by the probability of surviving the extrinsic incubation period, except in the case of (d) \\textit{An. gambiae} and \\textit{P. falciparum}. As temperature is increased, the influence of adult mosquito lifespan also increases to eventually become the most influential parameter for all systems except (e) \\textit{Cx. quinquefasciatus} and WNV.'}
 Temp_range_for_plot <- R0.HPD %>%
   ungroup() %>%
   dplyr::filter(rel_HPD_width > eps) %>%
@@ -1874,8 +1820,6 @@ Temp_range_for_plot <- R0.HPD %>%
 
 plot.R0.rel.sens <- R0.HPD %>%
   filter(KH %in% c(1) & sigmaH %in% c(100, Inf)) %>%
-  # filter(!(KH == 100 & sigmaH == Inf)) %>%
-  # filter(rel_HPD_width != 0) %>%
   # For each KH value, sum up all uncertainty values to get total uncertainty across parameters
   group_by(system_ID, sigmaH, KH, Temperature) %>%
   mutate(sens_total = sum(rel_HPD_width)) %>%
@@ -1890,10 +1834,7 @@ plot.R0.rel.sens <- R0.HPD %>%
     name = "Focal trait:",
     values = rev(c4a("misc.okabe", 7))
   ) +
-  scale_x_continuous(
-    # limits = Temp_range_for_plot,
-    expand = c(0, 0)
-  ) +
+  scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(
     name = unname(TeX("Relative contribution to $R_0$ HPD width"))
   ) +
@@ -1921,16 +1862,10 @@ plot.R0.rel.sens <- R0.HPD %>%
     )
   )
 
-# shift_legend(plot.R0.rel.sens)
 plot.R0.rel.sens
-
 ```
 
 ```{r fig-S9_ddTR0_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:ddTR0_unc} The uncertainty in the sensitivity of $\\mathcal{R}_0$ with respect to temperature.'}
-
-# !!! [] just compare "low host availability (sigmaH = 50, KH = 1 or 10)" and
-#        "high host availability (sigmaH = Inf, KH = 100)" scenarios
-
 ## Plot R0 uncertainty
 Temp_range_for_plot <- ddTR0.HPD %>%
   ungroup() %>%
@@ -1940,8 +1875,6 @@ Temp_range_for_plot <- ddTR0.HPD %>%
 
 plot.ddTR0.rel.sens <- ddTR0.HPD %>%
   filter(KH %in% c(1) & sigmaH %in% c(100, Inf)) %>%
-  # filter(!(KH == 100 & sigmaH == Inf)) %>%
-  # filter(rel_HPD_width != 0) %>%
   # For each KH value, sum up all uncertainty values to get total uncertainty across parameters
   group_by(system_ID, sigmaH, KH, Temperature) %>%
   mutate(sens_total = sum(rel_HPD_width)) %>%
@@ -1956,10 +1889,7 @@ plot.ddTR0.rel.sens <- ddTR0.HPD %>%
     name = "Focal trait:",
     values = rev(c4a("misc.okabe", 7))
   ) +
-  scale_x_continuous(
-    # limits = Temp_range_for_plot,
-    expand = c(0, 0)
-  ) +
+  scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(
     name = unname(TeX("Relative contribution to $dR_0 / dT$ HPD width"))
   ) +
@@ -1987,29 +1917,24 @@ plot.ddTR0.rel.sens <- ddTR0.HPD %>%
     )
   )
 
-# shift_legend(plot.R0.rel.sens)
 plot.ddTR0.rel.sens
-
 ```
 
 
 
-```{r fig-S10_Topt_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt_unc} The uncertainty of the thermal optimum to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$.'}
-
-# !!! mention the value of sigmaH
-
-plot.Topt.rel.sens <- Topt.HPD %>% 
+```{r fig-S10_Topt_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt_unc} The uncertainty of $T_{\\textrm{opt}}$ to mosquito traits across vertebrate host population densities as measured by the change in the 95\\% highest posterior density interval width when $\\sigma_H$ is 100 bites per vertebrate host per day. At high levels of vertebrate host population density, the effect of vertebrate host traits diminishes and the relative sensitivities of $T_{\\textrm{opt}}$ to mosquito traits stabilize. Generally, adult lifespan is an influential parameter and, to lesser extents, vector competence and the probability of surviving the extrinsic incubation period (EIP). Eggs per female per day tends to be most important when vertebrate host population density is low, though this not the case for (e) \\textit{Cx. quinquefasciatus} and WNV.Immature development rate and the probability of immature survival are never very influential parameters. Vertebrate host population density is varied on a $\\log_{10}$ scale. '}
+plot.Topt.rel.sens <- Topt.HPD %>%
   ungroup() %>%
-  distinct() %>% 
-  filter(sigmaH == 100) %>% 
-  filter(!is.na(HPD_width)) %>% 
+  distinct() %>%
+  filter(sigmaH == 100) %>%
+  filter(!is.na(HPD_width)) %>%
   pathosystem_labeller() %>%
   filter(!is.na(rel_HPD_width)) %>%
   # For each KH value, sum up all uncertainty values to get total uncertainty
   group_by(system_ID, sigmaH, KH) %>%
   mutate(sens_total = sum(rel_HPD_width)) %>%
   # Divide each uncertainty value by the total uncertainty
-  mutate(sens_rel = rel_HPD_width / sens_total) %>% 
+  mutate(sens_rel = rel_HPD_width / sens_total) %>%
   # Make a stacked plot, colored by parameter
   ggplot(aes(x = KH, y = sens_rel, fill = focal_var)) +
   geom_area() +
@@ -2044,36 +1969,14 @@ plot.Topt.rel.sens <- Topt.HPD %>%
 shift_legend(plot.Topt.rel.sens)
 ```
 
-```{r fig-S10_2_dToptdKH_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt_unc} The uncertainty in the sensitivity of the thermal optimum to host availability as a function of vertebrate host population density when $\\sigma_H = 50$.'}
-
-
-
-dToptdKH.HPD <- read_rds("results/dToptdKH_HPD_unc.rds") %>%
-  ungroup() %>%
-  distinct() %>% 
-  filter(!is.na(HPD_width)) %>% 
-  pathosystem_labeller() %>%
-    mutate(focal_var = factor(focal_var,
-                           levels = c("muV", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
-                           labels = c(
-                             TeX("Adult lifespan"),
-                             TeX("Biting frequency"),
-                             TeX("Eggs per female per day"),
-                             TeX("Immature development rate"),
-                             TeX("Prob. of immature survival"),
-                             TeX("Prob. of surviving EIP"),
-                             TeX("Vector competence")
-                           )
-  )) %>% 
+```{r fig-S10_2_dToptdKH_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:Topt_unc2} The uncertainty in the sensitivity of the thermal optimum to host availability as a function of vertebrate host population density when $\\sigma_H = 100$.'}
+dToptdKH.HPD <- dToptdKH.HPD %>%
   filter(!is.na(rel_HPD_width)) %>%
   # For each KH value, sum up all uncertainty values to get total uncertainty
   group_by(system_ID, sigmaH, KH) %>%
   mutate(sens_total = sum(rel_HPD_width)) %>%
   # Divide each uncertainty value by the total uncertainty
-  mutate(sens_rel = rel_HPD_width / sens_total) # %>%
-# arrange(sens_rel)
-
-# !!! mention the value of sigmaH
+  mutate(sens_rel = rel_HPD_width / sens_total)
 
 plot.dToptdKH.rel.sens <- dToptdKH.HPD %>%
   # Make a stacked plot, colored by parameter
@@ -2086,7 +1989,6 @@ plot.dToptdKH.rel.sens <- dToptdKH.HPD %>%
   scale_x_log10(
     name = TeX("Vertebrate host population density (ind/ha)"),
     expand = c(0, 0),
-    # limits = c(0.05, 1E3),
     breaks = 10^seq(-2, 4, 1),
     labels = TeX(c("$0.01$", "$0.1$", "$1$", "$10", "$100$", "$10^3$", "$10^4$"))
   ) +
@@ -2110,8 +2012,7 @@ plot.dToptdKH.rel.sens <- dToptdKH.HPD %>%
 shift_legend(plot.dToptdKH.rel.sens)
 ```
 
-```{r fig-S11_CTmin_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTmin_unc} The uncertainty of the critical thermal minimum to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$ and $\\sigma_H=\\infty$.'}
-
+```{r fig-S11_CTmin_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTmin_unc} The uncertainty of $\\textrm{CT}_{\\min}$ to mosquito traits across vertebrate host population densities as measured by the change in the 95\\% highest posterior density interval width for two values of $\\sigma_H$. Sensitivities are only plotted when $\\textrm{CT}_{\\min}$ exists for the given value of vertebrate host population density. Generally, eggs per female per day and the probability of surviving the EIP are the most influential parameters. $\\textrm{CT}_{\\min}$ is sensitive to vector competence across the full range of vertebrate host population densities for systems (b) and (e) but, in systems (a), (c), and (d), only when population density is high. Immature development rate and the probability of immature survival are not very influential parameters and $\\textrm{CT}_{\\min}$ is only sensitive to biting frequency in the case of system (e) when vertebrate host population density is high. Vertebrate host population density is varied on a $\\log_{10}$ scale. '}
 CTmin_df <- CT.HPD %>%
   filter(variable == "CTmin") %>%
   filter(sigmaH %in% c(100, Inf)) %>%
@@ -2120,10 +2021,10 @@ CTmin_df <- CT.HPD %>%
   group_by(system_ID, sigmaH, KH) %>%
   mutate(sens_total = sum(rel_HPD_width)) %>%
   # Divide each uncertainty value by the total uncertainty
-  mutate(sens_rel = rel_HPD_width / sens_total) #%>%
+  mutate(sens_rel = rel_HPD_width / sens_total) # %>%
 
-  # Make a stacked plot, colored by parameter
-plot.CTmin.rel.sens <- CTmin_df %>% 
+# Make a stacked plot, colored by parameter
+plot.CTmin.rel.sens <- CTmin_df %>%
   ggplot(aes(x = KH, y = sens_rel, fill = focal_var)) +
   geom_area() +
   scale_fill_manual(
@@ -2165,8 +2066,7 @@ plot.CTmin.rel.sens <- CTmin_df %>%
 plot.CTmin.rel.sens
 ```
 
-```{r fig-S12_CTmax_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTmax_unc} The uncertainty of the critical thermal maximum to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$ and $\\sigma_H=\\infty$.'}
-
+```{r fig-S12_CTmax_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTmax_unc} The uncertainty of $\\textrm{CT}_{\\max}$ to mosquito traits across vertebrate host population densities as measured by the change in the 95\\% highest posterior density interval width for two values of $\\sigma_H$. Sensitivities are only plotted when $\\textrm{CT}_{\\max}$ exists for the given value of vertebrate host population density. Generally, adult mosquito life span is the most influential parameter. At low vertebrate host population densities, $\\textrm{CT}_{\\max}$ is sensitive to eggs per female per day in systems (c) and (e). $\\textrm{CT}_{\\max}$ is only sensitive to biting frequency in the case of system (e) when vertebrate host population density is high. The influence of other parameters increases at high levels of vertebrate host population density. Vertebrate host population density is varied on a $\\log_{10}$ scale. '}
 plot.CTmax.rel.sens <- CT.HPD %>%
   filter(variable == "CTmax") %>%
   filter(sigmaH %in% c(100, Inf)) %>%
@@ -2221,8 +2121,7 @@ plot.CTmax.rel.sens
 
 
 
-```{r fig-S13_CTwidth_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTwidth_unc} The uncertainty of the thermal niche width to mosquito life history traits as a function of vertebrate host population density when $\\sigma_H = 50$ and $\\sigma_H=\\infty$.'}
-
+```{r fig-S13_CTwidth_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:CTwidth_unc}  The uncertainty of $\\textrm{CT}_{\\textrm{width}}$ to mosquito traits across vertebrate host population densities as measured by the change in the 95\\% highest posterior density interval width for two values of $\\sigma_H$. Sensitivities are only plotted when $\\textrm{CT}_{\\textrm{width}}$exists for the given value of vertebrate host population density. Generally, adult mosquito life span, eggs per female per day, and the probability of surviving the EIP are the most influential parameters, though $\\textrm{CT}_{\\textrm{width}}$ is not sensitive the probability of surviving the EIP in system (d). $\\textrm{CT}_{\\textrm{width}}$ is only sensitive to biting frequency in the case of system (e) when vertebrate host population density is high. Vertebrate host population density is varied on a $\\log_{10}$ scale. '}
 plot.CTwidth.rel.sens <- CT.HPD %>%
   filter(variable == "CTwidth") %>%
   filter(sigmaH %in% c(100, Inf)) %>%
@@ -2254,7 +2153,9 @@ plot.CTwidth.rel.sens <- CT.HPD %>%
     labeller = labeller(
       system_label = sens_labels,
       sigmaH = as_labeller(
-        appender_sigmaH, default = label_parsed)
+        appender_sigmaH,
+        default = label_parsed
+      )
     )
   ) +
   theme_minimal(10) +

@@ -1,0 +1,69 @@
+## Title: Mosquito Thermal Trait Data processing ###############################
+##
+## Project: Global zoonoses - spillover of mosquito-borne pathogens
+##
+## Purpose: Conduct all parts of the analysis
+##
+## Contents: 0) Set-up, load in necessary packages and data-sets
+##           1) Load empirical trait data
+##           2) Fit trait thermal performance curves to trait data
+##           3) Translate traits into model parameters
+##           4) Build data set incorporating all axes of variation
+##           5) Calculate model outputs
+##           6) Illustrate model outputs (might be done separately)
+##           7) Conduct sensitivity analysis
+##
+##
+## Inputs:
+##
+##
+## Outputs:
+##
+## Written and maintained by: Kyle Dahlin, kydahlin@gmail.com
+## Initialized March 2023
+
+
+# 0) Set-up, load in necessary packages and data-sets ---------------------
+library(tidyverse)
+
+# 1) Load empirical trait data --------------------------------------------
+
+# # Run this to produce workable dataset from raw data for the first time
+# plot_bool <- FALSE # decide whether you'd like to generate a diagnostic plot
+# source("code/data-cleaning.R")
+
+# # Alternatively, run this to load pre-processed dataset
+# # load dataset for fitting trait TPCs
+# data.in.TPC <- read_rds("data/clean/data_for_TPC_fitting.rds")
+
+# 2) Fit trait thermal performance curves to trait data -------------------
+
+# # Run this to generate samples of trait TPC parameters from informed posterior distributions for the first time
+# # Set parameters for MCMC
+# n.chains <- 5
+# n.adapt <- 5000
+# n.samps <- 5000
+# # Do you want to look at diagnostic plots?
+# plot_bool <- FALSE
+# # source("code/get-thermal-trait-priors.R")
+# # write_rds(data.in.transform, "results/TPC_param_samples.rds")
+
+# Alternatively, run this to load pre-processed data set
+data.in.transform <- read_rds("results/TPC_param_samples.rds")
+
+# 3) Translate traits into model parameters -------------------------------
+
+# Define temperature range of study
+Temps <- seq(10, 40, length.out = 601) # full: length.out = 601, thin: length.out = 301
+
+# Thin sample size
+thin_size <- 500 # full = 1000, thin = 100
+
+plot_bool = FALSE
+source("code/trait-transform.R")
+
+write_rds(data.in.params, "results/VecTPC_vals", compress = "gz")
+
+# remove work sets (these may be taking up a lot of memory)
+rm("combined_df", "Infection_df", "noInfection_df", "TPC_df", "data.in.transform")
+

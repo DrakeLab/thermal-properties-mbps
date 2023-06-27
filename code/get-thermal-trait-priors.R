@@ -53,7 +53,6 @@ source("code/Mordecai_2017/temp_functions_all.R")
 ### * Load in data ----
 # Trait data
 data.in <- data.in.TPC
-# data.in <- read_csv("data/clean/data_for_TPC_fitting.csv") # !!! remove this later so this can interact with the main-analysis.R script
 
 # 1) Define accessory functions -------------------------------------------
 
@@ -341,8 +340,6 @@ get.prior_hyperparams <- function(in_data, TPC_function, variable_names,
   # Initialize the hyperparameter list
   hypers <- NULL
   
-  # inits_list <- list(T0 = 5, Tm = 31, c = 0.00007)
-  
   # get samples from trait TPC parameter distributions
   temp_samples <- run.jags(
     in_data, TPC_function, variable_names,
@@ -500,19 +497,17 @@ distinct_combos <- data_in %>%
   filter(system_ID != "Culex spp. / WNV" | trait.name != "MDR") %>%
   filter(system_ID != "Culex spp. / WNV" | trait.name != "PDR")
 
-
 samples <- tibble(
   trait = as.character(),
   system_ID = as.character(),
   T0 = as.double(),
   Tm = as.double(),
-  c = as.double(), # !!! note that we're using c as a generic parameter for Briere or Quadratic
+  c = as.double(), # note that we're using c as a generic parameter for Briere or Quadratic
   sample_num = as.double(),
   func = as.character()
 )
 
 # Go through all trait/system combinations to generate TPC parameter posterior samples
-# system.time(
 for (system_index in 1:dim(distinct_combos)[1]) {
   # Pull system information
   system_sample <- distinct_combos$system_ID[system_index]
@@ -557,8 +552,6 @@ distinct_samples <- data.in.transform %>%
   distinct(system_ID, trait)
 
 print(distinct_samples)
-# 3) Save trait TPC parameter posterior distribution samples --------------
-
 
 
 # *) Diagnostics & visualizations -----------------------------------------
@@ -659,7 +652,7 @@ if (plot_bool) {
     summarise(mean_val = mean(Trait_val), .groups = "keep") %>%
     unique()
   
-  # get edges of 89% HCI of samples # !!! not calculated correctly?
+  # get edges of 89% HCI of samples
   quantsTPC_df <- TPC_df %>%
     group_by(system_ID, trait, Temperature) %>%
     mutate(lowHCI_val = quantile(Trait_val, 0.055)) %>%

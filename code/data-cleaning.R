@@ -19,7 +19,6 @@
 ##          A table explaining how traits are transformed into the ones used in
 ##          analyses
 ##
-## Outputs: data - data/clean/ThermalTraitData.rds
 ##
 ## Written and maintained by: Kyle Dahlin, kydahlin@gmail.com
 ## Initialized February 2023
@@ -27,7 +26,6 @@
 
 # 0) Set-up, load in necessary packages and data-sets ---------------------
 library(tidyverse)
-
 
 # 1) Load in all data sets ------------------------------------------------
 
@@ -69,7 +67,6 @@ data.Mordecai2017.Aegypti <- read.csv("data/raw/Mordecai_2017/aegyptiDENVmodelTe
     ref == "McLean_et_al_1974_CanJMicobiol" ~ "DENV",
     ref == "Watts_et_al_1987_AJTMH" ~ "DENV"
   ), NA)) %>% 
-  # mutate(pathogen = ifelse(trait.name %in% c("b", "c", "PDR"), "DENV", NA)) %>%
   dplyr::select(-c("trait2", "trait2.name"))
 
 data.Mordecai2017.Albopictus <- read.csv("data/raw/Mordecai_2017/albopictusCHIKVmodelTempData_2016-03-26.csv", header = TRUE) %>%
@@ -84,7 +81,6 @@ data.Mordecai2017.Albopictus <- read.csv("data/raw/Mordecai_2017/albopictusCHIKV
     ref == "Westbrook_Thesis_2010" ~ "CHIKV",
     ref == "Xiao_et_al_2014_Arch Virol" ~ "DENV"
   ), NA)) %>% 
-  # mutate(pathogen = ifelse(trait.name %in% c("b", "c", "PDR"), "CHIKV", NA)) %>%
   dplyr::select(-c("trait2", "trait2.name"))
 
 data.Mordecai2017.AedesSpp <- read.csv("data/raw/Mordecai_2017/Aedes_prior_data.csv", header = TRUE) %>%
@@ -273,15 +269,15 @@ data.Villena2022 <- read.csv("data/raw/Villena_2022/traits.csv", header = TRUE) 
   dplyr::select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year) 
 
 # Following Villena 2022, use An. arabiensis and An. Pseudopunctipennis data for Anopheles gambiae biting rate
-data.Villena2021 <- data.Villena2021 %>% 
-  rbind(filter(data.Villena2021, 
+data.Villena2022 <- data.Villena2022 %>% 
+  rbind(filter(data.Villena2022, 
                mosquito_species %in% c("Anopheles arabiensis", "Anopheles pseudopunctipennis"),
                trait.name == "a") %>% 
           mutate(mosquito_species = "Anopheles gambiae"))
 
 # Following Villena 2022, use Plasmodium berghei data for Anopheles gambiae / Plasmodium falciparum competence  
-data.Villena2021 <- data.Villena2021 %>% 
-  rbind(filter(data.Villena2021, 
+data.Villena2022 <- data.Villena2022 %>% 
+  rbind(filter(data.Villena2022, 
                pathogen == "Plasmodium berghei",
                trait.name == "bc") %>% 
           mutate(mosquito_species = "Anopheles gambiae", 
@@ -326,14 +322,12 @@ data.Reduced <- data.All %>%
     pathogen == "DENV" ~ "DENV",
     pathogen == "ZIKV" ~ "ZIKV",
     pathogen %in% c("WNV-NY99", "WNV-SA", "WNV") ~ "WNV",
-    # pathogen_1 == "Plasmodium" ~ "Plasmodium spp.",
     (pathogen_1 == "Plasmodium"  & pathogen_2 != "falciparum") ~ "Plasmodium spp.", # Not enough data for Plasmodium falciparum alone to fit model.
     (pathogen_1 == "Plasmodium"  & pathogen_2 == "falciparum") ~ "Plasmodium falciparum",
     pathogen %in% c("SLEV", "MVE", "YFV") ~ "other flavivirus",
     pathogen %in% c("RVFV", "WEEV", "SINV", "EEEV", "RRV", "CHIKV") ~ "other togavirus", # might want to separate out CHIKV later
     is.na(pathogen) ~ "none",
     TRUE ~ pathogen
-    # TRUE ~ NA
   )) %>% 
   # Remove other togavirus data as these are not used in our study
   filter(pathogen != "other togavirus") %>% 
@@ -383,8 +377,6 @@ write_rds(data.in.TPC, "data/clean/data_for_TPC_fitting.rds")
 # 5) Data visualizations / diagnostics ------------------------------------
 
 ###* Visualize traits as functions of temperature
-plot_bool <- TRUE # decide whether you'd like to generate a diagnostic plot
-
 if (plot_bool) {
   library(cowplot)
   # Set up data frame for visualization

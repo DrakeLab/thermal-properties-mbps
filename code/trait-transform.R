@@ -13,10 +13,6 @@
 ##           *) Diagnostics and visualizations
 ##
 ##
-## Inputs:  data - data/clean/trait_transforms.rds
-##
-## Outputs: data - data/clean/parameter_TPCs.rds
-##
 ## Written and maintained by: Kyle Dahlin, kydahlin@gmail.com
 ## Initialized March 2023
 # _______________________________________________________________________________
@@ -48,7 +44,7 @@ Linear <- function(q, Tmax) {
   }
 }
 
-# Function: designate proper thermal response function # !!! This should go somewhere else
+# Function: designate proper thermal response function
 # - output is a function of temperature
 get.thermal.response <- function(data_in, Temperature) {
   parms <- dplyr::select(data_in, c, T0, Tm)
@@ -62,7 +58,6 @@ get.thermal.response <- function(data_in, Temperature) {
   
   out <- temp_function(Temperature)
 }
-
 
 # 2) Create TPCs and deal with missing data ----
 
@@ -87,7 +82,6 @@ TPC_df <- data.in.transform %>%
   # i.e. putting together reproductive traits to estimate eggs per female per day (EFD)
   mutate(e2a = case_when(
     !(is.na(e2a)) ~ e2a,
-    # !(is.na(pRH * nLR * pLA)) ~ pRH * nLR * pLA,
     !(is.na(EV * pLA)) ~ EV * pLA
   )) %>% 
   mutate(EFD = case_when(
@@ -121,23 +115,6 @@ combined_df <- left_join(Infection_df, noInfection_df)%>%
   ) %>% 
   relocate(system_ID, mosquito_species, pathogen, Temperature, sample_num)
 
-
-# # Check what data we're missing (we'll go back and use substitutes for these)
-# missing_traits_df <- combined_df %>% 
-#   pivot_longer(cols = bc:MDR) %>% 
-#   dplyr::filter(is.na(value)) %>% 
-#   dplyr::select(-c(sample_num, Temperature)) %>% 
-#   filter(system_ID %in% c(
-#     "Aedes aegypti / DENV", "Aedes aegypti / none",
-#     "Aedes aegypti / ZIKV", "Aedes aegypti / none",
-#     "Aedes albopictus / DENV", "Aedes albopictus / none",
-#     "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
-#     "Anopheles gambiae / Plasmodium falciparum",
-#     "Anopheles gambiae / none"
-#   )) %>% 
-#   unique()
-# # Should just show: Culex quinquefasciatus / WNV / bc
-
 # Similar to Shocket 2020: use Culex spp. / WNV / bc data for Culex quinquefasciatus / WNV / bc
 # This combines data for Culex univittatus, tarsalis, and pipiens
 combined_df <- combined_df %>% 
@@ -153,9 +130,10 @@ combined_df <- combined_df %>%
   # remove Cx. univittatus data
   filter(system_ID != "Culex spp. / WNV") 
 
-# Deal with any duplicates: What do we do if we have two estimates for the same intermediate parameter?
-# i.e. We have e2a for Culex but also pO and EV
-
+## Carrying capacity for larval mosquitoes
+# NB: In the absence of good estimates for each species or temperature-dependence of this trait, we assume that this parameter is constant. It can be used as a  scaling parameter for overall mosquito abundance
+# (it could alternately be used to fix the maximum adult mosquito density across species)
+larval_mosquito_carrying_capacity <- 300
 
 # 3) Make parameter dataframe ---------------------------------------------
 eps <- .Machine$double.eps
@@ -177,11 +155,11 @@ data.in.params <- combined_df %>%
   mutate(etaV = PDR) %>%
   # Mosquito infection probability.
   mutate(betaV = bc) %>% 
-  dplyr::select(system_ID:sample_num, lf, sigmaV:betaV)
-
-
-# 4) Save parameter data frame --------------------------------------------
-
+  dplyr::select(system_ID:sample_num, lf, sigmaV:betaV) %>%
+  mutate(KL = larval_mosquito_carrying_capacity) %>%
+  mutate(V0 = ifelse( sigmaV_f * deltaL < (1 / lf),
+                      0,
+                      KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL))))
 
 # *) Diagnostics & visualizations -----------------------------------------
 
@@ -219,15 +197,10 @@ TPC_df <- data.in.params %>%
   unique() %>% ungroup()
 
 TPC_plot <- TPC_df %>%
-  # group_by(sample_num) %>%
   arrange(Temperature) %>%
-  # group_by()
   ggplot() +
   # means of TPC curves
   geom_path(aes(x = Temperature, y = mean, color = system_ID)) +
-  # 89% HCI of TPC curves
-  # geom_path(aes(x = Temperature, y = lowHCI, color = system_ID), lty = 2) +
-  # geom_path(aes(x = Temperature, y = highHCI, color = system_ID), lty = 2) +
   geom_ribbon(
     aes(x = Temperature, ymin = lowHCI, ymax = highHCI, fill = system_ID),
     alpha = 0.1
@@ -244,6 +217,3 @@ ggsave("figures/imputed_traits/param_TPC_plot.svg",
        device = "svg",
        width = 16, height = 9, units = "in")
 }
-
-# remove work sets
-rm("combined_df", "Infection_df", "noInfection_df", "TPC_df", "data.in.transform")
