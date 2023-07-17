@@ -13,12 +13,6 @@
 ##           6) Illustrate model outputs (might be done separately)
 ##           7) Conduct sensitivity analysis
 ##
-##
-## Inputs:
-##
-##
-## Outputs:
-##
 ## Written and maintained by: Kyle Dahlin, kydahlin@gmail.com
 ## Initialized March 2023
 
@@ -30,7 +24,7 @@ library(tidyverse)
 
 # # Run this to produce workable dataset from raw data for the first time
 # plot_bool <- FALSE # decide whether you'd like to generate a diagnostic plot
-# source("code/data-cleaning.R")
+source("code/data-cleaning.R")
 
 # # Alternatively, run this to load pre-processed dataset
 # # load dataset for fitting trait TPCs
@@ -38,18 +32,18 @@ library(tidyverse)
 
 # 2) Fit trait thermal performance curves to trait data -------------------
 
-# # Run this to generate samples of trait TPC parameters from informed posterior distributions for the first time
-# # Set parameters for MCMC
-# n.chains <- 5
-# n.adapt <- 5000
-# n.samps <- 5000
-# # Do you want to look at diagnostic plots?
-# plot_bool <- FALSE
-# # source("code/get-thermal-trait-priors.R")
-# # write_rds(data.in.transform, "results/TPC_param_samples.rds")
+# Run this to generate samples of trait TPC parameters from informed posterior distributions for the first time
+# Set parameters for MCMC
+n.chains <- 5
+n.adapt <- 5000
+n.samps <- 5000
+# Do you want to look at diagnostic plots?
+plot_bool <- FALSE
+source("code/get-thermal-trait-priors.R")
+write_rds(data.in.transform, "results/TPC_param_samples.rds")
 
-# Alternatively, run this to load pre-processed data set
-data.in.transform <- read_rds("results/TPC_param_samples.rds")
+# # Alternatively, run this to load pre-processed data set
+# data.in.transform <- read_rds("results/TPC_param_samples.rds")
 
 # 3) Translate traits into model parameters -------------------------------
 

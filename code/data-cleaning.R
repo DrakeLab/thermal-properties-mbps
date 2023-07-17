@@ -395,9 +395,7 @@ if (plot_bool) {
     facet_wrap(~ trait.name, scales = "free") +
     theme_minimal(16)
   
-  ggsave("figures/raw_data/trait_plots.svg", trait_plots,
-         width = 16, height = 9)
-  
+
   # show thermal response data for focal systems only
   select_trait_plots <- data.Viz %>% 
     filter(system_ID %in% c("Aedes aegypti / DENV", "Aedes aegypti / none", 
@@ -417,7 +415,5 @@ if (plot_bool) {
          y = "Trait value") +
     facet_wrap(~ trait.name, scales = "free") +
     theme_minimal(16)
-  
-  ggsave("figures/raw_data/select_trait_plots.svg", trait_plots,
-         width = 16, height = 9)
+
 }

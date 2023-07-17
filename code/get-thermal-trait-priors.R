@@ -223,7 +223,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
   # Begin using data on the focal species to create and generate samples from
   # the TPC parameter posterior distributions
   
-  # get all of studies with data reported for the particular trait and mosquito species
+  # get all of the studies with data reported for the particular trait and mosquito species
   other_studies <- working_data %>%
     dplyr::filter(mosquito_species == mosquito_in) %>%
     arrange(year, lead_author) %>%
@@ -560,7 +560,7 @@ print(distinct_samples)
 focal_bool <- TRUE
 
 if (plot_bool) {
-  plot_samples <- read_rds("data/clean/TPC_param_samples.rds") %>% #data.in.transform %>%
+  plot_samples <- data.in.transform %>%
     filter(sample_num %in% 1:1000)
   
   if (focal_bool) {
@@ -622,11 +622,11 @@ if (plot_bool) {
     facet_grid(trait ~ variable, scales = "free") +
     theme_minimal_grid(12)
   
-  # Save figure
-  ggsave("figures/imputed_traits/parm_hists.svg",
-         device = "svg",
-         width = 16, height = 9, units = "in"
-  )
+  # # Save figure
+  # ggsave("figures/imputed_traits/parm_hists.svg",
+  #        device = "svg",
+  #        width = 16, height = 9, units = "in"
+  # )
   
   ###* Figure: TPC curves with 89% high confidence intervals ----
   
@@ -680,9 +680,9 @@ if (plot_bool) {
     facet_wrap(~trait, scales = "free", ncol = 2) +
     theme_minimal_grid(12)
   
-  # Save figure
-  ggsave("figures/imputed_traits/TPC_plot.svg", TPC_plot,
-         device = "svg",
-         width = 16, height = 9, units = "in"
-  )
+  # # Save figure
+  # ggsave("figures/imputed_traits/TPC_plot.svg", TPC_plot,
+  #        device = "svg",
+  #        width = 16, height = 9, units = "in"
+  # )
 }
