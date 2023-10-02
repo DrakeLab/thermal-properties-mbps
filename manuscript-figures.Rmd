@@ -45,22 +45,22 @@ inf_skew_func <- function(df, skew, divide, n_rows_to_add) {
     select(sigmaH) %>%
     max() %>%
     log10()
-
+  
   # Define the gap dividing finite and infinite sigmaH
   infinite_divide <- 10^mean(log10(c(divide, skew)))
-
+  
   # Create a proxy sigmaH variable that replaces Inf with the value of "skew"
   df <- mutate(df, sigmaH_proxy = ifelse(is.finite(sigmaH),
-    sigmaH, skew
+                                         sigmaH, skew
   ))
-
+  
   # add more proxy sigmaH values to make a "spread" at Inf
   added_sigma_vals <- seq(divide, skew, length.out = n_rows_to_add)
   for (i in 1:n_rows_to_add) {
     bump_val <- 1 + 0.05 * (i - 1)
     temp <- filter(df, is.infinite(sigmaH)) %>%
       mutate(sigmaH_proxy = ifelse(is.finite(sigmaH), sigmaH,
-        added_sigma_vals[i]
+                                   added_sigma_vals[i]
       ))
     df <- add_row(df, temp) %>% distinct()
   }
@@ -70,8 +70,8 @@ inf_skew_func <- function(df, skew, divide, n_rows_to_add) {
 # Label functions:
 appender_sigmaH <- function(string) {
   ifelse(string == "Inf",
-    unname(TeX(paste("$\\sigma_H = \\infty$"))),
-    unname(TeX(paste("$\\sigma_H = $", string)))
+         unname(TeX(paste("$\\sigma_H = \\infty$"))),
+         unname(TeX(paste("$\\sigma_H = $", string)))
   )
 }
 appender_KH <- function(string) {
@@ -93,9 +93,9 @@ shift_legend <- function(p) {
     gtable::gtable_filter("panel") %>%
     with(setNames(grobs, layout$name)) %>%
     purrr::keep(~ identical(.x, zeroGrob()))
-
+  
   if (length(pnls) == 0) stop("No empty facets in the plot")
-
+  
   lemon::reposition_legend(p, "center", panel = names(pnls))
 }
 
@@ -118,16 +118,16 @@ focalvar_labeller <- function(df) {
   df <- df %>%
     mutate(focal_var = ifelse(focal_var == "muV", "lf", focal_var)) %>%
     mutate(focal_var = factor(focal_var,
-      levels = c("lf", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
-      labels = c(
-        TeX("Adult lifespan"),
-        TeX("Biting frequency"),
-        TeX("Eggs per female per day"),
-        TeX("Immature development rate"),
-        TeX("Prob. of immature survival"),
-        TeX("Prob. of surviving EIP"),
-        TeX("Vector competence")
-      )
+                              levels = c("lf", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
+                              labels = c(
+                                TeX("Adult lifespan"),
+                                TeX("Biting frequency"),
+                                TeX("Eggs per female per day"),
+                                TeX("Immature development rate"),
+                                TeX("Prob. of immature survival"),
+                                TeX("Prob. of surviving EIP"),
+                                TeX("Vector competence")
+                              )
     ))
 }
 
@@ -212,8 +212,8 @@ mean.Vec <- data.Vec %>%
   mutate(etaL = rhoL / (deltaL + eps)) %>%
   mutate(muL = etaL - rhoL) %>%
   mutate(V0 = ifelse(sigmaV_f * deltaL < (1 / lf),
-    0,
-    KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL))
+                     0,
+                     KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL))
   ))
 
 # Median values (this one is used more frequently)
@@ -227,8 +227,8 @@ median.Vec <- data.Vec %>%
   mutate(etaL = rhoL / (deltaL + eps)) %>%
   mutate(muL = etaL - rhoL) %>%
   mutate(V0 = ifelse(sigmaV_f * deltaL < (1 / lf),
-    0,
-    KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL))
+                     0,
+                     KL * rhoL * lf * (1 - 1 / (lf * sigmaV_f * deltaL))
   ))
 
 # Compute *mosquito* thermal tolerance range (minimum and maximum)
@@ -279,15 +279,15 @@ host_vector_contact_func <- function(df) {
 host_density_range <- c(1E0, 1E3)
 host_fixed_value <- 10
 host_density_vec <- sort(c(10^seq(log10(host_density_range[1]),
-  log10(host_density_range[2]),
-  length.out = resolution
+                                  log10(host_density_range[2]),
+                                  length.out = resolution
 ), host_fixed_value))
 
 vector_density_range <- c(1E0, 1E3)
 vector_fixed_value <- 1000
 vector_density_vec <- sort(c(10^seq(log10(vector_density_range[1]),
-  log10(vector_density_range[2]),
-  length.out = resolution
+                                    log10(vector_density_range[2]),
+                                    length.out = resolution
 ), vector_fixed_value))
 
 ## Set other parameters
@@ -319,7 +319,7 @@ contact_df <- expand.grid(
 ## Put plots together:
 new_df <- contact_df %>%
   filter(`Mosquito population density` == vector_fixed_value |
-    `Host population density` == host_fixed_value) %>%
+           `Host population density` == host_fixed_value) %>%
   select(-sigma_V, -sigma_H, -model) %>%
   melt(
     id = c(
@@ -351,7 +351,7 @@ plot_HD_MC <- new_df %>%
   geom_blank(aes(y = y_max)) +
   # plot labels
   geom_abs_text(aes(xpos = 0.08, ypos = 0.89, label = label),
-    color = "black", show.legend = FALSE
+                color = "black", show.legend = FALSE
   ) +
   # x-axis:
   scale_x_log10(
@@ -374,7 +374,7 @@ plot_MD_MC <- new_df %>%
   geom_blank(aes(y = y_max)) +
   # plot labels
   geom_abs_text(aes(xpos = 0.08, ypos = 0.89, label = label),
-    color = "black", show.legend = FALSE
+                color = "black", show.legend = FALSE
   ) +
   # x-axis:
   scale_x_log10(
@@ -401,7 +401,7 @@ plot_MD_HC <- new_df %>%
   geom_blank(aes(y = y_max)) +
   # plot labels
   geom_abs_text(aes(xpos = 0.08, ypos = 0.89, label = label),
-    color = "black", show.legend = FALSE
+                color = "black", show.legend = FALSE
   ) +
   # x-axis:
   scale_x_log10(
@@ -426,7 +426,7 @@ plot_HD_HC <- new_df %>%
   geom_blank(aes(y = y_max)) +
   # plot labels
   geom_abs_text(aes(xpos = 0.08, ypos = 0.89, label = label),
-    color = "black", show.legend = FALSE
+                color = "black", show.legend = FALSE
   ) +
   # x-axis:
   scale_x_log10(
@@ -479,16 +479,16 @@ MosqThermTraits_df <- median.Vec %>%
   # Turn all columns except Temperature and system_ID into variables
   melt(id = c("Temperature", "system_ID")) %>%
   mutate(variable = factor(variable,
-    levels = c("lf", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "P_EIP", "betaV"),
-    labels = c(
-      TeX("(a) Adult lifespan: $1/\\mu_V$ (days)"),
-      TeX("(b) Biting frequency: $\\sigma_V$ (day$^{-1}$)"),
-      TeX("(c) Eggs per female per day: $\\sigma_V f$"),
-      TeX("(d) Immature development rate: $\\rho_L$ (day$^{-1}$)"),
-      TeX("(e) Prob. of immature survival: $\\delta_L$"),
-      TeX("(f) Prob. of surviving EIP: $\\theta_V$"),
-      TeX("(g) Vector competence: $\\beta_V$")
-    )
+                           levels = c("lf", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "P_EIP", "betaV"),
+                           labels = c(
+                             TeX("(a) Adult lifespan: $1/\\mu_V$ (days)"),
+                             TeX("(b) Biting frequency: $\\sigma_V$ (day$^{-1}$)"),
+                             TeX("(c) Eggs per female per day: $\\sigma_V f$"),
+                             TeX("(d) Immature development rate: $\\rho_L$ (day$^{-1}$)"),
+                             TeX("(e) Prob. of immature survival: $\\delta_L$"),
+                             TeX("(f) Prob. of surviving EIP: $\\theta_V$"),
+                             TeX("(g) Vector competence: $\\beta_V$")
+                           )
   )) %>%
   group_by(Temperature, system_ID)
 
@@ -523,8 +523,8 @@ MosqThermTraits_plot <- MosqThermTraits_df %>%
   ) +
   # faceting:
   facet_wrap(~variable,
-    nrow = 3, scales = "free",
-    labeller = labeller(variable = label_parsed)
+             nrow = 3, scales = "free",
+             labeller = labeller(variable = label_parsed)
   ) +
   # legend:
   guides(color = guide_legend(override.aes = list(size = 4))) +
@@ -735,8 +735,8 @@ Toptalt_plots <- Toptalt_df %>%
   scale_fill_manual(
     name = "Transmission thermal optimum (°C)",
     values = met.brewer("Johnson",
-      n = length(Topt_breaks),
-      direction = -1
+                        n = length(Topt_breaks),
+                        direction = -1
     )
   ) +
   # color:
@@ -1166,8 +1166,8 @@ infinite_divide <- 10^3.35 # 10^log10(max_sigmaH*1)
 
 Topt_df <- data.Topt %>%
   mutate(sigmaH_proxy = ifelse(is.finite(sigmaH),
-    sigmaH,
-    infinite_skew
+                               sigmaH,
+                               infinite_skew
   ))
 Topt_df <- inf_skew_func(Topt_df, infinite_skew, infinite_divide, 6)
 
@@ -1228,9 +1228,9 @@ Topt_plot <- Topt_df %>%
   ) +
   # faceting:
   facet_wrap(~system_label,
-    scales = "free",
-    nrow = 2,
-    labeller = labeller()
+             scales = "free",
+             nrow = 2,
+             labeller = labeller()
   ) +
   # theme options:
   theme_minimal(10) +
@@ -1277,27 +1277,29 @@ sigmaH_breaks <- c(10^c(seq(-1, 2, by = 1)), 10^2.3125, 10^2.5625)
 sigmaH_labels <- c(paste(c(10^c(seq(-1, 2, by = 1)))), TeX("$\\ldots$"), TeX("$\\infty$"))
 
 CTmin_df <- data.CT %>%
-  filter(variable == "CTmin") %>%
+  select(sigmaH, KH, Model, system_ID, variable, median, system_label) %>% 
+  pivot_wider(names_from = variable, values_from = median) %>% 
+  # If CTwidth is essentially zero, set CTmin to Inf indicating R0 < 1
+  mutate(CTmin = if_else(CTwidth < eps, Inf, CTmin)) %>%
   mutate(sigmaH_proxy = sigmaH) %>%
   # Arrange along the plotting variables
-  arrange(system_ID, KH, sigmaH_proxy, median) %>%
+  arrange(system_ID, KH, sigmaH_proxy, CTmin) %>%
   ungroup() %>%
   # Assign a value for cases where R0<1 for all temperatures
-  mutate(median_proxy = ifelse(is.finite(median), median, 100))
+  mutate(CTmin = ifelse(is.finite(CTmin), CTmin, 100))
 
 CTmin_df <- inf_skew_func(CTmin_df, infinite_skew, infinite_divide, 8)
 
-maxCTmin <- ceiling(max(filter(CTmin_df, is.finite(median))$median))
+maxCTmin <- ceiling(max(filter(CTmin_df, CTmin<100)$CTmin))
 
 CTmin_breaks <- c(seq(14, 35, by = 2), 101)
 
 CTmin_heat_plots <- CTmin_df %>%
-  select(-median) %>%
   ## Set up plot ##
   # x = biting tolerance (with a point at infinity),
   # y = vertebrate host population density,
   # color = width of parasite thermal median_CTwidth
-  ggplot(aes(x = KH, y = sigmaH_proxy, z = median_proxy)) +
+  ggplot(aes(x = KH, y = sigmaH_proxy, z = CTmin)) +
   # CTmin for FINITE sigmaH:
   geom_contour_filled(
     data = filter(
@@ -1385,27 +1387,29 @@ sigmaH_breaks <- c(10^c(seq(-1, 2, by = 1)), 10^2.3125, 10^2.5625)
 sigmaH_labels <- c(paste(c(10^c(seq(-1, 2, by = 1)))), TeX("$\\ldots$"), TeX("$\\infty$"))
 
 CTmax_df <- data.CT %>%
-  filter(variable == "CTmax") %>%
+  select(sigmaH, KH, Model, system_ID, variable, median, system_label) %>% 
+  pivot_wider(names_from = variable, values_from = median) %>% 
+  # If CTwidth is essentially zero, set CTmax to -Inf indicating R0 < 1
+  mutate(CTmax = if_else(CTwidth < eps, Inf, CTmax)) %>%
   mutate(sigmaH_proxy = sigmaH) %>%
   # Arrange along the plotting variables
-  arrange(system_ID, KH, sigmaH_proxy, median) %>%
+  arrange(system_ID, KH, sigmaH_proxy, CTmax) %>%
   ungroup() %>%
   # Assign a value for cases where R0<1 for all temperatures
-  mutate(median_proxy = ifelse(is.finite(median), median, -100))
+  mutate(CTmax = ifelse(is.finite(CTmax), CTmax, -100))
 
 CTmax_df <- inf_skew_func(CTmax_df, infinite_skew, infinite_divide, 8)
 
-minCTmax <- floor(min(filter(CTmax_df, is.finite(median))$median))
+minCTmax <- floor(min(filter(CTmax_df, CTmax>0)$CTmax))
 
 CTmax_breaks <- c(-101, seq(21, 35, by = 2))
 
 CTmax_heat_plots <- CTmax_df %>%
-  select(-median) %>%
   ## Set up plot ##
   # x = biting tolerance (with a point at infinity),
   # y = vertebrate host population density,
   # color = width of parasite thermal median_CTwidth
-  ggplot(aes(x = KH, y = sigmaH_proxy, z = median_proxy)) +
+  ggplot(aes(x = KH, y = sigmaH_proxy, z = CTmax)) +
   # CTmin for FINITE sigmaH:
   geom_contour_filled(
     data = filter(
@@ -1543,8 +1547,8 @@ CTRange_plots <- CTRange_df %>%
     expand = c(0.05, 0.05),
     limits = c(min(MosqThermRange_df$CTmin_V0), max(MosqThermRange_df$CTmax_V0)),
     breaks = seq(floor(range(CTRange_df$value, na.rm = TRUE)[1]),
-      floor(range(CTRange_df$value, na.rm = TRUE)[2]),
-      by = 2
+                 floor(range(CTRange_df$value, na.rm = TRUE)[2]),
+                 by = 2
     )
   ) +
   # linetype:
@@ -1745,7 +1749,7 @@ dR0dk.df <- data.dR0dvar %>%
     sigmaH %in% c(100, Inf)
   ) %>%
   right_join(select(data.R0, system_label, Temperature, Model, sigmaH, KH, median_R0 = median) %>%
-    filter(KH %in% KH_vals & sigmaH %in% c(100, Inf))) %>%
+               filter(KH %in% KH_vals & sigmaH %in% c(100, Inf))) %>%
   filter(median_R0 > 0) %>%
   mutate(abs_median = abs(median)) %>%
   mutate(sign_median = sign(median)) %>%
