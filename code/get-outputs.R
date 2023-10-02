@@ -31,9 +31,10 @@ library(progress)
 eps <- .Machine$double.eps
 
 # Initialize a data frame to save our analyses
-init.df <- tibble(system_ID = c(), Temperature = c(), Model = c(),
-                  sigmaH = c(), KH = c(), variable = c(),
-                  lowHCI = c(), highHCI = c(), mean = c(), median = c())
+init.df <- tibble(system_ID = character(), Temperature = double(), 
+                  Model = character(), sigmaH = double(), KH = double(), 
+                  variable = character(), lowHCI = double(), highHCI = double(),
+                  mean = double(), median = double())
 
 
 # Load in vector trait data
@@ -44,7 +45,7 @@ samples <- unique(data.Vec$sample_num)
 num_samples <- length(samples)
 sample_inds <- sample(samples, min(num_samples, thin_size), replace = FALSE)
 
-data.Vec <- data.Vec%>% 
+data.Vec <- data.Vec %>% 
   filter(sample_num %in% sample_inds)
 
 # Load in host trait data
@@ -109,19 +110,18 @@ Topt_heat_func <- function(in_df, system_name) {
     # Basic reproduction number
     mutate(R0 = sqrt(RV*RH)) %>%
     # Filter to maximum value of R0
-    group_by(system_ID, sample_num, sigmaH, KH) %>%
+    group_by(system_ID, sigmaH, KH, sample_num) %>%
     filter(R0 == max(R0)) %>%
     # Get temperature at which R0 is maximized
     rename(Topt = Temperature) %>%
-    dplyr::select(system_ID, sample_num, Model, sigmaH, KH, Topt) %>%
+    dplyr::select(system_ID, Model, sigmaH, KH, Topt, sample_num) %>%
     ungroup() %>%
-    pivot_longer(cols = Topt, names_to = "variable", values_to = "value") %>%
-    group_by(system_ID, Model, sigmaH, KH, variable) %>%
+    group_by(system_ID, Model, sigmaH, KH, Topt) %>%
     summarise(
-      lowHCI = quantile(value, 0.055),
-      highHCI = quantile(value, 0.945),
-      mean = mean(value),
-      median = median(value),
+      lowHCI = quantile(Topt, 0.055),
+      highHCI = quantile(Topt, 0.945),
+      mean = mean(Topt),
+      median = median(Topt),
       .groups = "keep"
     )
 }
@@ -324,59 +324,59 @@ temp_vars <- data.Vec %>%
 # Collect R0 TPC data across systems and host trait values
 print_index = 1
 for (system_name in unique(data.Vec$system_ID)) {
-    print(paste0("(",print_index, "/", length(unique(data.Vec$system_ID)),") dR0/dvar: ", system_name))
+  print(paste0("(",print_index, "/", length(unique(data.Vec$system_ID)),") dR0/dvar: ", system_name))
   
-    pb <- progress_bar$new(
-      format = ":spin :system progress = :percent [:bar] :elapsedfull | eta: :eta",
-      total = length(unique(data.dR0dpar$KH)) * length(sigmaH_slices),
-      width = 120)  
-    for(index_KH in KH_slices) {
-      for (index_sigmaH in sigmaH_slices) {
-        pb$tick()
-        
-        dpardT_df <- data.Vec %>%  
-          filter(system_ID == system_name) %>%
-          ungroup() %>%
-          select(-c(KL, V0)) %>% 
-          pivot_longer(cols = lf:betaV, names_to = "focal_var") %>% 
-          group_by(system_ID, mosquito_species, pathogen, sample_num, focal_var) %>% 
-          arrange(system_ID, sample_num, focal_var, Temperature) %>% 
-          mutate(dpardT = value/lag(value))
-          
-        
-        temp_df <- data.dR0dpar %>%
-          filter(sigmaH %in% index_sigmaH,
-                 KH %in% index_KH) %>%
-          expand_grid(filter(data.Vec, system_ID == system_name)) %>%
-          cross_join(data.frame(focal_var = temp_vars)) %>% 
-          right_join(dpardT_df, by = join_by(system_ID, mosquito_species, pathogen, Temperature, sample_num, focal_var)) %>% 
-          mutate(thetaV = exp(-1 / (lf * etaV + eps))) %>% 
-          # Host constant
-          mutate(C = betaH / (KH * (gammaH + muH))) %>% 
-          # Biting rate term
-          mutate(K = ifelse(is.infinite(sigmaH), 1, sigmaH * KH / (sigmaH * KH + sigmaV * V0))) %>% 
-          # Basic reproduction number
-          mutate(R0 = K * sqrt(C * sigmaV^2 * V0 * betaV * thetaV * lf)) %>% 
-          # filter(R0 > 0) %>% 
-          # Calculate derivatives
-          R0_deriv_func(.) %>% 
-          dplyr::select(system_ID, sample_num, Temperature, Model, sigmaH, KH, focal_var, out) %>%
-          group_by(system_ID, Temperature, Model, sigmaH, KH, focal_var) %>%
-          # filter(!is.na(out)) %>%
-          partition(cluster) %>%
-          summarise(
-            lowHCI = quantile(out, 0.055, na.rm = TRUE),
-            highHCI = quantile(out, 0.945, na.rm = TRUE),
-            mean = mean(out),
-            median = median(out)
-          ) %>%
-          collect()
-        
-        dR0dvar.df <- rbind(temp_df, dR0dvar.df)
-      }
+  pb <- progress_bar$new(
+    format = ":spin :system progress = :percent [:bar] :elapsedfull | eta: :eta",
+    total = length(unique(data.dR0dpar$KH)) * length(sigmaH_slices),
+    width = 120)  
+  for(index_KH in KH_slices) {
+    for (index_sigmaH in sigmaH_slices) {
+      pb$tick()
+      
+      dpardT_df <- data.Vec %>%  
+        filter(system_ID == system_name) %>%
+        ungroup() %>%
+        select(-c(KL, V0)) %>% 
+        pivot_longer(cols = lf:betaV, names_to = "focal_var") %>% 
+        group_by(system_ID, mosquito_species, pathogen, sample_num, focal_var) %>% 
+        arrange(system_ID, sample_num, focal_var, Temperature) %>% 
+        mutate(dpardT = value/lag(value))
+      
+      
+      temp_df <- data.dR0dpar %>%
+        filter(sigmaH %in% index_sigmaH,
+               KH %in% index_KH) %>%
+        expand_grid(filter(data.Vec, system_ID == system_name)) %>%
+        cross_join(data.frame(focal_var = temp_vars)) %>% 
+        left_join(dpardT_df, by = join_by(system_ID, mosquito_species, pathogen, Temperature, sample_num, focal_var)) %>% 
+        mutate(thetaV = exp(-1 / (lf * etaV + eps))) %>% 
+        # Host constant
+        mutate(C = betaH / (KH * (gammaH + muH))) %>% 
+        # Biting rate term
+        mutate(K = ifelse(is.infinite(sigmaH), 1, sigmaH * KH / (sigmaH * KH + sigmaV * V0))) %>% 
+        # Basic reproduction number
+        mutate(R0 = K * sqrt(C * sigmaV^2 * V0 * betaV * thetaV * lf)) %>% 
+        # filter(R0 > 0) %>% 
+        # Calculate derivatives
+        R0_deriv_func(.) %>% 
+        dplyr::select(system_ID, sample_num, Temperature, Model, sigmaH, KH, focal_var, out) %>%
+        group_by(system_ID, Temperature, Model, sigmaH, KH, focal_var) %>%
+        # filter(!is.na(out)) %>%
+        partition(cluster) %>%
+        summarise(
+          lowHCI = quantile(out, 0.055, na.rm = TRUE),
+          highHCI = quantile(out, 0.945, na.rm = TRUE),
+          mean = mean(out),
+          median = median(out)
+        ) %>%
+        collect()
+      
+      dR0dvar.df <- rbind(temp_df, dR0dvar.df)
     }
-    gc()
-    print_index <- print_index + 1
+  }
+  gc()
+  print_index <- print_index + 1
 }
 pb$terminate()
 
@@ -397,7 +397,7 @@ gc()
 # Start new cluster for doParallel
 cluster_size <- parallel::detectCores()-1
 my.cluster <- parallel::makeCluster(cluster_size, type = "PSOCK"
-                                    )
+)
 # Register cluster for doParallel
 doSNOW::registerDoSNOW(cl = my.cluster)
 
@@ -487,6 +487,26 @@ CT.df <- foreach(
              KH %in% index_KH) %>%
       CT_heat_func(., system_name)
   }
+
+# CT.df <- tibble(sigmaH = c(), KH = c(), Model = c(), system_ID = c(),
+#                 variable = c(), mean = c(), median = c(), highHCI = c(), lowHCI = c())
+# 
+# progress_index = 1
+# 
+# for (system_name in iter_grid$system_ID) {
+#   for (index_KH in iter_grid$KH) {
+#     for (index_sigmaH in iter_grid$sigmaH) {
+#       print(100 * progress_index/(dim(iter_grid)[1]))
+#       temp_df <- data.Host %>%
+#         filter(sigmaH %in% index_sigmaH,
+#                KH %in% index_KH) %>%
+#         CT_heat_func(., system_name)
+#       
+#       rbind(CT.df, temp_df)
+#       progress_index = progress_index + 1
+#     }
+#   }
+# }
 
 close(pb)
 
