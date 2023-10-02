@@ -189,14 +189,15 @@ CT_heat_func <- function(in_df, system_name) {
 
 # Function: Evaluate local derivatives of R0 with respect to mosquito traits
 R0_deriv_func <- function(in_df) {
-  out_df <- in_df %>% # Pr(surviving the EIP)
-    mutate(thetaV = exp(-1 / (lf * etaV + eps))) %>% 
-    # Host constant
-    mutate(C = betaH / (KH * (gammaH + muH))) %>% 
-    # Biting rate term
-    mutate(K = ifelse(is.infinite(sigmaH), 1, sigmaH * KH / (sigmaH * KH + sigmaV * V0))) %>% 
-    # Basic reproduction number
-    mutate(R0 = K * sqrt(C * sigmaV^2 * V0 * betaV * thetaV * lf)) %>% 
+  out_df <- in_df %>% 
+    # # Pr(surviving the EIP)
+    # mutate(thetaV = exp(-1 / (lf * etaV + eps))) %>% 
+    # # Host constant
+    # mutate(C = betaH / (KH * (gammaH + muH))) %>% 
+    # # Biting rate term
+    # mutate(K = ifelse(is.infinite(sigmaH), 1, sigmaH * KH / (sigmaH * KH + sigmaV * V0))) %>% 
+    # # Basic reproduction number
+    # mutate(R0 = K * sqrt(C * sigmaV^2 * V0 * betaV * thetaV * lf)) %>% 
     # Derivative of biting rate term wrt vector abundance
     mutate(dKdV0 = -sigmaV * K^2 / (sigmaH * KH)) %>% 
     # Derivative of vector abundance wrt variable
@@ -208,7 +209,7 @@ R0_deriv_func <- function(in_df) {
       TRUE ~ 0
     )) %>% 
     # Derivative of R0 wrt variable
-    mutate(dR0dk = (C / (2 * R0 + eps)) * case_when(
+    mutate(dR0dpar = (C / (2 * R0 + eps)) * case_when(
       focal_var == "lf" ~ sigmaV^2 * betaV * K * thetaV * (2 * dKdV0 * dV0dvar * V0 * lf + dV0dvar * K * lf + K * V0 * lf / (etaV * (lf^2) + eps) + K * V0),
       focal_var == "sigmaV" ~ 2 * V0 * betaV * thetaV * lf * K * sigmaV * (K + sigmaV * dKdV0 * dV0dvar),
       focal_var == "sigmaV_f" ~ sigmaV^2 * betaV * thetaV * lf * K * dV0dvar * (2 * dKdV0 * V0 + K),
@@ -217,7 +218,8 @@ R0_deriv_func <- function(in_df) {
       focal_var == "etaV" ~ K^2 *sigmaV^2 * V0 * betaV * thetaV / (etaV^2 + eps),
       focal_var == "betaV" ~ K^2 *sigmaV^2 * V0 * thetaV * lf,
       TRUE ~ NA
-    ))
+    )) %>% 
+    mutate(out = dR0dpar * dpardT / R0) # out = (dR0dpar * dkdT / R0)
 }
 
 # 2) Calculate R0 TPCs -----------------------------------------
@@ -300,13 +302,13 @@ if (!exists("cluster")) {
 }
 
 # Set up host trait data frame (for future visualization)
-data.dR0dk <- data.Host %>%
+data.dR0dpar <- data.Host %>%
   filter(sigmaH %in% c(100, Inf)) %>%
   filter(KH %in% 10^seq(-2,5))
 
 # Slice host trait data
-sigmaH_slices <- slice_func(unique(data.dR0dk$sigmaH), 2)
-KH_slices <- slice_func(unique(data.dR0dk$KH), 1)
+sigmaH_slices <- slice_func(unique(data.dR0dpar$sigmaH), 2)
+KH_slices <- slice_func(unique(data.dR0dpar$KH), 1)
 
 # Initialize R0 data frame
 dR0dvar.df <- init.df
@@ -326,27 +328,47 @@ for (system_name in unique(data.Vec$system_ID)) {
   
     pb <- progress_bar$new(
       format = ":spin :system progress = :percent [:bar] :elapsedfull | eta: :eta",
-      total = length(unique(data.dR0dk$KH)) * length(sigmaH_slices),
+      total = length(unique(data.dR0dpar$KH)) * length(sigmaH_slices),
       width = 120)  
     for(index_KH in KH_slices) {
       for (index_sigmaH in sigmaH_slices) {
         pb$tick()
         
-        temp_df <- data.dR0dk %>%
+        dpardT_df <- data.Vec %>%  
+          filter(system_ID == system_name) %>%
+          ungroup() %>%
+          select(-c(KL, V0)) %>% 
+          pivot_longer(cols = lf:betaV, names_to = "focal_var") %>% 
+          group_by(system_ID, mosquito_species, pathogen, sample_num, focal_var) %>% 
+          arrange(system_ID, sample_num, focal_var, Temperature) %>% 
+          mutate(dpardT = value/lag(value))
+          
+        
+        temp_df <- data.dR0dpar %>%
           filter(sigmaH %in% index_sigmaH,
                  KH %in% index_KH) %>%
           expand_grid(filter(data.Vec, system_ID == system_name)) %>%
           cross_join(data.frame(focal_var = temp_vars)) %>% 
+          right_join(dpardT_df, by = join_by(system_ID, mosquito_species, pathogen, Temperature, sample_num, focal_var)) %>% 
+          mutate(thetaV = exp(-1 / (lf * etaV + eps))) %>% 
+          # Host constant
+          mutate(C = betaH / (KH * (gammaH + muH))) %>% 
+          # Biting rate term
+          mutate(K = ifelse(is.infinite(sigmaH), 1, sigmaH * KH / (sigmaH * KH + sigmaV * V0))) %>% 
+          # Basic reproduction number
+          mutate(R0 = K * sqrt(C * sigmaV^2 * V0 * betaV * thetaV * lf)) %>% 
+          # filter(R0 > 0) %>% 
           # Calculate derivatives
           R0_deriv_func(.) %>% 
-          dplyr::select(system_ID, sample_num, Temperature, Model, sigmaH, KH, focal_var, dR0dk) %>%
+          dplyr::select(system_ID, sample_num, Temperature, Model, sigmaH, KH, focal_var, out) %>%
           group_by(system_ID, Temperature, Model, sigmaH, KH, focal_var) %>%
+          # filter(!is.na(out)) %>%
           partition(cluster) %>%
           summarise(
-            lowHCI = quantile(dR0dk, 0.055),
-            highHCI = quantile(dR0dk, 0.945),
-            mean = mean(dR0dk),
-            median = median(dR0dk)
+            lowHCI = quantile(out, 0.055, na.rm = TRUE),
+            highHCI = quantile(out, 0.945, na.rm = TRUE),
+            mean = mean(out),
+            median = median(out)
           ) %>%
           collect()
         
@@ -359,7 +381,7 @@ for (system_name in unique(data.Vec$system_ID)) {
 pb$terminate()
 
 # Save data
-proper_dim <- dim(data.dR0dk)[1] * length(unique(data.Vec$system_ID)) * length(unique(data.Vec$Temperature)) * length(temp_vars)
+proper_dim <- dim(data.dR0dpar)[1] * length(unique(data.Vec$system_ID)) * length(unique(data.Vec$Temperature)) * length(temp_vars)
 
 (dim(dR0dvar.df)[1] == proper_dim)
 

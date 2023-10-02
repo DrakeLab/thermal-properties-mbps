@@ -1756,7 +1756,7 @@ dR0dk.df <- data.dR0dvar %>%
 
 plot.dR0dk <- dR0dk.df %>%
   # Make a stacked plot, colored by parameter
-  ggplot(aes(x = Temperature, y = abs_median, color = focal_var, linetype = (as.factor(sign_median)))) +
+  ggplot(aes(x = Temperature, y = median, color = focal_var, linetype = (as.factor(sign_median)))) +
   geom_line(lwd = 1) +
   scale_color_manual(
     name = "Focal trait:",
@@ -1765,10 +1765,11 @@ plot.dR0dk <- dR0dk.df %>%
   scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(
     name = unname(TeX("Local sensitivity of $R_0$")),
-    limits = 10^c(-4, 3),
-    breaks = 10^(seq(-4, 3)),
-    labels = TeX(c("$10^{-4}$", "$10^{-3}$", "$10^{-2}$", "$10^{-1}$", "$10^0$", "$10^1$", "$10^2$", "$10^3$")),
-    trans = "log10",
+    # limits = c(-2,2),
+    # limits = 10^c(-4, 3),
+    # breaks = 10^(seq(-4, 3)),
+    # labels = TeX(c("$10^{-4}$", "$10^{-3}$", "$10^{-2}$", "$10^{-1}$", "$10^0$", "$10^1$", "$10^2$", "$10^3$")),
+    # trans = "log10",
     expand = c(0, 0)
   ) +
   scale_linetype_manual(

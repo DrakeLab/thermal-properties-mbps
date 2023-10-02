@@ -10,10 +10,10 @@
 
 ## Set resolution for host trait variation
 # Host density vector: Number of values to include to consider for vertebrate host density
-KH_vec_length <- 300
+KH_vec_length <- 100
 
 # Biting tolerance vector: Number of values to consider for biting tolerance
-sigmaH_vec_length <- 300
+sigmaH_vec_length <- 100
 
 ## Host life history & behavioral traits
 # Host recruitment rate:
@@ -31,7 +31,7 @@ sigmaH_vec <- 10^seq(-0.25, 3.25, length.out = sigmaH_vec_length - 7) %>%
 sigmaH_baseline <- 100
 
 # Host carrying capacity
-KH_vec <- 10^seq(-2, 5, length.out = KH_vec_length) %>%
+KH_vec <- 10^seq(-2, 5, length.out = KH_vec_length - 6) %>%
   c(10^seq(-2,5)) %>%
   unique() %>% sort()
 
