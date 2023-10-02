@@ -8,6 +8,8 @@
 ## Initialized March 2023
 # _______________________________________________________________________________
 
+library(tidyverse)
+
 ## Set resolution for host trait variation
 # Host density vector: Number of values to include to consider for vertebrate host density
 KH_vec_length <- 300
