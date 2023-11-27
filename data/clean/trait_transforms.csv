@@ -26,4 +26,4 @@ EIP,PDR,PDR,Inverse,extrinsic incubation period
 PDR,PDR,PDR,Identity,parasite development rate
 EIR,PDR,PDR,Identity,extrinsic incubation rate (same as PDR)
 pO,pO,pO,NA,average proportion of females ovipositing at any point in time. Accessory trait used to compute EFD with EPR
-mu,lf,lff,Inverse,mortality rate
+mu,lf,lf,Inverse,mortality rate

@@ -31,7 +31,7 @@ library(cols4all) # for colorblind friendly color palettes
 library(here)
 library(lemon)
 library(see) # for half-violin plots
-library(zplyr) # from https://github.com/burchill/zplyr/ # only needed for placing text using absolute coordinates in contact comparison figure
+library(zplyr) #devtools::install_github("burchill/zplyr") from https://github.com/burchill/zplyr/ # only needed for placing text using absolute coordinates in contdact comparison figure
 
 # Plot settings ----
 
