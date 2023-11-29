@@ -438,10 +438,10 @@ if (plot_bool) {
 
   # show thermal response data for focal systems only
   select_trait_plots <- data.Viz %>% 
-    filter(system_ID %in% c("Aedes aegypti / DENV", "Aedes aegypti / none", 
-                            "Aedes aegypti / ZIKV", "Aedes aegypti / none",
-                            "Aedes albopictus / DENV", "Aedes albopictus / none",
-                            "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
+    filter(system_ID %in% c(#"Aedes aegypti / DENV", "Aedes aegypti / none", 
+                            # "Aedes aegypti / ZIKV", "Aedes aegypti / none",
+                            # "Aedes albopictus / DENV", "Aedes albopictus / none",
+                            # "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
                             "Anopheles spp. / Plasmodium spp.",
                             "Anopheles spp. / none"
     )) %>%

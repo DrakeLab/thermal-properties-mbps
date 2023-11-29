@@ -163,7 +163,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
         get.prior_hyperparams(
           other_data, TPC_function, variable_names,
           jags_other, inits_list,
-          n.chains, n.adapt, 5000, prob_bool
+          n.chains, n.adapt, 500, prob_bool
         ),
         until = function(val, cnd) {
           !is.null(val)
@@ -381,7 +381,7 @@ run.jags <- function(jags_data, TPC_function, variable_names,
                      data = jags_data,
                      n.chains = n.chains, inits = inits_list,
                      n.adapt = n.adapt,
-                     quiet = TRUE # switch to FALSE to show messages and progress bars
+                     quiet = FALSE # switch to FALSE to show messages and progress bars
   )
   # get n.samps new samples from the trait TPC parameter posterior distributions
   print("Sampling...")
@@ -481,6 +481,11 @@ run.jags <- function(jags_data, TPC_function, variable_names,
 
 # 2) Calculate prior distributions of thermal trait parameters from data ----
 
+# MCMC settings
+n.chains <- 5
+n.adapt <- 5000
+n.samps <- 5000
+
 # Identify all distinct combinations of traits and transmission systems
 data_in <- data.in.TPC
 distinct_combos <- data_in %>%
@@ -509,7 +514,7 @@ samples <- tibble(
 )
 
 # Go through all trait/system combinations to generate TPC parameter posterior samples
-for (system_index in 1:dim(distinct_combos)[1]) {
+for (system_index in 11:dim(distinct_combos)[1]) {
   # Pull system information
   system_sample <- distinct_combos$system_ID[system_index]
   trait_in <- distinct_combos$trait.name[system_index]
@@ -616,11 +621,55 @@ if (plot_bool) {
     mutate(logc = log(c)) %>%
     melt(id = c("system_ID", "trait", "sample_num"))
   
+  label_order =c("Gonotrophic cycle rate",
+                 "Eggs per female per day",
+                 "Eggs per female per oviposition cycle",
+                 "\\% females ovipositing",
+                 "Eggs per raft",
+                 "\\% of egg rafts that hatch",
+                 "\\# of emerging larvae per raft",
+                 "Egg viability",
+                 "Pr(egg -> adult survival)",
+                 "Pr(larva -> adult survival)",
+                 "Mosquito development rate",
+                 "Lifespan",
+                 "Vector competence",
+                 "Pr(infectious | infected)",
+                 "Pr(infected | exposure)",
+                 "Parasite development rate")
+  
+  plot_df$trait_label <-  case_match(
+    plot_df$trait,
+    "a" ~ "Gonotrophic cycle rate",
+    "EFD" ~ "Eggs per female per day",
+    "EFOC" ~ "Eggs per female per oviposition cycle",
+    "pO" ~ "\\% females ovipositing",
+    "EPR" ~ "Eggs per raft",
+    "pRH" ~ "\\% of egg rafts that hatch",
+    "nLR" ~ "\\# of emerging larvae per raft",
+    "EV" ~ "Egg viability",
+    "e2a" ~ "Pr(egg -> adult survival)",
+    "pLA" ~ "Pr(larva -> adult survival)",
+    "MDR" ~ "Mosquito development rate",
+    "lf" ~ "Lifespan",
+    "bc" ~ "Vector competence",
+    "c" ~ "Pr(infectious | infected)",
+    "b" ~ "Pr(infected | exposure)",
+    "PDR" ~ "Parasite development rate"
+  )
+  
+  plot_df <- plot_df %>% mutate(trait_label = factor(trait_label, levels = label_order))
+  
   parm_hists <- plot_df %>%
-    filter(variable != "c") %>%
+    filter(variable %in%  c("T0", "Tm", "logc")) %>%
+    mutate(var_label = case_when(
+      variable == "T0" ~  "CT_min",
+      variable == "Tm" ~  "CT_max",
+      variable == "logc" ~  "log(q)"
+    )) %>% 
     ggplot(aes(value, color = system_ID, fill = system_ID)) +
     geom_histogram(aes(), bins = 100) +
-    facet_grid(trait ~ variable, scales = "free") +
+    facet_grid(trait ~ var_label, scales = "free") +
     theme_minimal_grid(12)
   
   # # Save figure
@@ -660,6 +709,23 @@ if (plot_bool) {
     mutate(highHCI_val = quantile(Trait_val, 0.945)) %>%
     dplyr::select(-c("sample_num", "Trait_val", "func")) %>%
     unique()
+  
+  TPC_plot_all <- TPC_df %>%
+    filter(sample_num < 51) %>%
+    group_by(sample_num) %>%
+    arrange(Temperature, trait, system_ID) %>% 
+    # group_by()
+    ggplot(aes(x = Temperature, y = Trait_val, color = system_ID, group = sample_num)) +
+    # means of TPC curves
+    geom_line(alpha = 0.3) +
+    ylab("") +
+    facet_wrap(~trait, scales = "free", ncol = 2) +
+    theme_minimal_grid(12)
+  # Save figure
+  ggsave("TPC_plot_all.svg", TPC_plot_all,
+         device = "svg",
+         width = 16, height = 9, units = "in"
+  )
   
   TPC_plot <- TPC_df %>%
     group_by(sample_num) %>%
