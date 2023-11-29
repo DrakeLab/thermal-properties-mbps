@@ -382,6 +382,46 @@ if (plot_bool) {
   # Set up data frame for visualization
   data.Viz <- data.in.TPC
   
+  label_order =c("Gonotrophic cycle rate",
+                 "Eggs per female per day",
+                 "Eggs per female per oviposition cycle",
+                 "\\% females ovipositing",
+                 "Eggs per raft",
+                 "\\% of egg rafts that hatch",
+                 "\\# of emerging larvae per raft",
+                 "Egg viability",
+                 "Pr(egg -> adult survival)",
+                 "Pr(larva -> adult survival)",
+                 "Mosquito development rate",
+                 "Lifespan",
+                 "Vector competence",
+                 "Pr(infectious | infected)",
+                 "Pr(infected | exposure)",
+                 "Parasite development rate")
+  
+  data.Viz$trait_label <-  case_match(
+    data.Viz$trait.name,
+    "a" ~ "Gonotrophic cycle rate",
+    "EFD" ~ "Eggs per female per day",
+    "EFOC" ~ "Eggs per female per oviposition cycle",
+    "pO" ~ "\\% females ovipositing",
+    "EPR" ~ "Eggs per raft",
+    "pRH" ~ "\\% of egg rafts that hatch",
+    "nLR" ~ "\\# of emerging larvae per raft",
+    "EV" ~ "Egg viability",
+    "e2a" ~ "Pr(egg -> adult survival)",
+    "pLA" ~ "Pr(larva -> adult survival)",
+    "MDR" ~ "Mosquito development rate",
+    "lf" ~ "Lifespan",
+    "bc" ~ "Vector competence",
+    "c" ~ "Pr(infectious | infected)",
+    "b" ~ "Pr(infected | exposure)",
+    "PDR" ~ "Parasite development rate"
+  )
+  
+ data.Viz <- data.Viz %>% mutate(trait_label = factor(trait_label, levels = label_order))
+  
+  
   # show thermal response of all traits across all systems
   trait_plots <- data.Viz %>%
     ggplot(aes(x = T, y = trait, color = as.factor(mosquito_species),
@@ -392,8 +432,8 @@ if (plot_bool) {
     scale_color_discrete(name = "Mosquito species") +
     labs(x = "Temperature",
          y = "Trait value") +
-    facet_wrap(~ trait.name, scales = "free") +
-    theme_minimal(16)
+    facet_wrap(~ trait_label, scales = "free") +
+    theme_cowplot(16)
   
 
   # show thermal response data for focal systems only
@@ -413,7 +453,7 @@ if (plot_bool) {
     scale_color_discrete(name = "Mosquito species") +
     labs(x = "Temperature",
          y = "Trait value") +
-    facet_wrap(~ trait.name, scales = "free") +
-    theme_minimal(16)
+    facet_wrap(~ trait_label, scales = "free") +
+    theme_cowplot(16)
 
 }

@@ -111,7 +111,7 @@ thermtrait.prior.sample <- function(data_in, trait_in, mosquito_in, pathogen_in,
   # 1) use default priors
   # 2) update these using any related species
   # 3) sequentially update with more recent datasets
-  if (old_informative != TRUE) {
+  if (old_informative == FALSE) {
     # Gather data from other species of the same genus
     other_species <- working_data %>%
       dplyr::filter(stringr::word(mosquito_species, 1, 1) == stringr::word(mosquito_in, 1, 1)) %>%
@@ -376,6 +376,7 @@ run.jags <- function(jags_data, TPC_function, variable_names,
                      jags_choice, inits_list,
                      n.chains, n.adapt, n.samps, prob_bool = FALSE) {
   # initialize jags model
+  print("Initializing JAGS model...")
   jags <- jags.model(jags_choice,
                      data = jags_data,
                      n.chains = n.chains, inits = inits_list,
@@ -530,7 +531,7 @@ for (system_index in 1:dim(distinct_combos)[1]) {
   
   # generate TPC parameter posterior samples
   temp_sample <- thermtrait.prior.sample(data_in, trait_in, mosquito_in, pathogen_in,
-                                         n.chains, n.adapt, n.samps,
+                                         n.chains = 5, n.adapt = 5000, n.samps = 5000,
                                          old_informative = FALSE
   )
   
