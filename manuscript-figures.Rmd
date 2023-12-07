@@ -116,16 +116,16 @@ pathosystem_labeller <- function(df) {
 # Helper function: apply nice labels for focal variables
 focalvar_labeller <- function(df) {
   df <- df %>%
-    mutate(focal_var = ifelse(focal_var == "muV", "lf", focal_var)) %>%
     mutate(focal_var = factor(focal_var,
-                              levels = c("lf", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
+                              levels = c("total", "muV", "sigmaV", "sigmaV_f", "rhoL", "deltaL", "etaV", "betaV"),
                               labels = c(
-                                TeX("Adult lifespan"),
+                                TeX("Overall"),
+                                TeX("Adult mortality rate"),
                                 TeX("Biting frequency"),
                                 TeX("Eggs per female per day"),
                                 TeX("Immature development rate"),
                                 TeX("Prob. of immature survival"),
-                                TeX("Prob. of surviving EIP"),
+                                TeX("Parasite development rate"),
                                 TeX("Vector competence")
                               )
     ))
@@ -1743,6 +1743,22 @@ shift_legend(plot.densities_violin_inline)
 ```{r fig-S8_2_dR0dvar_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:dR0dvar_unc} The local sensitivity of $\\mathcal{R}_0$ to mosquito traits across temperatures for two values of $\\sigma_H$. Generally, $\\mathcal{R}_0$ is most sensitive to biting frequency, the probability of surviving the extrinsic incubation period, and vector competence. Shown here are the median values of the derivative of $\\mathcal{R}_0$ with respect to each focal mosquito trait across the mosquito trait TPC hyperparameter posterior distributions. Sensitivity values are shown on a logarithmic scale with solid lines indicating positive values and dotted lines indicating negative. Temperatures are restricted to those at which the median of $\\mathcal{R}_0$ is positive for the given system. '}
 KH_vals <- c(1)
 
+temp_lims <- data.dR0dvar %>% 
+  filter(focal_var == "Adult mortality rate") %>% 
+  filter(!is.na(median)) %>% 
+  right_join(select(data.R0, system_label, Temperature, Model, sigmaH, KH, median_R0 = median) %>%
+               filter(KH %in% KH_vals & sigmaH %in% c(100, Inf))) %>%
+  filter(median_R0 > 0) %>%
+  group_by(system_ID) %>% 
+  summarise(min_Temp = min(Temperature),
+            max_Temp = max(Temperature))
+
+
+val_lims <- tibble(sigmaH = c(100, Inf), 
+                   min_median = c(-90, -0.05), 
+                   max_median = c(5, 0.5))
+
+
 dR0dk.df <- data.dR0dvar %>%
   filter(
     KH %in% KH_vals,
@@ -1750,8 +1766,16 @@ dR0dk.df <- data.dR0dvar %>%
   ) %>%
   right_join(select(data.R0, system_label, Temperature, Model, sigmaH, KH, median_R0 = median) %>%
                filter(KH %in% KH_vals & sigmaH %in% c(100, Inf))) %>%
-  filter(median_R0 > 0) %>%
+  right_join(temp_lims) %>% 
+  group_by(system_ID) %>% 
+  filter(Temperature > min_Temp, Temperature < max_Temp) %>% 
+  ungroup() %>% 
+  right_join(val_lims) %>% 
+  group_by(sigmaH) %>% 
+  filter(median > min_median, median < max_median) %>% 
+  # filter(median_R0 > 0) %>%
   mutate(abs_median = abs(median)) %>%
+  # filter(abs_median < 1e10) %>%
   mutate(sign_median = sign(median)) %>%
   filter(sign_median != 0, !is.na(sign_median)) %>%
   arrange(sign_median) %>%
@@ -1759,20 +1783,23 @@ dR0dk.df <- data.dR0dvar %>%
 
 
 plot.dR0dk <- dR0dk.df %>%
+  # filter(focal_var %in% c("Adult mortality rate")) %>%
   # Make a stacked plot, colored by parameter
-  ggplot(aes(x = Temperature, y = median, color = focal_var, linetype = (as.factor(sign_median)))) +
+  ggplot(aes(x = Temperature, y = median, color = focal_var, 
+             # linetype = (as.factor(sign_median))
+             )) +
   geom_line(lwd = 1) +
   scale_color_manual(
     name = "Focal trait:",
-    values = rev(c4a("misc.okabe", 7))
+    values = rev(c(c4a("misc.okabe", 7), "black"))
   ) +
   scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(
     name = unname(TeX("Local sensitivity of $R_0$")),
-    # limits = c(-2,2),
-    # limits = 10^c(-4, 3),
-    # breaks = 10^(seq(-4, 3)),
-    # labels = TeX(c("$10^{-4}$", "$10^{-3}$", "$10^{-2}$", "$10^{-1}$", "$10^0$", "$10^1$", "$10^2$", "$10^3$")),
+    # limits = c(-1, 1),
+    # limits = 10^c(-4, 4),
+    # breaks = 10^(seq(-4, 4)),
+    # labels = TeX(c("$10^{-4}$", "$10^{-3}$", "$10^{-2}$", "$10^{-1}$", "$10^0$", "$10^1$", "$10^2$", "$10^3$", "$10^4$")),
     # trans = "log10",
     expand = c(0, 0)
   ) +
