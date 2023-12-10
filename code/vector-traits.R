@@ -23,7 +23,7 @@ library(tidyverse)
 # 1) Load empirical trait data --------------------------------------------
 
 # # Run this to produce workable dataset from raw data for the first time
-# plot_bool <- FALSE # decide whether you'd like to generate a diagnostic plot
+plot_bool <- FALSE # decide whether you'd like to generate a diagnostic plot
 source("code/data-cleaning.R")
 
 # # Alternatively, run this to load pre-processed dataset
@@ -51,12 +51,12 @@ write_rds(data.in.transform, "results/TPC_param_samples.rds")
 Temps <- seq(10, 40, length.out = 601) # full: length.out = 601, thin: length.out = 301
 
 # Thin sample size
-thin_size <- 500 # full = 1000, thin = 100
+thin_size <- 5000 # full = 1000, thin = 100
 
 plot_bool = FALSE
 source("code/trait-transform.R")
 
-write_rds(data.in.params, "results/VecTPC_vals", compress = "gz")
+write_rds(data.in.params, "results/VecTPC_vals.rds", compress = "gz")
 
 # remove work sets (these may be taking up a lot of memory)
 rm("combined_df", "Infection_df", "noInfection_df", "TPC_df", "data.in.transform")

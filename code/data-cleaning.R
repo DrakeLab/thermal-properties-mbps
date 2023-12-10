@@ -229,6 +229,15 @@ data.Anga_fecundity <- read.csv("data/raw/Anopheles_fecundity.csv", header = TRU
   mutate(pathogen = NA) %>% 
   dplyr::select(trait.name, T, trait, mosquito_species, pathogen, lead_author, year) 
 
+### * Anopheles lifespan death points ----
+# We lack data expressing temperatures at which Anopheles mosquitoes can never survive
+# This impedes our ability to properly fit TPCs for adult mortality rates
+# We add two additional data points setting lifespan to zero at 0C and 50C
+data.An_extreme <- tibble(trait.name = "lf", T = c(0,50), trait = c(0,0), 
+                          mosquito_species = "Anopheles spp.", pathogen = NA)%>%
+  mutate(lead_author = "Dahlin") %>%
+  mutate(year = "2023")
+
 ### * Villena 2022 ----
 data.Villena2022 <- read.csv("data/raw/Villena_2022/traits.csv", header = TRUE) %>%
   # make mosquito names consistent with other data
@@ -287,7 +296,7 @@ data.Villena2022 <- data.Villena2022 %>%
 # Combine all data frames
 data.All <- rbind(data.Mordecai2013, data.Mordecai2017, data.Shocket2018, 
                   data.Tesla2018, data.Shocket2020, data.Anga_fecundity, 
-                  data.Villena2022)
+                  data.Villena2022, data.An_extreme)
 
 # 3) Rename non-focal systems and combine synonymous traits -----------------
 
@@ -419,7 +428,7 @@ if (plot_bool) {
     "PDR" ~ "Parasite development rate"
   )
   
- data.Viz <- data.Viz %>% mutate(trait_label = factor(trait_label, levels = label_order))
+  data.Viz <- data.Viz %>% mutate(trait_label = factor(trait_label, levels = label_order))
   
   
   # show thermal response of all traits across all systems
@@ -435,19 +444,22 @@ if (plot_bool) {
     facet_wrap(~ trait_label, scales = "free") +
     theme_cowplot(16)
   
-
+  
   # show thermal response data for focal systems only
   select_trait_plots <- data.Viz %>% 
     filter(system_ID %in% c(#"Aedes aegypti / DENV", "Aedes aegypti / none", 
-                            # "Aedes aegypti / ZIKV", "Aedes aegypti / none",
-                            # "Aedes albopictus / DENV", "Aedes albopictus / none",
-                            # "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
-                            "Anopheles spp. / Plasmodium spp.",
-                            "Anopheles spp. / none"
-    )) %>%
-    ggplot(aes(x = T, y = trait, color = as.factor(mosquito_species),
+      # "Aedes aegypti / ZIKV", "Aedes aegypti / none",
+      # "Aedes albopictus / DENV", "Aedes albopictus / none",
+      # "Culex quinquefasciatus / WNV", "Culex quinquefasciatus / none",
+      "Anopheles spp. / Plasmodium spp.",
+      "Anopheles spp. / none"
+    ),
+    trait.name == "lf"
+    ) %>%
+    ggplot(aes(x = T, y = trait, #color = as.factor(mosquito_species),
                shape = as.factor(pathogen), group = system_ID)) +
     geom_point() +
+    geom_smooth() +
     scale_shape_manual(name = "Pathogen",
                        values = 1:length(unique(data.Viz$pathogen))) +
     scale_color_discrete(name = "Mosquito species") +
@@ -455,5 +467,5 @@ if (plot_bool) {
          y = "Trait value") +
     facet_wrap(~ trait_label, scales = "free") +
     theme_cowplot(16)
-
+  
 }

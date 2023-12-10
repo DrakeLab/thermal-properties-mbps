@@ -514,7 +514,7 @@ samples <- tibble(
 )
 
 # Go through all trait/system combinations to generate TPC parameter posterior samples
-for (system_index in 11:dim(distinct_combos)[1]) {
+for (system_index in 1:dim(distinct_combos)[1]) {
   # Pull system information
   system_sample <- distinct_combos$system_ID[system_index]
   trait_in <- distinct_combos$trait.name[system_index]

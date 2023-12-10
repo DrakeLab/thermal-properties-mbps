@@ -136,8 +136,19 @@ focalvar_labeller <- function(df) {
 eps <- .Machine$double.eps
 
 # Vector trait TPC data
+
+
+
+# Create data frame of TPCs
+
 data.Vec <- read_rds("results/VecTPC_vals.rds") %>%
   pathosystem_labeller()
+
+thin_size <- 500
+num_samples <- length(unique(data.Vec$sample_num))
+sample_inds <- sample(1:num_samples, thin_size, replace = FALSE)
+
+data.Vec <- filter(data.Vec, sample_num %in% sample_inds)
 
 # R0 data
 data.R0_TPCs <- read_rds("results/R0_TPC_vals.rds") %>%
@@ -180,6 +191,7 @@ ddTR0.HPD <- read_rds("results/ddTR0_HPD_unc.rds") %>%
 
 # Uncertainty data for Topt
 Topt.HPD <- read_rds("results/Topt_HPD_unc.rds") %>%
+  mutate(focal_var = ifelse(focal_var == "lf", "muV", focal_var)) %>% 
   ungroup() %>%
   pathosystem_labeller() %>%
   focalvar_labeller()
@@ -1740,16 +1752,15 @@ plot.densities_violin_inline <- ggplot() +
 shift_legend(plot.densities_violin_inline)
 ```
 
-```{r fig-S8_2_dR0dvar_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:dR0dvar_unc} The local sensitivity of $\\mathcal{R}_0$ to mosquito traits across temperatures for two values of $\\sigma_H$. Generally, $\\mathcal{R}_0$ is most sensitive to biting frequency, the probability of surviving the extrinsic incubation period, and vector competence. Shown here are the median values of the derivative of $\\mathcal{R}_0$ with respect to each focal mosquito trait across the mosquito trait TPC hyperparameter posterior distributions. Sensitivity values are shown on a logarithmic scale with solid lines indicating positive values and dotted lines indicating negative. Temperatures are restricted to those at which the median of $\\mathcal{R}_0$ is positive for the given system. '}
-KH_vals <- c(10)
+```{r fig-S8_2_dR0dvar_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:dR0dvar_unc} The local sensitivity of $\\mathcal{R}_0$ to mosquito traits across temperatures for two values of $\\sigma_H$ and $K_H$. Generally, $\\mathcal{R}_0$ is most sensitive to biting frequency, the probability of surviving the extrinsic incubation period, and vector competence. Shown here are the median values of the derivative of $\\mathcal{R}_0$ with respect to each focal mosquito trait across the mosquito trait TPC hyperparameter posterior distributions. Sensitivity values are shown on a logarithmic scale with solid lines indicating positive values and dotted lines indicating negative. Temperatures are restricted to those at which the median of $\\mathcal{R}_0$ is positive for the given system. '}
+KH_vals <- c(1, 100)
 
-data.dR0dT <- data.dR0dvar %>% 
-  filter(KH %in% KH_vals)
+data.dR0dT <- data.dR0dvar %>%
+  filter((KH %in% KH_vals & sigmaH == 10) | (KH == 100 & is.infinite(sigmaH)))
 
 temp_lims <- select(data.R0, system_ID, system_label, Temperature, Model, sigmaH, KH, median_R0 = median) %>%
-               filter(KH %in% KH_vals & sigmaH %in% c(100, Inf)) %>%
-  filter(median_R0 > 0) %>%
-  # filter(!is.na(median_R0)) %>%
+  filter(KH %in% KH_vals & sigmaH %in% c(100, Inf)) %>%
+  filter(!is.na(median_R0), median_R0 > eps) %>%
   group_by(system_ID) %>% 
   summarise(min_Temp = min(Temperature),
             max_Temp = max(Temperature))
@@ -1771,6 +1782,7 @@ dR0dk.df <- data.dR0dT %>%
   right_join(temp_lims) %>% 
   group_by(system_ID) %>% 
   filter(Temperature > min_Temp, Temperature < max_Temp) %>% 
+  filter(!is.na(median)) %>% 
   ungroup() %>% 
   # Restrict plotted values (so all plots are visible)
   right_join(val_lims) %>% 
@@ -1781,66 +1793,66 @@ dR0dk.df <- data.dR0dT %>%
   mutate(abs_median = abs(median)) %>%
   # Normalize values to better tell which is most important
   mutate(sign_median = sign(median)) %>%
-  group_by(system_ID, sigmaH, KH) %>% 
-  mutate(median = ifelse(sign_median>0,
-                         sign_median * median / max(median, na.rm = TRUE),
-                         sign_median * median / min(median, na.rm = TRUE))) %>% 
-  # filter(sign_median != 0, !is.na(sign_median)) %>%
+  group_by(system_ID, sigmaH, KH) %>%
+  mutate(norm_median = ifelse(sign_median>0,
+                              sign_median * median / max(median, na.rm = TRUE),
+                              sign_median * median / min(median, na.rm = TRUE))) %>%
+  filter(sign_median != 0, !is.na(sign_median)) %>%
   arrange(sign_median) %>%
   arrange(Temperature)
 
-# R0 derivative dataframe
-R0deriv_df <- data.R0 %>% 
-  group_by(system_ID, Model, sigmaH, KH) %>% 
-  arrange(system_ID, Model, sigmaH, KH, Temperature) %>%
-  mutate(deriv = (mean - lag(mean)) / (Temperature - lag(Temperature)))
+# # R0 derivative dataframe
+# R0deriv_df <- data.R0 %>% 
+#   group_by(system_ID, Model, sigmaH, KH) %>% 
+#   arrange(system_ID, Model, sigmaH, KH, Temperature) %>%
+#   mutate(deriv = (mean - lag(mean)) / (Temperature - lag(Temperature)))
 
-test_plot <- R0deriv_df %>% 
-  filter(KH %in% c(1), sigmaH %in% c(100, Inf), median > 0) %>% 
-  ggplot(aes(x = Temperature, y = deriv)) +
-  geom_line() +
-  geom_hline(yintercept = 0) +
-  facet_rep_grid(
-    rows = vars(KH, sigmaH),
-    cols = vars(system_label),
-    labeller = labeller(
-      system_label = sens_labels,
-      sigmaH = as_labeller(appender_sigmaH, default = label_parsed),
-      KH = as_labeller(appender_KH, default = label_parsed)
-    ),
-    scales = "free"
-  ) 
-test_plot
+# test_plot <- R0deriv_df %>% 
+#   filter(KH %in% c(1), sigmaH %in% c(100, Inf), median > 0) %>% 
+#   ggplot(aes(x = Temperature, y = deriv)) +
+#   geom_line() +
+#   geom_hline(yintercept = 0) +
+#   facet_rep_grid(
+#     rows = vars(KH, sigmaH),
+#     cols = vars(system_label),
+#     labeller = labeller(
+#       system_label = sens_labels,
+#       sigmaH = as_labeller(appender_sigmaH, default = label_parsed),
+#       KH = as_labeller(appender_KH, default = label_parsed)
+#     ),
+#     scales = "free"
+#   ) 
+# test_plot
 
 # NB: in order to produce an R0 TPC, overall derivative should go from positive to negative
 plot.dR0dk <- dR0dk.df %>%
   # filter(focal_var %in% c("Overall")) %>%
   # Make a stacked plot, colored by parameter
-  ggplot(aes(x = Temperature, y = median, color = focal_var, 
+  ggplot(aes(x = Temperature, y = norm_median, color = focal_var, 
              # linetype = (as.factor(sign_median))
-             )) +
-  geom_line(lwd = 1) +
-  geom_hline(yintercept = 0) +
+  )) +
+  geom_line(lwd = 0.5) +
+  geom_hline(yintercept = 0, lwd = 0.25) +
   scale_color_manual(
     name = "Focal trait:",
     values = rev(c(c4a("misc.okabe", 7), "black"))
   ) +
   scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(
-    name = unname(TeX("Local sensitivity of $R_0$")),
-    limits = c(-1, 1),
+    name = unname(TeX("Normalized local sensitivity of $\\,R_0$ to temperature")),
+    # limits = c(-1, 1),
     # limits = 10^c(-4, 4),
     # breaks = 10^(seq(-4, 4)),
     # labels = TeX(c("$10^{-4}$", "$10^{-3}$", "$10^{-2}$", "$10^{-1}$", "$10^0$", "$10^1$", "$10^2$", "$10^3$", "$10^4$")),
     # trans = "log10",
     expand = c(0, 0)
   ) +
-  scale_linetype_manual(
-    name = "Sign of sensitivity:",
-    values = c(1, 3),
-    breaks = c(1, -1),
-    labels = c("Positive", "Negative")
-  ) +
+  # scale_linetype_manual(
+  #   name = "Sign of sensitivity:",
+  #   values = c(1, 3),
+  #   breaks = c(1, -1),
+  #   labels = c("Positive", "Negative")
+  # ) +
   facet_rep_grid(
     rows = vars(KH, sigmaH),
     cols = vars(system_label),
@@ -1871,9 +1883,174 @@ plot.dR0dk <- dR0dk.df %>%
       margin = margin(1, 1, 1, 1)
     )
   )
-  
+
 
 plot.dR0dk
+```
+
+```{r fig-S8_3_dR0dvar_comparison, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:dR0dvar_comp} Comparison of the local sensitivities of $\\mathcal{R}_0$ to mosquito traits across temperatures for two values of $\\sigma_H$. Generally, $\\mathcal{R}_0$ is most sensitive to biting frequency, the probability of surviving the extrinsic incubation period, and vector competence. Shown here are the median values of the derivative of $\\mathcal{R}_0$ with respect to each focal mosquito trait across the mosquito trait TPC hyperparameter posterior distributions. Sensitivity values are shown on a logarithmic scale with solid lines indicating positive values and dotted lines indicating negative. Temperatures are restricted to those at which the median of $\\mathcal{R}_0$ is positive for the given system. '}
+
+comp_dR0dk.df <- dR0dk.df %>%
+  # filter(sigmaH == 10) %>% 
+  filter(focal_var != "Overall") %>% 
+  group_by(system_ID, Temperature, sigmaH, KH) %>% 
+  mutate(abs_median = abs(median),
+         total_sens = sum(abs_median),
+         prop_sens = abs_median / total_sens) %>% 
+  arrange(system_label, Temperature, KH, sigmaH, focal_var) #%>% 
+# filter(focal_var %in% c("Parasite development rate", "Biting frequency"))
+# # mutate(median = abs(median)) %>% 
+# select(system_ID, Temperature, sigmaH, KH, focal_var, system_label, prop_sens) %>%
+# pivot_wider(names_from = KH, values_from = prop_sens) %>% 
+# mutate(sens_comp = ifelse(`10` == 0 & `1` == 0,
+#                           0,
+#                           (`10` - `1`) / ((`10` + `1`)/2)))
+# mutate(sens_comp = (`10` - `1`) / `1`)
+
+plot.comp_dR0dk <- comp_dR0dk.df %>%
+  # filter(focal_var %in% c("Overall")) %>%
+  # Make a stacked plot, colored by parameter
+  ggplot(aes(x = Temperature, y = prop_sens, fill = focal_var, color = focal_var,
+             # linetype = (as.factor(sign_median))
+  )) +
+  # geom_area() +
+  geom_line(lwd = 1) +
+  geom_hline(yintercept = 0, lwd = 0.25) +
+  scale_color_manual(
+    name = "Focal trait:",
+    values = rev(c4a("misc.okabe", 7))
+  ) +
+  scale_fill_manual(
+    name = "Focal trait:",
+    values = rev(c4a("misc.okabe", 7))
+  ) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(
+    name = unname(TeX("Contributions to overall local sensitivity of $\\,R_0$")),
+    # limits = c(-100, 100),
+    # limits = c(-0.2, 0.1),
+    # limits = 10^c(-4, 4),
+    # breaks = 10^(seq(-4, 4)),
+    # labels = TeX(c("$10^{-4}$", "$10^{-3}$", "$10^{-2}$", "$10^{-1}$", "$10^0$", "$10^1$", "$10^2$", "$10^3$", "$10^4$")),
+    # trans = "log10",
+    expand = c(0, 0)
+  ) +
+  # scale_linetype_manual(
+  #   name = "Sign of sensitivity:",
+  #   values = c(1, 3),
+  #   breaks = c(1, -1),
+  #   labels = c("Positive", "Negative")
+  # ) +
+  facet_rep_grid(
+    rows = vars(sigmaH, KH),
+    cols = vars(system_label),
+    labeller = labeller(
+      system_label = sens_labels,
+      sigmaH = as_labeller(appender_sigmaH, default = label_parsed),
+      KH = as_labeller(appender_KH, default = label_parsed)
+    ),
+    scales = "free"
+  ) +
+  guides(linetype = guide_legend(
+    title.position = "left",
+    title.vjust = 0.5,
+    direction = "vertical"
+  )) +
+  theme_minimal_hgrid(10) +
+  theme(
+    legend.margin = margin(0, 0, 0, 0),
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 8),
+    legend.position = "bottom",
+    legend.justification = 0.5,
+    axis.title.x = element_text(hjust = 0.5),
+    strip.text.x = ggtext::element_markdown(
+      size = 10,
+      hjust = 0,
+      padding = margin(0, 0, 0, 0),
+      margin = margin(1, 1, 1, 1)
+    )
+  )
+
+
+plot.comp_dR0dk
+```
+
+```{r fig-S8_4_dR0dvar_compzoom, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:dR0dvar_comp} Comparison of the local sensitivities of $\\mathcal{R}_0$ to mosquito traits across temperatures for two values of $\\sigma_H$. Generally, $\\mathcal{R}_0$ is most sensitive to biting frequency, the probability of surviving the extrinsic incubation period, and vector competence. Shown here are the median values of the derivative of $\\mathcal{R}_0$ with respect to each focal mosquito trait across the mosquito trait TPC hyperparameter posterior distributions. Sensitivity values are shown on a logarithmic scale with solid lines indicating positive values and dotted lines indicating negative. Temperatures are restricted to those at which the median of $\\mathcal{R}_0$ is positive for the given system. '}
+
+compzoom_dR0dk.df <- comp_dR0dk.df %>%
+  filter(sigmaH == 10) %>% 
+  select(system_ID, Temperature, sigmaH, KH, focal_var, system_label, prop_sens) %>%
+  pivot_wider(names_from = KH, values_from = prop_sens) %>%
+  mutate(abs_comp = abs(`1`) - abs(`100`))
+
+plot.compzoom_dR0dk <- compzoom_dR0dk.df %>% 
+  # filter(focal_var %in% c("Parasite development rate", "Adult mortality rate", "Biting frequency")) %>%
+  # Make a stacked plot, colored by parameter
+  ggplot(aes(x = Temperature, y = abs_comp, fill = focal_var, color = focal_var,
+             # linetype = (as.factor(sign_median))
+  )) +
+  # geom_area() +
+  # geom_smooth(se = FALSE) +
+  geom_line(lwd = 1) +
+  geom_hline(yintercept = 0, lwd = 0.25) +
+  scale_color_manual(
+    name = "Focal trait:",
+    values = rev(c4a("misc.okabe", 7))
+  ) +
+  scale_fill_manual(
+    name = "Focal trait:",
+    values = rev(c4a("misc.okabe", 7))
+  ) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(
+    name = unname(TeX("Change in contributions to overall local sensitivity of $\\,R_0$ \n  from $\\,K_H = 1$ to $\\,K_H = 10$ ")),
+    # limits = c(-100, 100),
+    # limits = c(-0.2, 0.1),
+    # limits = 10^c(-4, 4),
+    # breaks = 10^(seq(-4, 4)),
+    # labels = TeX(c("$10^{-4}$", "$10^{-3}$", "$10^{-2}$", "$10^{-1}$", "$10^0$", "$10^1$", "$10^2$", "$10^3$", "$10^4$")),
+    # trans = "log10",
+    expand = c(0, 0)
+  ) +
+  # scale_linetype_manual(
+  #   name = "Sign of sensitivity:",
+  #   values = c(1, 3),
+  #   breaks = c(1, -1),
+  #   labels = c("Positive", "Negative")
+  # ) +
+  facet_rep_grid(
+    rows = vars(sigmaH),
+    cols = vars(system_label),
+    labeller = labeller(
+      system_label = sens_labels,
+      # sigmaH = as_labeller(appender_sigmaH, default = label_parsed),
+      # KH = as_labeller(appender_KH, default = label_parsed)
+    ),
+    scales = "free"
+  ) +
+  guides(linetype = guide_legend(
+    title.position = "left",
+    title.vjust = 0.5,
+    direction = "vertical"
+  )) +
+  theme_minimal_hgrid(10) +
+  theme(
+    legend.margin = margin(0, 0, 0, 0),
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 8),
+    legend.position = "bottom",
+    legend.justification = 0.5,
+    axis.title.x = element_text(hjust = 0.5),
+    strip.text.x = ggtext::element_markdown(
+      size = 10,
+      hjust = 0,
+      padding = margin(0, 0, 0, 0),
+      margin = margin(1, 1, 1, 1)
+    )
+  )
+
+plot.compzoom_dR0dk
 ```
 
 ```{r fig-S8_R0_uncertainty, dev = c('pdf','svg', 'png'), message=FALSE, out.width='100%', fig.width=9, fig.height=6, fig.align='center', fig.cap='\\label{fig:R0_unc}  The uncertainty of $\\mathcal{R}_0$ to mosquito traits across temperatures as measured by the change in the 95\\% highest posterior density interval width for two values of $\\sigma_H$ when vertebrate host population density is set to one individual per hectare. Temperatures are restricted to those at which $\\mathcal{R}_0$ is positive for the given system. At the cool end of the thermal niche, variation in $\\mathcal{R}_0$ is mostly driven by the probability of surviving the extrinsic incubation period, except in the case of (d) \\textit{An. gambiae} and \\textit{P. falciparum}. As temperature is increased, the influence of adult mosquito lifespan also increases to eventually become the most influential parameter for all systems except (e) \\textit{Cx. quinquefasciatus} and WNV.'}

@@ -242,6 +242,7 @@ full.ddTR0.HPD <- expand_grid(data.ddTR0HPD,
   mutate(R0 = sqrt(RV*RH)) %>%
   ungroup() %>% 
   arrange(system_ID, sample_num, sigmaH, KH, Temperature) %>% 
+  # Calculate temperature derivative of R0
   mutate(ddTR0 = (R0 - lag(R0)) / (Temperature - lag(Temperature))) %>% 
   select(system_ID, sample_num, sigmaH, KH, Temperature, ddTR0) %>% 
   group_by(system_ID, sigmaH, KH, Temperature) %>% 
@@ -298,6 +299,7 @@ for (var_name in temp_vars) {
     mutate(R0 = sqrt(RV*RH)) %>%
     ungroup() %>% 
     arrange(system_ID, sample_num, sigmaH, KH, Temperature) %>% 
+    # Calculate temperature derivative of R0
     mutate(ddTR0 = (R0 - lag(R0)) / (Temperature - lag(Temperature))) %>% 
     select(system_ID, sample_num, sigmaH, KH, Temperature, ddTR0) %>% 
     # c) Calculate the 95% HPD at each temperature
@@ -425,7 +427,7 @@ for (var_name in temp_vars) {
                      .combine = 'rbind') %dopar%  {
                        expand_grid(dplyr::filter(data.ToptHPD, 
                                                  KH %in% KH_vec[index_KH]), 
-                                           data.HPD.Vec) %>%  
+                                   data.HPD.Vec) %>%  
                          ungroup() %>% 
                          mutate(RV = ifelse(is.infinite(sigmaH),
                                             sigmaV * betaH / (1 / (lf + eps)), # Ross-Macdonald

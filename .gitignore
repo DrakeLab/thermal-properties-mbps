@@ -48,3 +48,6 @@ doc/manuscript-figures_files
 # TeX files
 *.tex
 *.svg
+
+# Large data files
+*.rds
